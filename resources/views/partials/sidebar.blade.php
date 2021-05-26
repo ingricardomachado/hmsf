@@ -1,0 +1,151 @@
+<style type="text/css">
+  .img-shadow {
+    box-shadow: 0 2px 4px 0 rgba(255, 255, 255, 0.8);
+  }
+</style>
+
+<nav class="navbar-default navbar-static-side" role="navigation">
+    <div class="sidebar-collapse">
+        <ul class="nav metismenu" id="side-menu">
+            
+            <!-- Profile -->
+            <li class="nav-header">
+                <div class="dropdown profile-element">
+                    <span><img alt="image" class="img-circle" style="max-height:70px; max-width:70px;" src="{{ url('user_avatar/'.Auth::user()->id) }}"/></span>
+                    <a data-toggle="dropdown" class="dropdown-toggle" href="#">
+                    <span class="clear"> <span class="block m-t-xs"> <strong class="font-bold">{{ Auth::user()->name }}</strong>
+                    </span> <span class="text-muted text-xs block">{{ Auth::user()->role_description }} <b class="caret"></b></span> </span> </a>
+                    <ul class="dropdown-menu animated fadeInRight m-t-xs">
+                        <li>
+                            <a class="dropdown-item" href="{{ route('logout') }}" onclick="event.preventDefault(); document.getElementById('logout-form').submit();"><i class="fa fa-sign-out"></i> Salir</a>
+                            <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">@csrf</form>
+                        </li>
+                    </ul>
+                </div>
+                <div class="logo-element">
+                    CB+
+                </div>
+            </li>
+            <!-- /Profile -->
+        
+        <!-- Menu SAM Super Administrador -->
+        @if(session('role')=='SAM')
+            <li class="{{ set_active(['home']) }}">
+                <a href="{{url('home')}}"><i class="fa fa-laptop"></i> <span class="nav-label">Dashboard</span></a>
+            </li>
+            <li class="{{ set_active(['condominiums']) }}">
+                <a href="{{url('users')}}"><i class="fa fa-user"></i> <span class="nav-label">Condominios</span></a>
+            </li>
+            <li class="{{ set_active(['settings']) }}">
+                <a href="{{url('settings')}}"><span class="nav-label"><i class="fa fa-cogs"></i> Configuraciones</span></a>
+            </li>
+        @endif
+        <!-- /Menu SAM Super Administrador -->
+
+        <!-- Menu ADM Administrador  -->
+        @if(session('role')=='ADM')
+            <li class="{{ set_active(['home']) }}">
+                <a href="{{url('home')}}"><i class="fa fa-laptop"></i> <span class="nav-label">Dashboard</span></a>
+            </li>
+            <li class="{{ set_active(['properties', 'owners', 'taxes', 'facilities', 'reservations', 'cars', 'assets']) }}">
+                <a href="#"><i class="fa fa-building-o"></i><span class="nav-label">Condominio</span> <span class="fa arrow"></span></a>
+                <ul class="nav nav-second-level collapse">
+                    <li class="{{ set_active(['properties']) }}">
+                        <a href="{{url('properties')}}">Propiedades</a>
+                    </li>
+                    <li class="{{ set_active(['owners']) }}">
+                        <a href="{{url('owners')}}">Propietarios</a>
+                    </li>
+                    <li class="{{ set_active(['taxes']) }}">
+                        <a href="{{url('taxes')}}">Alicuotas</a>
+                    </li>
+                    <li class="{{ set_active(['facilities']) }}">
+                        <a href="{{url('facilities')}}">Instalaciones</a>
+                    </li>
+                    <li class="{{ set_active(['reservations']) }}">
+                        <a href="{{url('reservations')}}">Reservaciones</a>
+                    </li>
+                    <li class="{{ set_active(['cars']) }}">
+                        <a href="{{url('cars')}}">Vehículos</a>
+                    </li>
+                    <li class="{{ set_active(['assets']) }}">
+                        <a href="{{url('assets')}}">Activos</a>
+                    </li>
+                </ul>
+            </li>
+            <li class="{{ set_active(['accounts', 'income_types', 'payments', 'incomes']) }}">
+                <a href="#"><i class="fa fa-line-chart"></i><span class="nav-label">Finanzas</span> <span class="fa arrow"></span></a>
+                <ul class="nav nav-second-level collapse">
+                    <li class="{{ set_active(['accounts']) }}">
+                        <a href="{{url('accounts')}}">Caja y Banco</a>
+                    </li>
+                    <li class="{{ set_active(['income_types', 'payments', 'incomes']) }}">
+                        <a href="#">Ingresos <span class="fa arrow"></span></a>
+                        <ul class="nav nav-third-level">
+                            <li class="{{ set_active(['income_types']) }}">
+                                <a href="{{url('income_types')}}">Tipos de Ingresos</a>
+                            </li>
+                            <li class="{{ set_active(['payments']) }}">
+                                <a href="{{url('payments')}}">Pagos de Cuotas</a>
+                            </li>
+                            <li class="{{ set_active(['incomes']) }}">
+                                <a href="{{url('incomes')}}">Extraordinarios</a>
+                            </li>
+                        </ul>
+                    </li>
+                    <li class="{{ set_active(['income_types', 'payments', 'incomes']) }}">
+                        <a href="#">Egresos <span class="fa arrow"></span></a>
+                        <ul class="nav nav-third-level">
+                            <li class="{{ set_active(['expense_types']) }}">
+                                <a href="{{url('expense_types')}}">Tipos de Egresos</a>
+                            </li>
+                            <li class="{{ set_active(['expenses']) }}">
+                                <a href="{{url('espenses')}}">Egresos</a>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+            </li>
+            
+            <li class="{{ set_active(['supplier_categories', 'suppliers', 'services', 'contacts', 'employees']) }}">
+                <a href="#"><i class="fa fa-address-book-o"></i><span class="nav-label">Directorios</span> <span class="fa arrow"></span></a>
+                <ul class="nav nav-second-level collapse">
+                    <li class="{{ set_active(['supplier_categories', 'suppliers']) }}">
+                        <a href="#">Proveedores <span class="fa arrow"></span></a>
+                        <ul class="nav nav-third-level">
+                            <li class="{{ set_active(['supplier_categories']) }}">
+                                <a href="{{url('supplier_categories')}}">Categorías</a>
+                            </li>
+                            <li class="{{ set_active(['suppliers']) }}">
+                                <a href="{{url('suppliers')}}">Proveedores</a>
+                            </li>
+                        </ul>
+                    </li>
+                    <li class="{{ set_active(['employees']) }}">
+                        <a href="{{url('employees')}}">Empleados</a>
+                    </li>
+                    <li class="{{ set_active(['contacts']) }}">
+                        <a href="{{url('contacts')}}">Contactos</a>
+                    </li>
+                </ul>
+            </li>
+            <li class="{{ set_active(['document_types', 'documents']) }}">
+                <a href="#"><i class="fa fa-folder-o"></i><span class="nav-label">Documentos</span> <span class="fa arrow"></span></a>
+                <ul class="nav nav-second-level collapse">
+                    <li class="{{ set_active(['document_types']) }}">
+                        <a href="{{url('document_types')}}">Clasificación</a>
+                    </li>
+                    <li class="{{ set_active(['documents']) }}">
+                        <a href="{{url('documents')}}">Documentos</a>
+                    </li>
+                </ul>
+            </li>
+            <li class="{{ set_active(['settings.condominium']) }}">
+                <a href="{{url('settings.condominium')}}"><i class="fa fa-cogs"></i> <span class="nav-label">Configuración</span></a>
+            </li>
+        @endif
+        <!-- /Menu ADM Administrador -->        
+        
+        </ul>
+    </div>
+</nav>
