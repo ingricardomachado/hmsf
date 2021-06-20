@@ -39,11 +39,13 @@
             {{ Form::open(array('url' => '', 'id' => 'form_rpt', 'method' => 'get'), ['' ])}}
             {{ Form::close() }}
             <div class="col-sm-3 col-xs-12">
+                {{ Form::select('property_filter', $properties, null, ['id'=>'property_filter', 'class'=>'select2 form-control-sm', 'tabindex'=>'-1', 'placeholder'=>''])}}
+            </div>
+            <div class="col-sm-3 col-xs-12">
                 {{ Form::select('status_filter', ['P'=>'Pendientes', 'A'=>'Aprobadas', 'R'=>'Rechazadas'], null, ['id'=>'status_filter', 'class'=>'select2 form-control-sm', 'tabindex'=>'-1', 'placeholder'=>''])}}
             </div>
-            <div class="col-sm-9 col-xs-12 text-right">
+            <div class="col-sm-6 col-xs-12 text-right">
                 <a href="#" class="btn btn-sm btn-primary" onclick="showModalSelectFacility();"><i class="fa fa-plus-circle"></i> Reservar</a>
-                <a href="{{ url('reservations.rpt_reservations') }}" class="btn btn-sm btn-default" target="_blank" title="Imprimir PDF"><i class="fa fa-print"></i></a>
                 <br><br>
             </div>
             <div class="col-sm-12">
@@ -57,6 +59,8 @@
                     <th text-align="center" width="5%"></th>
                     <th>Instalación</th>
                     <th>Propiedad</th>
+                    <th width="20%">Notas</th>
+                    <th width="20%">Observaciones</th>
                     <th>Costo</th>
                     <th>Estado</th>
                   </tr>
@@ -66,6 +70,8 @@
                     <th></th>
                     <th>Instalación</th>
                     <th>Propiedad</th>
+                    <th>Notas</th>
+                    <th>Observaciones</th>
                     <th>Costo</th>
                     <th>Estado</th>
                   </tr>
@@ -82,19 +88,19 @@
   </div>
 </div>
   
-<!-- Modal para Datos -->
-<div class="modal inmodal" id="modalReservation" tabindex="-1" role="dialog"  aria-hidden="true">
+<!-- Modal para confirmar reservacion -->
+<div class="modal inmodal" id="modalConfirmReservation" tabindex="-1" role="dialog"  aria-hidden="true">
   <div class="modal-dialog">
     <div class="modal-content animated fadeIn">
-      <div id="reservation"></div>
+      <div id="confirm_reservation"></div>
     </div>
   </div>
 </div>
-<!-- /Modal para Datos -->
+<!-- /Modal para confirmar reservacion -->
 
 <!-- Modal para selecionar instalacion -->
 <div class="modal inmodal" id="modalSelectFacility" tabindex="-1" role="dialog"  aria-hidden="true">
-  <div class="modal-dialog modal-sm">
+  <div class="modal-dialog">
     <div class="modal-content animated fadeIn">
       <form action="" id="form_select_facility" method="POST" role="form">
         <input type="hidden" name="_token" value="{{{ csrf_token() }}}" />
@@ -124,7 +130,7 @@
   <div class="modal-dialog">
     <div class="modal-content animated fadeIn">
       <div class="modal-header">
-        <h5 class="modal-title"><i class="fa fa-trash" aria-hidden="true"></i> <strong>Eliminar Proveedor</strong></h5>
+        <h5 class="modal-title"><i class="fa fa-trash" aria-hidden="true"></i> <strong>Eliminar Reservación</strong></h5>
         <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
       </div>      
       <div class="modal-body">
@@ -159,13 +165,13 @@ $('#btn_next').on("click", function (e) {
   $('#form_select_facility').attr('action', url);
   $('#form_select_facility').submit();
 });
-
-function showModalReservation(id){
-  url = '{{URL::to("reservations.load")}}/'+id;
-  $('#reservation').load(url);  
-  $("#modalReservation").modal("show");
-}
  
+function showModalConfirmReservation(id){
+  url = '{{URL::to("reservations.load_confirm")}}/'+id;
+  $('#confirm_reservation').load(url);  
+  $("#modalConfirmReservation").modal("show");
+}
+
 function change_status(id){
   $.ajax({
       url: `{{URL::to("reservations.status")}}/${id}`,
@@ -221,41 +227,9 @@ function reservation_delete(id){
   });
 }  
 
-function reservation_CRUD(id){
-        
-    var validator = $("#form_reservation").validate();
-    formulario_validado = validator.form();
-    if(formulario_validado){
-        $('#btn_submit').attr('disabled', true);
-        var form_data = new FormData($("#form_reservation")[0]);
-        $.ajax({
-          url:(id==0)?'{{URL::to("reservations")}}':'{{URL::to("reservations")}}/'+id,
-          type:'POST',
-          cache:true,
-          processData: false,
-          contentType: false,      
-          data: form_data
-        })
-        .done(function(response) {
-          $('#btn_submit').attr('disabled', false);
-          $('#modalReservation').modal('toggle');
-          $('#reservations-table').DataTable().draw(); 
-          toastr_msg('success', '{{ config('app.name') }}', response.message, 2000);
-        })
-        .fail(function(response) {
-          if(response.status == 422){
-            $('#btn_submit').attr('disabled', false);
-            var errorsHtml='';
-            $.each(response.responseJSON.errors, function (key, value) {
-              errorsHtml += '<li>' + value[0] + '</li>'; 
-            });          
-            toastr_msg('error', '{{ config('app.name') }}', errorsHtml, 3000);
-          }else{
-            toastr_msg('error', '{{ config('app.name') }}', response.responseJSON.message, 2000);
-          }
-        });
-    }
-}
+$("#property_filter").change( event => {
+  $('#reservations-table').DataTable().draw();
+});
 
 $("#status_filter").change( event => {
   $('#reservations-table').DataTable().draw();
@@ -275,15 +249,26 @@ $(document).ready(function(){
             data: function(d) {
                 d._token= "{{ csrf_token() }}";
                 d.status_filter = $('#status_filter').val();
+                d.property_filter = $('#property_filter').val();
             }
         },        
         columns: [
             { data: 'action', name: 'action', orderable: false, searchable: false},
             { data: 'facility',   name: 'facility', orderable: false, searchable: false},
             { data: 'property',   name: 'property', orderable: false, searchable: true},
+            { data: 'notes', name: 'notes', orderable: false, searchable: false },
+            { data: 'observations', name: 'observations', orderable: false, searchable: false },
             { data: 'cost', name: 'cost', orderable: false, searchable: false },
             { data: 'status', name: 'status', orderable: false, searchable: false }
         ]
+    });
+
+    $("#property_filter").select2({
+      language: "es",
+      placeholder: "Propiedades - Todas",
+      minimumResultsForSearch: 10,
+      allowClear: true,
+      width: '100%'
     });
 
     $("#status_filter").select2({
@@ -304,6 +289,5 @@ $(document).ready(function(){
     });
 
 });
-
 </script>
 @endpush

@@ -11,7 +11,7 @@ class Document extends Model
     //*** Relations ***
     public function condominium(){
    
-        return $this->belongsTo('App\Models\Condomnium');
+        return $this->belongsTo('App\Models\Condominium');
     }
 
     public function document_type(){
@@ -31,5 +31,4 @@ class Document extends Model
 
         return "<span class='label label-".$label."' style='font-weight:normal'>$this->status_description</span>";       
     }
-
 }

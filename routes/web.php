@@ -98,6 +98,12 @@ Route::get('facilities.status/{id}', 'FacilityController@status')->name('facilit
 Route::get('facilities.rpt_facilities', 'FacilityController@rpt_facilities')->name('facilities.rpt_facilities');
 Route::post('facilities/{id}/reservations', 'FacilityController@reservations');
 
+//Fees
+Route::resource("fees","FeeController");
+Route::post('fees.datatable', 'FeeController@datatable')->name('fees.datatable');
+Route::get('fees.load/{id}', 'FeeController@load')->name('fees.load');
+Route::get('fees.create_multiple', 'FeeController@create_multiple')->name('fees.create_multiple');
+Route::post('fees.store_multiple', 'FeeController@store_multiple')->name('fees.store_multiple');
 
 //Home
 //Route::get('/', 'HomeController@index');
@@ -108,8 +114,15 @@ Route::get('user_avatar/{id}', 'ImgController@showUserAvatar');
 Route::get('contact_avatar/{id}', 'ImgController@showContactAvatar');
 Route::get('employee_avatar/{id}', 'ImgController@showEmployeeAvatar');
 Route::get('condominium_logo/{id}', 'ImgController@showCondominiumLogo');
-Route::get('document_photo/{id}', 'ImgController@showDocumentPhoto')->name('document_photo');
+Route::get('document_image/{id}', 'ImgController@showDocumentImage')->name('document_image');
+Route::get('income_image/{id}', 'ImgController@showIncomeImage')->name('income_image');
 Route::get('facility_photo/{id}', 'ImgController@showFacilityPhoto');
+
+//Income
+Route::resource("incomes","IncomeController");
+Route::get('incomes.datatable', 'IncomeController@datatable')->name('incomes.datatable');
+Route::get('incomes.load/{id}', 'IncomeController@load')->name('properties.load');
+Route::get('incomes.download/{id}', ['as' => 'incomes.download', 'uses' => 'IncomeController@download_file']);
 
 
 //IncomeTypes
@@ -139,11 +152,12 @@ Route::post('properties.update_taxes', 'PropertyController@update_taxes')->name(
 //Reservations
 Route::resource("reservations","ReservationController");
 Route::post('reservations.datatable', 'ReservationController@datatable')->name('reservations.datatable');
-Route::get('reservations.load/{id}', 'ReservationController@load')->name('reservations.load');
+Route::get('reservations.load/{id}/{facility}', 'ReservationController@load')->name('reservations.load');
 Route::get('reservations.status/{id}', 'ReservationController@status')->name('reservations.status');
 Route::get('reservations.rpt_reservation', 'ReservationController@rpt_reservation')->name('reservations.rpt_reservation');
 Route::post('reserve/{id}', 'ReservationController@reserve')->name('reserve');
-
+Route::get('reservations.load_confirm/{id}', 'ReservationController@load_confirm')->name('reservations.load_confirm');
+Route::post('reservations.confirm/{id}', 'ReservationController@confirm')->name('reservations.confirm');
 
 //Setting
 Route::get('settings.global', ['as' => 'settings.global', 'uses' => 'SettingController@global']);

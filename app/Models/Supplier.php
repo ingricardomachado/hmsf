@@ -11,7 +11,7 @@ class Supplier extends Model
     //*** Relations ***
     public function condominium(){
    
-        return $this->belongsTo('App\Models\Condomnium');
+        return $this->belongsTo('App\Models\Condominium');
     }
 
     public function supplier_category(){

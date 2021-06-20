@@ -104,6 +104,9 @@
                             </li>
                         </ul>
                     </li>
+                    <li class="{{ set_active(['fees']) }}">
+                        <a href="{{url('fees')}}">Cuotas</a>
+                    </li>
                 </ul>
             </li>
             

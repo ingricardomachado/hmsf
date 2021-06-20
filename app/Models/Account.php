@@ -15,6 +15,34 @@ class Account extends Model
         return $this->belongsTo('App\Models\Condomnium');
     }
 
+    public function incomes(){
+   
+        return $this->hasMany('App\Models\Income');
+    }
+
+    public function payments(){
+   
+        return $this->hasMany('App\Models\Payment');
+    }
+
+    //*** Methods ***
+    public function update_credits(){
+        //Pagos a cuotas o ingresos extraordinarios
+        $this->credits= $this->payments()->sum('amount')+
+                        $this->incomes()->sum('amount');
+        
+        $this->balance=$this->initial_balance+$this->credits-$this->debits;
+        $this->save();
+    }    
+
+    public function update_debits(){
+        $this->debits=0;
+        
+        $this->balance=$this->initial_balance+$this->credits-$this->debits;
+        $this->save();
+    }    
+
+
     //*** Accesors ***   
     public function getStatusDescriptionAttribute(){
         

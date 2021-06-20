@@ -11,7 +11,7 @@ class Country extends Model
     //*** Relations ***
     public function condominiums(){
    
-        return $this->hasMany('App\Models\Condomnium');
+        return $this->hasMany('App\Models\Condominium');
     }
 
     public function states(){

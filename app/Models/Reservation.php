@@ -12,12 +12,17 @@ class Reservation extends Model
     //*** Relations ***
     public function condominium(){
    
-        return $this->belongsTo('App\Models\Condomnium');
+        return $this->belongsTo('App\Models\Condominium');
     }
 
     public function facility(){
    
         return $this->belongsTo('App\Models\Facility');
+    }
+
+    public function fee(){
+   
+        return $this->belongsTo('App\Models\Fee');
     }
 
     public function property(){
@@ -27,6 +32,11 @@ class Reservation extends Model
 
     //*** Accesors ***   
     public function getStatusDescriptionAttribute(){
+        /*
+            A=Aprobada
+            P=Pendiente
+            R=Rechazada
+        */
         if($this->status=='P'){
             return 'Pendiente';   
         }elseif($this->status=='A'){

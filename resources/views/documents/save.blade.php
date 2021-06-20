@@ -69,7 +69,7 @@ $(document).ready(function() {
     $('#file').fileinput({
         language: 'es',
         allowedFileExtensions : ['jpg', 'jpeg', 'png', 'bmp', 'pdf', 'xls', 'xlsx', 'doc', 'docx', 'ods', 'odt'],
-        previewFileIcon: "<i class='glyphicon glyphicon-king'></i>",
+        previewFileIcon: "<i class='fa fa-exclamation-triangle'></i>",
         showUpload: false,        
         maxFileSize: 2000,
         maxFilesNum: 1,

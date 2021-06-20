@@ -26,11 +26,13 @@ class CreateIncomesTable extends Migration
             $table->date('date');
             $table->string('concept');
             $table->char('payment_method',2);
-            $table->string('reference',50);
+            $table->string('reference',50)->nullable();
             $table->float('amount',11,2)->unsigned();
+            $table->string('notes',200)->nullable();
             $table->string('file',100)->nullable();
             $table->string('file_name',100)->nullable();
             $table->string('file_type',10)->nullable();
+            $table->integer('file_size')->unsigned()->nullable();
             $table->timestamps();
         });
     }

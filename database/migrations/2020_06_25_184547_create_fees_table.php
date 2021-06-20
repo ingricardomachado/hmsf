@@ -21,16 +21,12 @@ class CreateFeesTable extends Migration
             $table->foreign('property_id')->references('id')->on('properties')->onDelete('cascade');
             $table->bigInteger('income_type_id')->unsigned()->nullable();
             $table->foreign('income_type_id')->references('id')->on('income_types')->onDelete('cascade');
-            $table->bigInteger('event_id')->unsigned()->nullable();
-            $table->foreign('event_id')->references('id')->on('events')->onDelete('cascade');
             $table->date('date');
-            $table->string('concept');
-            $table->float('tot_amount',11,2)->nullable();
-            $table->integer('tot_properties')->unsigned();
-            $table->float('aliquot',11,2)->unsigned();
+            $table->date('due_date');            
+            $table->string('concept',500)->nullabel();
             $table->float('amount',11,2)->unsigned();
-            $table->date('due_date');
-
+            $table->float('balance',11,2)->nullable();
+            $table->string('created_by',100)->nullable();
             $table->timestamps();
         });
     }

@@ -12,6 +12,7 @@ use App\Models\Employee;
 use App\Models\Facility;
 use App\Models\Contact;
 use App\Models\Document;
+use App\Models\Income;
 use File;
 use Image;
 use Illuminate\Support\Facades\Redirect;
@@ -144,7 +145,7 @@ class ImgController extends Controller
         return $response;
     }
 
-    public function showDocumentPhoto($id)
+    public function showDocumentImage($id)
     {
         $document = Document::findOrFail($id);
         $picture = Image::make(storage_path('app/'.$document->condominium_id.'/documents/'.$document->file));
@@ -154,6 +155,15 @@ class ImgController extends Controller
         return $response;
     }
 
+    public function showIncomeImage($id)
+    {
+        $income = Income::findOrFail($id);
+        $picture = Image::make(storage_path('app/'.$income->condominium_id.'/incomes/'.$income->file));
+        $response = Response::make($picture->encode('jpg'));
+        $response->header('Content-Type', 'image/jpeg');
+
+        return $response;
+    }
 
 }
 

@@ -24,7 +24,7 @@ class CreateFacilitiesTable extends Migration
             $table->boolean('defaulters')->default(true);
             $table->boolean('rent')->default(false);
             $table->float('day_cost',8,2);
-            $table->float('hr_cost',8,2);
+            $table->float('hour_cost',8,2);
             $table->char('status', 1)->default('O');
             $table->string('photo',100)->nullable();
             $table->string('photo_name',100)->nullable();

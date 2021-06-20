@@ -72,10 +72,18 @@ class FacilityController extends Controller
             ->editColumn('name', function ($facility) {                    
                     return '<a href="#"  onclick="showModalFacility('.$facility->id.')" class="modal-class" style="color:inherit"  title="Click para editar"><b>'.$facility->name.'</b><br><small><i>De '.$facility->start->format('g:i a').' a '.$facility->end->format('g:i a').'</i></small></a>';
                 })
+            ->editColumn('more', function ($facility) {                    
+                    $defaulters=($facility->defaulters)?'Si':'No';
+                    if($facility->rent){
+                        return '<small>Morosos pueden reservar: '.$defaulters.'<br>Costo día: '.session('coin').money_fmt($facility->day_cost).'<br> Costo hora: '.session('coin').''.money_fmt($facility->hour_cost);
+                    }else{
+                        return '<small>Morosos pueden reservar: '.$defaulters;
+                    }
+                })
             ->editColumn('status', function ($facility) {                    
                     return $facility->status_label;
                 })
-            ->rawColumns(['action', 'name', 'hours', 'status'])
+            ->rawColumns(['action', 'name', 'more', 'hours', 'status'])
             ->make(true);
     }
     
@@ -131,13 +139,13 @@ class FacilityController extends Controller
             $facility->condominium_id=$condominium_id;
             $facility->name=$request->name;
             $facility->rules=$request->rules;
-            $facility->start=Carbon::createFromFormat('H:i:s', $request->start);
-            $facility->end=Carbon::createFromFormat('H:i:s', $request->end);
+            $facility->start=Carbon::createFromFormat('H:i', $request->start);
+            $facility->end=Carbon::createFromFormat('H:i', $request->end);
             $facility->defaulters=($request->defaulters)?true:false;
             $facility->rent=($request->rent)?true:false;
             if($facility->rent){
                 $facility->day_cost=$request->day_cost;
-                $facility->hr_cost=$request->hr_cost;
+                $facility->hour_cost=$request->hour_cost;
             }
             $facility->status=$request->status;
             $facility->save();
@@ -181,13 +189,13 @@ class FacilityController extends Controller
             }
             $facility->name=$request->name;
             $facility->rules=$request->rules;
-            $facility->start=Carbon::createFromFormat('H:i:s', $request->start);
-            $facility->end=Carbon::createFromFormat('H:i:s', $request->end);
+            $facility->start=Carbon::createFromFormat('H:i', $request->start);
+            $facility->end=Carbon::createFromFormat('H:i', $request->end);
             $facility->defaulters=($request->defaulters)?true:false;
             $facility->rent=($request->rent)?true:false;
             if($facility->rent){
                 $facility->day_cost=$request->day_cost;
-                $facility->hr_cost=$request->hr_cost;
+                $facility->hour_cost=$request->hour_cost;
             }
             $facility->status=$request->status;
             $facility->save();

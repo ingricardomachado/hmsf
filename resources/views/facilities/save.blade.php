@@ -79,7 +79,7 @@
                     </div>
                     <div class="form-group col-sm-6">                
                       <label>Costo por hora ({{ session('coin') }}) *</label>
-                      {!! Form::text('hr_cost', $facility->hr_cost, ['id'=>'hr_cost', 'class'=>'form-control decimal', 'type'=>'text', 'placeholder'=>'', 'min'=>'1', 'number', 'required']) !!}
+                      {!! Form::text('hour_cost', $facility->hour_cost, ['id'=>'hour_cost', 'class'=>'form-control decimal', 'type'=>'text', 'placeholder'=>'', 'min'=>'1', 'number', 'required']) !!}
                     </div>
                 </div>
 

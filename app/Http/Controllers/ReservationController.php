@@ -7,10 +7,10 @@ use Illuminate\Http\Request;
 use App\Http\Requests;
 use App\Http\Requests\ReservationRequest;
 use App\Models\Reservation;
-use App\Models\ReservationCategory;
 use App\Models\Property;
 use App\Models\Setting;
 use App\Models\Facility;
+use App\Models\Fee;
 use Illuminate\Support\Facades\Crypt;
 use Yajra\Datatables\Datatables;
 use Maatwebsite\Excel\Facades\Excel;
@@ -26,6 +26,9 @@ use File;
 use DB;
 use PDF;
 use Auth;
+use Mail;
+use App\Mail\ReservationConfirm;
+
 
 class ReservationController extends Controller
 {
@@ -48,33 +51,44 @@ class ReservationController extends Controller
     public function index()
     {                        
         $facilities=$this->condominium->facilities()->orderBy('name')->pluck('name','id');
+        $properties=$this->condominium->properties()->orderBy('number')->pluck('number','id');
         
-        return view('reservations.index')->with('facilities', $facilities);
+        return view('reservations.index')->with('properties', $properties)
+                                        ->with('facilities', $facilities);
     }
 
     public function datatable(Request $request)
     {        
+        $property_filter=$request->property_filter;
         $status_filter=$request->status_filter;
 
-        if($status_filter!=''){
-            $reservations = $this->condominium->reservations()->where('status', $status_filter);
+        if($property_filter!=''){
+            if($status_filter!=''){
+                $reservations = $this->condominium->reservations()
+                                    ->where('property_id', $property_filter)
+                                    ->where('status', $status_filter);
+            }else{
+                $reservations = $this->condominium->reservations()
+                                    ->where('property_id', $property_filter);
+            }
         }else{
-            $reservations = $this->condominium->reservations();
+            if($status_filter!=''){
+                $reservations = $this->condominium->reservations()->where('status', $status_filter);
+            }else{
+                $reservations = $this->condominium->reservations();
+            }
         }
                 
         return Datatables::of($reservations)
             ->addColumn('action', function ($reservation) {
                 $reservation_id = Crypt::encrypt($reservation->id);
                 $url_edit = route('reservations.edit', $reservation_id);
-                    if($reservation->active){
+                    if($reservation->status=='P'){
                         return '<div class="input-group-btn text-center">
                             <button data-toggle="dropdown" class="btn btn-xs btn-default dropdown-toggle" type="button" title="Acciones"><i class="fa fa-chevron-circle-down" aria-hidden="true"></i></button>
                             <ul class="dropdown-menu">
                                 <li>
-                                    <a href="#" name="href_cancel" class="modal-class" onclick="showModalReservation('.$reservation->id.')"><i class="fa fa-pencil-square-o"></i> Editar</a>
-                                </li>
-                                <li>
-                                    <a href="#" name="href_status" class="modal-class" onclick="change_status('.$reservation->id.')"><i class="fa fa-ban"></i> Deshabilitar</a>
+                                    <a href="#" class="modal-class" onclick="showModalConfirmReservation('.$reservation->id.')"><i class="fa fa-check-square-o"></i> Confirmar</a>
                                 </li>
                                 <li class="divider"></li>
                                 <li>
@@ -83,22 +97,19 @@ class ReservationController extends Controller
                             </ul>
                         </div>';
                     }else{
-                        return '<div class="input-group-btn text-center">
-                            <button data-toggle="dropdown" class="btn btn-xs btn-default dropdown-toggle" type="button" title="Acciones"><i class="fa fa-chevron-circle-down" aria-hidden="true"></i></button>
-                            <ul class="dropdown-menu">
-                                <li>
-                                    <a href="#" name="href_status" class="modal-class" onclick="change_status('.$reservation->id.')"><i class="fa fa-check"></i> Activar</a>
-                                </li>
-                            </ul>
-                        </div>';
-
+                        return "";
                     }    
                 })           
-            ->addColumn('facility', function ($reservation) {                    
+            ->addColumn('facility', function ($reservation) {
                     if($reservation->all_day){
-                        return '<a href="#"  onclick="showModalReservation('.$reservation->id.')" class="modal-class" style="color:inherit"  title="Click para editar"><b>'.$reservation->facility->name.'</b><br><small>'.day_letter($reservation->start->dayOfWeek, 'lg').' '.$reservation->start->format('d.m.Y').'<br> Todo el día</small></a>';
+                        $label='<b>'.$reservation->facility->name.'</b><br><small>'.day_letter($reservation->start->dayOfWeek, 'lg').' '.$reservation->start->format('d.m.Y').'<br> Todo el día</small>';
                     }else{
-                        return '<a href="#"  onclick="showModalReservation('.$reservation->id.')" class="modal-class" style="color:inherit"  title="Click para editar"><b>'.$reservation->facility->name.'</b><br><small>'.day_letter($reservation->start->dayOfWeek, 'lg').' '.$reservation->start->format('d.m.Y').'<br>De '.$reservation->start->format('g:i a').' a '.$reservation->end->format('g:i a').'</small></a>';
+                        $label='<b>'.$reservation->facility->name.'</b><br><small>'.day_letter($reservation->start->dayOfWeek, 'lg').' '.$reservation->start->format('d.m.Y').'<br>De '.$reservation->start->format('g:i a').' a '.$reservation->end->format('g:i a').'</small>';
+                    }
+                    if($reservation->status=='P'){
+                        return '<a href="#" onclick="showModalConfirmReservation('.$reservation->id.')" class="modal-class" style="color:inherit"  title="Click para editar">'.$label.'</a>';                        
+                    }else{
+                        return $label;
                     }
                 })
             ->addColumn('property', function ($reservation) {                    
@@ -108,13 +119,20 @@ class ReservationController extends Controller
                         return $reservation->property->number;
                     }
                 })
-            ->addColumn('cost', function ($reservation) {                    
-                    return "0000";
+            ->editColumn('notes', function ($reservation) {                    
+                    return '<small>'.$reservation->notes.'</small>';
                 })
+            ->editColumn('observations', function ($reservation) {                    
+                    return '<small>'.$reservation->observations.'</small>';
+                })
+            ->editColumn('cost', function ($reservation) {                    
+                    return ($reservation->amount)?session('coin').$reservation->amount:'';
+                })
+
             ->editColumn('status', function ($reservation) {                    
                     return $reservation->status_label;
                 })
-            ->rawColumns(['action', 'facility', 'property', 'status'])
+            ->rawColumns(['action', 'facility', 'property', 'notes', 'observations', 'cost', 'status'])
             ->make(true);
     }
     
@@ -124,9 +142,10 @@ class ReservationController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function load($id)
+    public function load($id, $facility_id)
     {
         $properties=$this->condominium->properties()->orderBy('number')->pluck('number','id');
+        $facility=Facility::find($facility_id);
         
         if($id==0){
             $reservation = new Reservation();
@@ -135,7 +154,15 @@ class ReservationController extends Controller
         }
         
         return view('reservations.save')->with('reservation', $reservation)
+                                    ->with('facility', $facility)
                                     ->with('properties', $properties);
+    }
+
+    public function load_confirm($id)
+    {
+        $reservation=Reservation::find($id);
+        
+        return view('reservations.confirm')->with('reservation', $reservation);
     }
 
     /**
@@ -153,24 +180,23 @@ class ReservationController extends Controller
             $reservation->property_id=$request->property;
             $reservation->facility_id=$facility->id;
             $reservation->title= 'Reservación '.$facility->name;
+            $reservation->notes= $request->notes;
             $reservation->date=Carbon::createFromFormat('d/m/Y', $request->date);
+            $reservation->rent=$facility->rent;
             $reservation->all_day=($request->all_day)?true:false;
-            $reservation->hour_cost=$facility->hr_cost;                    
-            $reservation->day_cost= $facility->day_cost;
-            $reservation->amount=$reservation->hr_cost*$reservation->tot_hrs;
-            if ($reservation->all_day){
-                $reservation->start=Carbon::createFromFormat('d/m/Y', $request->date);
-            }else{
-                $reservation->start=Carbon::createFromFormat('d/m/Y H', $request->date.' '.$request->start);
-                $reservation->end=Carbon::createFromFormat('d/m/Y H', $request->date.' '.$request->end);
-                $reservation->tot_hours=$reservation->end->floatDiffInHours($reservation->start);
+            $reservation->start=($reservation->all_day)?Carbon::createFromFormat('d/m/Y', $request->date):Carbon::createFromFormat('d/m/Y H', $request->date.' '.$request->start);
+            $reservation->end=($reservation->all_day)?null:Carbon::createFromFormat('d/m/Y H', $request->date.' '.$request->end);
+            if($reservation->rent){
+                if($reservation->all_day){
+                    $reservation->day_cost= $facility->day_cost;
+                    $reservation->amount=$reservation->day_cost;
+                }else{
+                    $reservation->hour_cost=$facility->hour_cost;
+                    $reservation->tot_hours=$reservation->end->floatDiffInHours($reservation->start);
+                    $reservation->amount=$reservation->tot_hours*$reservation->hour_cost;
+                }
             }
-            if(session('role')=='ADM'){
-                $reservation->confirm_date=Carbon::now();
-                $reservation->status= 'A';
-            }else{
-                $reservation->status= 'P';
-            }
+            $reservation->status= 'P';
             $reservation->save();            
             
             return response()->json([
@@ -194,16 +220,41 @@ class ReservationController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(ReservationRequest $request, $id)
+    public function confirm(Request $request, $id)
     {
         try {
             $reservation = Reservation::find($id);
-            $reservation->save();
+            if($request->resp=='A'){
+                //se registra la cuota de alquiler
+                $fee = new Fee();
+                $fee->created_by=Auth::user()->name;
+                $fee->condominium_id=$reservation->condominium_id;
+                $fee->income_type_id=9; //9=Alquiler
+                $fee->property_id=$reservation->property_id;
+                $fee->date=$reservation->start;
+                $fee->due_date=Carbon::createFromFormat('d/m/Y', $request->due_date);
+                $fee->concept=$request->concept;
+                $fee->amount=$reservation->amount;
+                $fee->balance=$fee->amount;
+                $fee->save();
+                //se actualiza la reservacion y se le asigna la cuota
+                $reservation->fee_id=$fee->id;
+                $reservation->status='A';
+                $reservation->observations=$request->observations;
+                $reservation->save();
+            }else{
+                $reservation->status='R';
+                $reservation->observations=$request->observations;
+                $reservation->save();
+            }
+            //se envia la notificacion al propietario            
+            ($reservation->property->user_id)?Mail::to($reservation->property->user->email)->send(new ReservationConfirm($reservation)):'';
+
 
             return response()->json([
                     'success' => true,
-                    'message' => 'Reservación actualizada exitosamente',
-                    'reservation' => $reservation
+                    'message' => 'Reservación confirmada exitosamente',
+                    'reservation' => $reservation->toArray()
                 ], 200);
             
         } catch (Exception $e) {
@@ -252,22 +303,5 @@ class ReservationController extends Controller
         $facility = Facility::find($id);
         
         return view('reservations.reserve')->with('facility', $facility);
-    }
-    
-    public function rpt_reservations()
-    {        
-        $logo=($this->condominium->logo)?realpath(storage_path()).'/app/'.$this->condominium->id.'/'.$this->condominium->logo:public_path().'/img/company_logo.png';
-        $company=$this->condominium->name;
-        
-        $data=[
-            'company' => $this->condominium->name,
-            'reservations' => $this->condominium->reservations()->get(),
-            'logo' => $logo
-        ];
-
-        $pdf = PDF::loadView('reports/rpt_reservations', $data);
-        
-        return $pdf->stream('Reservaciones.pdf');
-
-    }
+    }    
 }

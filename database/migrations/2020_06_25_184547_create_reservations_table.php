@@ -21,19 +21,22 @@ class CreateReservationsTable extends Migration
             $table->foreign('property_id')->references('id')->on('properties')->onDelete('cascade');
             $table->bigInteger('facility_id')->unsigned()->nullable();
             $table->foreign('facility_id')->references('id')->on('facilities')->onDelete('cascade');
+            $table->bigInteger('fee_id')->unsigned()->nullable();
+            $table->foreign('fee_id')->references('id')->on('fees')->onDelete('cascade');
             $table->date('date');
             $table->string('title');
             $table->string('description')->nullable();
             $table->dateTime('start')->nullable();
             $table->dateTime('end')->nullable();
             $table->boolean('all_day')->default(false);
+            $table->boolean('rent')->default(false);
             $table->float('day_cost',11,2)->nullable();
             $table->float('hour_cost',11,2)->nullable();
             $table->integer('tot_hours')->nullable();
             $table->float('amount',11,2);
             $table->date('confirm_date')->nullable();
             $table->string('notes', 500)->nullable();
-            $table->string('reasons', 500)->nullable();
+            $table->string('observations', 500)->nullable();
             $table->char('status',1)->default('P'); //P=Pendiente A=Aprobado R=Rechazado
             $table->timestamps();
         });

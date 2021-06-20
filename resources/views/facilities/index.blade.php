@@ -52,7 +52,8 @@
                   <tr>
                     <th text-align="center" width="5%"></th>
                     <th width="25%">Nombre</th>
-                    <th width="50%">Normas de uso</th>
+                    <th width="25%">Mas info</th>
+                    <th width="35%">Normas de uso</th>
                     <th width="10%">Estado</th>
                   </tr>
                 </thead>
@@ -60,6 +61,7 @@
                   <tr>
                     <th></th>
                     <th>Nombre</th>
+                    <th>Mas info</th>
                     <th>Normas de uso</th>
                     <th>Estado</th>
                   </tr>
@@ -197,6 +199,7 @@ $(document).ready(function(){
         columns: [
             { data: 'action', name: 'action', orderable: false, searchable: false},
             { data: 'name',   name: 'name', orderable: true, searchable: true},
+            { data: 'more',   name: 'more', orderable: true, searchable: true},
             { data: 'rules',   name: 'rules', orderable: true, searchable: true},
             { data: 'status', name: 'status', orderable: false, searchable: false }
         ]

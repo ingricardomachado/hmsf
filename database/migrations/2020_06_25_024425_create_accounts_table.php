@@ -27,8 +27,8 @@ class CreateAccountsTable extends Migration
             $table->string('holder', 100)->nullable();
             $table->string('email', 100)->nullable();
             $table->float('initial_balance',11,2);
-            $table->float('credits',11,2)->unsigned();
-            $table->float('debits',11,2)->unsigned();
+            $table->float('credits',11,2)->unsigned()->default(0);
+            $table->float('debits',11,2)->unsigned()->default(0);
             $table->float('balance',11,2);
             $table->boolean('active')->default(true);
             $table->timestamps();

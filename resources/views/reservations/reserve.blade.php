@@ -29,7 +29,7 @@
                     @if($facility->rent)
                         <div>
                             <b>Costos</b>
-                            Hora {{ money_fmt($facility->hr_cost) }} Día completo {{ money_fmt($facility->day_cost) }} 
+                            Hora {{ session('coin') }} {{ money_fmt($facility->hour_cost) }} Día completo {{ session('coin') }} {{ money_fmt($facility->day_cost) }} 
                         </div>
                     @endif
                     <div>
@@ -137,7 +137,8 @@ $('#calendar').fullCalendar({
 });
 
 function showModalReservation(id){
-  url = '{{URL::to("reservations.load")}}/'+id;
+  var facility_id={{ $facility->id }};
+  url = '{{URL::to("reservations.load")}}/'+id+'/'+facility_id;
   $('#reservation').load(url);  
   $("#modalReservation").modal("show");
 }
