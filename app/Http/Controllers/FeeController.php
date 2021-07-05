@@ -87,14 +87,24 @@ class FeeController extends Controller
                 
         return Datatables::of($fees)
             ->addColumn('action', function ($fee) {
-                if($fee->status=='P'){
-
-                }else{}
+                if($fee->payments->count()){
                     return '<div class="input-group-btn text-center">
                         <button data-toggle="dropdown" class="btn btn-xs btn-default dropdown-toggle" type="button" title="Acciones"><i class="fa fa-chevron-circle-down" aria-hidden="true"></i></button>
                         <ul class="dropdown-menu">
                             <li>
-                                <a href="#" class="modal-class"><i class="fa fa-pencil-square-o"></i> Confirmar</a>
+                                <a href="#" class="modal-class" onclick="showModalFeeInfo('.$fee->id.')"><i class="fa fa-laptop"></i> Ver Detalle</a>
+                            </li>
+                        </ul>
+                    </div>';
+                }else{
+                    return '<div class="input-group-btn text-center">
+                        <button data-toggle="dropdown" class="btn btn-xs btn-default dropdown-toggle" type="button" title="Acciones"><i class="fa fa-chevron-circle-down" aria-hidden="true"></i></button>
+                        <ul class="dropdown-menu">
+                            <li>
+                                <a href="#" class="modal-class" onclick="showModalFee('.$fee->id.')"><i class="fa fa-pencil-square-o"></i> Editar</a>
+                            </li>
+                            <li>
+                                <a href="#" class="modal-class" onclick="showModalFeeInfo('.$fee->id.')"><i class="fa fa-laptop"></i> Ver Detalle</a>
                             </li>
                             <li class="divider"></li>
                             <li>
@@ -102,9 +112,14 @@ class FeeController extends Controller
                             </li>
                         </ul>
                     </div>';
+                }
                 })           
             ->editColumn('fee', function ($fee) {                    
-                    return '<a href="#"  onclick="showModalFee('.$fee->id.')" class="modal-class" style="color:inherit"  title="Click para editar">'.$fee->concept.'<br><small><i>'.$fee->income_type->name.'</small></i></a>';
+                    if($fee->payments->count()){
+                        return '<a href="#" onclick="showModalFeeInfo('.$fee->id.')" style="color:inherit" title="Click para ver detalle">'.$fee->concept.'<br><small><i>'.$fee->income_type->name.'</small></i></a>';
+                    }else{
+                        return '<a href="#"  onclick="showModalFee('.$fee->id.')" class="modal-class" style="color:inherit"  title="Click para editar">'.$fee->concept.'<br><small><i>'.$fee->income_type->name.'</small></i></a>';
+                    }
                 })
             ->editColumn('date', function ($fee) {                    
                     return $fee->date->format('d/m/Y');
@@ -118,11 +133,25 @@ class FeeController extends Controller
             ->editColumn('amount', function ($fee) {                    
                     return money_fmt($fee->amount);
                 })
+            ->editColumn('paid', function ($fee) {                    
+                    $paid=$fee->payments()->where('status','A')->sum('payment_fee.amount');
+                    return ($paid>0)?money_fmt($paid):'';
+                })
+            ->editColumn('balance', function ($fee) {                    
+                    return ($fee->balance>0)?money_fmt($fee->balance):'';
+                })
             ->editColumn('status', function ($fee) {                    
                     return $fee->status_label;
                 })
             ->rawColumns(['action', 'fee', 'date', 'due_date', 'status'])
             ->make(true);
+    }
+    
+    public function info($id){
+
+        $fee=Fee::findOrFail($id);
+
+        return view('fees.info')->with('fee', $fee);
     }
     
     public function create_multiple()

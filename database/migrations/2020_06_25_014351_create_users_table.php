@@ -24,8 +24,6 @@ class CreateUsersTable extends Migration
             $table->rememberToken();
             $table->char('role',3); //SAM - ADM - US1 - US2
             $table->string('cell',15)->nullable();
-            $table->char('iso2',2)->nullable();
-            $table->string('num_region',5)->nullable();
             $table->string('phone',15)->nullable();
             $table->boolean('committee')->default(false);
             $table->boolean('email_notification')->default(false);

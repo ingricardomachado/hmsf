@@ -79,17 +79,11 @@ class LoginController extends Controller
                 if($user->role=='SAM'){
                     Session::put('coin', $setting->coin);
                     Session::put('money_format', $setting->money_format);
-                    Session::put('create_notification', $setting->create_notification);
-                    Session::put('update_notification', $setting->update_notification);
-                    Session::put('delete_notification', $setting->delete_notification);
                 }else{
                     $condominium=Condominium::find($user->condominium_id);
                     Session::put('condominium', $condominium);
                     Session::put('coin', $condominium->coin);
                     Session::put('money_format', $condominium->money_format);
-                    Session::put('create_notification', $condominium->create_notification);
-                    Session::put('update_notification', $condominium->update_notification);
-                    Session::put('delete_notification', $condominium->delete_notification);
                 }
 
                 return $this->sendLoginResponse($request);

@@ -143,7 +143,7 @@ function asset_delete(id){
   })
   .done(function(response) {
       $('#modalDeleteAsset').modal('toggle');
-      $('#assets-table').DataTable().draw();
+      $('#assets-table').DataTable().draw(false);
       toastr_msg('success', '{{ config('app.name') }}', response.message, 2000);
 
   })
@@ -171,7 +171,7 @@ function asset_CRUD(id){
         .done(function(response) {
           $('#btn_submit').attr('disabled', false);
           $('#modalAsset').modal('toggle');
-          $('#assets-table').DataTable().draw(); 
+          $('#assets-table').DataTable().draw(false); 
           toastr_msg('success', '{{ config('app.name') }}', response.message, 2000);
         })
         .fail(function(response) {

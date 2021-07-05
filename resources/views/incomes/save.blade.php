@@ -2,6 +2,8 @@
 <link href="{{ URL::asset('js/plugins/kartik-fileinput/css/fileinput.min.css') }}" media="all" rel="stylesheet" type="text/css" />
 <!-- DatePicker -->
 <link href="{{ URL::asset('css/plugins/datapicker/datepicker3.css') }}" rel="stylesheet">
+<!-- iCheck -->
+<link href="{{ URL::asset('css/plugins/iCheck/custom.css') }}" rel="stylesheet">
     
     <form action="" id="form_income" method="POST">
         <input type="hidden" name="_token" value="{{{ csrf_token() }}}" />
@@ -17,6 +19,15 @@
         </div>
         <div class="modal-body">
             <div class="row">            
+                <div class="form-group col-sm-12">
+                    <div class="i-checks">
+                        {!! Form::checkbox('to_project', null, false, ['id'=>'to_project', 'class'=>'i-checks']) !!} <label>Asociarlo a un proyecto</label>
+                    </div>
+                </div>
+                <div class="form-group col-sm-12" id="div_projects" style="display:none">  
+                  <label>Proyectos *</label>
+                  {{ Form::select('project', $projects, $income->project_id, ['id'=>'project', 'class'=>'select2 form-control', 'tabindex'=>'-1', 'placeholder'=>'', 'required'])}}
+                </div>
                 <div class="form-group col-sm-6">
                     <label>Fecha *</label>
                     <div class="input-group date">
@@ -25,12 +36,12 @@
                     </div>
                 </div>
                 <div class="form-group col-sm-6">  
-                  <label>Tipo de Ingreso *</label>
-                  {{ Form::select('income_type', $income_types, $income->income_type_id, ['id'=>'income_type', 'class'=>'select2 form-control form-control-sm', 'tabindex'=>'-1', 'placeholder'=>'', 'required'])}}
+                  <label>Cuenta destino *</label>
+                  {{ Form::select('account', $accounts, $income->account_id, ['id'=>'account', 'class'=>'select2 form-control', 'tabindex'=>'-1', 'placeholder'=>'', 'required'])}}
                 </div>
                 <div class="form-group col-sm-6">  
-                  <label>Cuenta destino *</label>
-                  {{ Form::select('account', $accounts, $income->account_id, ['id'=>'account', 'class'=>'select2 form-control form-control-sm', 'tabindex'=>'-1', 'placeholder'=>'', 'required'])}}
+                  <label>Tipo de Ingreso *</label>
+                  {{ Form::select('income_type', $income_types, $income->income_type_id, ['id'=>'income_type', 'class'=>'select2 form-control form-control-sm', 'tabindex'=>'-1', 'placeholder'=>'', 'required'])}}
                 </div>
                 <div class="form-group col-sm-6">  
                   <label>Método de Pago *</label>
@@ -52,12 +63,10 @@
                     <label>Notas</label><small> Máx. 150 caracteres</small>
                     {!! Form::textarea('notes', $income->notes, ['id'=>'notes', 'class'=>'form-control', 'type'=>'text', 'rows'=>'2', 'style'=>'font-size:12px', 'placeholder'=>'Escribe aqui alguna nota de interés ...', 'maxlength'=>'150']) !!}
                 </div>
-                @if(!$income->file)
-                    <div class="form-group col-sm-12">
-                      <label>Soporte</label><small> (Sólo formatos jpg, jpeg, png, pdf. Máx. 2Mb.)</small>
-                      <input id="file" name="file" type="file">
-                    </div>
-                @endif
+                <div class="form-group col-sm-12">
+                  <label>Soporte</label><small> (Sólo formatos jpg, jpeg, png, pdf. Máx. 2Mb.)</small>
+                  <input id="file" name="file" type="file">
+                </div>
             </div>
         </div>
         <div class="modal-footer">
@@ -73,17 +82,45 @@
 <script src="{{ URL::asset('js/plugins/datapicker/bootstrap-datepicker.es.min.js') }}"></script>
 <!-- Maxlenght -->
 <script src="{{ asset('js/plugins/bootstrap-character-counter/dist/bootstrap-maxlength.min.js') }}"></script>
+<!-- iCheck -->
+<script src="{{ URL::asset('js/plugins/iCheck/icheck.min.js') }}"></script>
 <script>
 
+//Validar fecha minima segun la cuenta seleccionada
+$("#account").change( event => {
+    url = `{{URL::to('accounts')}}/${event.target.value}`;                    
+    $.get(url, function(response){
+        $('#date').datepicker('setStartDate', new Date(response.account.date_initial_balance));
+    });
+});
+
+$('#to_project').on('ifChanged', function(event){
+  (event.target.checked)?$('#div_projects').show():$('#div_projects').hide();
+});
 
 $(document).ready(function() {
-
+    
+    // iCheck
+    $('.i-checks').iCheck({
+        checkboxClass: 'icheckbox_square-green',
+        radioClass: 'iradio_square-green',
+    });
+    
     $(':input[type=number]').on('mousewheel', function(e){
         e.preventDefault();
     });    
     
     $('#name').focus();
     
+    $("#project").select2({
+        language: "es",
+        placeholder: "Seleccione",
+        minimumResultsForSearch: 10,
+        allowClear: false,
+        dropdownParent: $('#modalIncome .modal-content'),
+        width: '100%'
+    });
+
     $("#account").select2({
         language: "es",
         placeholder: "Seleccione",

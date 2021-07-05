@@ -9,6 +9,7 @@ use App\Http\Requests\AccountRequest;
 use App\Models\Account;
 use App\Models\Property;
 use App\Models\Setting;
+use App\Models\Movement;
 use Illuminate\Support\Facades\Crypt;
 use Yajra\Datatables\Datatables;
 use Maatwebsite\Excel\Facades\Excel;
@@ -17,7 +18,7 @@ use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Response;
 use App\Http\Controllers\ImgController;
 //Export
-use App\Exports\PropertiesExport;
+use App\Exports\MovementsExport;
 use Carbon\Carbon;
 use Image;
 use File;
@@ -63,6 +64,10 @@ class AccountController extends Controller
                                     <a href="#" name="href_cancel" class="modal-class" onclick="showModalAccount('.$account->id.')"><i class="fa fa-pencil-square-o"></i> Editar</a>
                                 </li>
                                 <li>
+                                    <a href="'.url('accounts.statement',$account->id).'" name="href_cancel" class="modal-class"><i class="fa fa-pencil-square-o"></i> Estado de Cuenta</a>
+                                </li>
+
+                                <li>
                                     <a href="#" name="href_status" class="modal-class" onclick="change_status('.$account->id.')"><i class="fa fa-ban"></i> Deshabilitar</a>
                                 </li>
                                 <li class="divider"></li>
@@ -84,19 +89,52 @@ class AccountController extends Controller
                     }    
                 })           
             ->editColumn('aliase', function ($account) {                    
-                    return '<a href="#"  onclick="showModalAccount('.$account->id.')" class="modal-class" style="color:inherit"  title="Click para editar"><b>'.$account->aliase.'</b><br><small>'.$account->date_initial_balance->format('d/m/Y').'<br>'.$account->type_description.'</small></a>';
-                })
-            ->editColumn('bank', function ($account) {                    
-                    return $account->bank.'<br><small>'.$account->number.'<br>'.$account->holder.'</small>';
+                    $info=($account->type=='C')?'Caja':$account->bank.'<br><small>'.$account->number.'<br>'.$account->holder.'</small>';
+
+                    return '<a href="'.url('accounts.statement', $account->id).'" class="modal-class" style="color:inherit"  title="Click para estado de cuenta"><b>'.$account->aliase.'</b><br>'.$info.'</a>';
                 })
             ->editColumn('status', function ($account) {                    
                     return $account->status_label;
                 })
+            ->editColumn('initial_balance', function ($account) {                    
+                    return money_fmt($account->initial_balance).'<br><small>'.$account->date_initial_balance->format('d/m/Y').'</small>';
+                })
+            ->editColumn('credits', function ($account) {                    
+                    return money_fmt($account->credits);
+                })
+            ->editColumn('debits', function ($account) {                    
+                    return money_fmt($account->debits);
+                })
             ->editColumn('balance', function ($account) {                    
                     return money_fmt($account->balance);
                 })
-            ->rawColumns(['action', 'aliase', 'bank', 'status'])
+            ->rawColumns(['action', 'aliase', 'initial_balance', 'status'])
             ->make(true);
+    }
+    
+    /**
+     * Display the specified resource.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function show($id)
+    {            
+        try {
+            
+            $account = Account::findOrFail($id);
+        
+            return response()->json([
+                'account' => $account,
+            ], 200);
+            
+        } catch (Exception $e) {
+            
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage()
+            ], 500);
+        }            
     }
     
     /**
@@ -249,4 +287,54 @@ class AccountController extends Controller
         return $pdf->stream('Cuentas.pdf');
 
     }
+
+    /**
+     * Display the specified account.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function statement($id)
+    {
+        $account=Account::findOrFail($id);
+        $start = new Carbon('first day of this month');
+        $end = new Carbon('last day of this month');
+        
+        return view('accounts.statement')->with('account', $account)
+                                    ->with('start', $start->format('d/m/Y'))
+                                    ->with('end', $end->format('d/m/Y'));
+    }
+
+
+    public function movements(Request $request)
+    {        
+        $account=Account::find($request->account);
+        $start=Carbon::createFromFormat('d/m/Y', $request->start);
+        $end=Carbon::createFromFormat('d/m/Y', $request->end);
+
+        $movements = Movement::where('account_id', $account->id)
+                        ->whereDate('date', '>=', $start)
+                        ->whereDate('date', '<=', $end)
+                        ->orderBy('date')->orderBy('id')->get();        
+        
+        return view('accounts.movements')->with('account', $account)
+                    ->with('start', $start)
+                    ->with('end', $end)
+                    ->with('movements', $movements);
+    }
+
+    public function xls_movements(Request $request)
+    {        
+        $account=Account::find($request->account);
+        $start=Carbon::createFromFormat('d/m/Y', $request->start);
+        $end=Carbon::createFromFormat('d/m/Y', $request->end);
+
+        $movements = Movement::where('account_id', $account->id)
+                        ->whereDate('date', '>=', $start)
+                        ->whereDate('date', '<=', $end)
+                        ->orderBy('date')->orderBy('id')->get();        
+
+        return Excel::download(new MovementsExport($start, $account, $movements), 'Estado de Cuenta '.$account->aliase.'.xlsx');        
+    }
+
 }

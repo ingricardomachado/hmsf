@@ -22,6 +22,13 @@ class Fee extends Model
         return $this->belongsTo('App\Models\IncomeType');
     }
 
+    public function payments(){
+   
+        return $this->belongsToMany('App\Models\Payment','payment_fee')
+                            ->withPivot('amount')
+                            ->withTimestamps();
+    }
+    
     public function property(){
    
         return $this->belongsTo('App\Models\Property');
@@ -33,11 +40,17 @@ class Fee extends Model
     }
     
     //*** Methods ***
+    public function update_balance(){
+        $this->balance=$this->amount-$this->payments()
+                                        ->where('payments.status', 'A')
+                                        ->sum('payment_fee.amount');
+        $this->save();        
+    }
 
     //*** Accesors ***   
     public function getRemainigDaysAttribute(){
         
-        $now = Carbon::now()->subDay(1);
+        $now = Carbon::now();
         return $this->due_date->diffInDays($now, false);
     }
 
@@ -49,6 +62,17 @@ class Fee extends Model
             return "<span class='label label-warning' style='font-weight:normal'>Pendiente</span>";
         }elseif($this->balance>0 && $this->remainig_days>0){
             return "<span class='label label-danger' style='font-weight:normal'>Morosa</span>";
+        }
+    }    
+
+    public function getBulletAttribute(){
+                
+        if($this->balance<=0){
+            return "<i class='fa fa-circle text-navy' aria-hidden='true'></i>";
+        }elseif($this->balance>0 && $this->remainig_days<=0){
+            return "<i class='fa fa-circle text-warning' aria-hidden='true'></i>";
+        }elseif($this->balance>0 && $this->remainig_days>0){
+            return "<i class='fa fa-circle text-danger' aria-hidden='true'></i>";
         }
     }    
 

@@ -86,7 +86,8 @@ class SettingController extends Controller
         $condominium=Condominium::find($this->condominium->id);
         $file = $request->logo;
         if (File::exists($file)){
-            ($condominium->logo)?Storage::delete($condominium->id.'/'.$condominium->logo):'';
+            Storage::delete($condominium->id.'/'.$condominium->logo);
+            Storage::delete($condominium->id.'/thumbs/'.$condominium->logo);
             $condominium->logo_name = $file->getClientOriginalName();
             $condominium->logo_type = $file->getClientOriginalExtension();
             $condominium->logo=$this->upload_file($condominium->id, $file);
@@ -101,9 +102,6 @@ class SettingController extends Controller
         $condominium->cell=$request->cell;
         $condominium->phone=$request->phone;
         $condominium->email= $request->email;
-        $condominium->create_notification=($request->create_notification)?true:false;
-        $condominium->update_notification=($request->update_notification)?true:false;
-        $condominium->delete_notification=($request->delete_notification)?true:false;
         $condominium->save();        
         $this->set_session_condominium($condominium->id);
         
@@ -119,9 +117,6 @@ class SettingController extends Controller
     public function set_session_condominium($id){
         $condominium = Condominium::find($id);
         Session::put('condominium', $condominium);
-        Session::put('create_notification', $condominium->create_notification);
-        Session::put('update_notification', $condominium->update_notification);
-        Session::put('delete_notification', $condominium->delete_notification);
     }
 
 }

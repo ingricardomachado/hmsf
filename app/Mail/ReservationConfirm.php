@@ -37,6 +37,7 @@ class ReservationConfirm extends Mailable
     public function build()
     {
         $subject=($this->reservation->status=='A')?'Reservación Aprobada':'Reservación Rechazada';
-        return $this->markdown('emails.reservation_confirm')->subject($subject);
+        return $this->markdown('emails.reservation_confirm')
+                    ->subject($subject);
     }
 }

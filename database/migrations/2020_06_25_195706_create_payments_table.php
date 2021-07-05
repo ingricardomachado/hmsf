@@ -22,15 +22,16 @@ class CreatePaymentsTable extends Migration
             $table->bigInteger('account_id')->unsigned()->nullable();
             $table->foreign('account_id')->references('id')->on('accounts')->onDelete('cascade');
             $table->date('date');
-            $table->string('concept');
+            $table->string('concept',200);
             $table->char('payment_method',2);
-            $table->string('reference',50);
-            $table->float('amount',11,2)->unsigned();
+            $table->string('reference',50)->nullable();
+            $table->float('amount',11,2)->unsigned()->nullable();
             $table->char('status',1)->default('P');
-            $table->string('comment',400);
+            $table->string('observations',500)->nullable();
             $table->string('file',100)->nullable();
             $table->string('file_name',100)->nullable();
             $table->string('file_type',10)->nullable();
+            $table->integer('file_size')->unsigned()->nullable();
             $table->timestamps();
         });
     }

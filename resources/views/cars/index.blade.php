@@ -136,7 +136,7 @@ function change_status(id){
       },
   })
   .done(function(response) {
-      $('#cars-table').DataTable().draw();
+      $('#cars-table').DataTable().draw(false);
       toastr_msg('success', '{{ config('app.name') }}', response.message, 2000);
   })
   .fail(function() {
@@ -172,7 +172,7 @@ function car_delete(id){
   })
   .done(function(response) {
       $('#modalDeleteCar').modal('toggle');
-      $('#cars-table').DataTable().draw();
+      $('#cars-table').DataTable().draw(false);
       toastr_msg('success', '{{ config('app.name') }}', response.message, 2000);
 
   })
@@ -200,7 +200,7 @@ function car_CRUD(id){
         .done(function(response) {
           $('#btn_submit').attr('disabled', false);
           $('#modalCar').modal('toggle');
-          $('#cars-table').DataTable().draw(); 
+          $('#cars-table').DataTable().draw(false); 
           toastr_msg('success', '{{ config('app.name') }}', response.message, 2000);
         })
         .fail(function(response) {

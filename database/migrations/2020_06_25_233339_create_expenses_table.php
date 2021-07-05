@@ -26,7 +26,7 @@ class CreateExpensesTable extends Migration
             $table->bigInteger('account_id')->unsigned()->nullable();
             $table->foreign('account_id')->references('id')->on('accounts')->onDelete('cascade');
             $table->date('date');
-            $table->string('concept');
+            $table->string('concept',200);
             $table->char('payment_method',2);
             $table->string('reference',50);            
             $table->float('amount',11,2)->unsigned();
@@ -34,6 +34,7 @@ class CreateExpensesTable extends Migration
             $table->string('file',100)->nullable();
             $table->string('file_name',100)->nullable();
             $table->string('file_type',10)->nullable();
+            $table->integer('file_size')->unsigned()->nullable();
             $table->timestamps();
         });
     }

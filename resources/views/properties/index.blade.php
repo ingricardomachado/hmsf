@@ -146,7 +146,7 @@ function property_delete(id){
   })
   .done(function(response) {
       $('#modalDeleteProperty').modal('toggle');
-      $('#properties-table').DataTable().draw();
+      $('#properties-table').DataTable().draw(false);
       toastr_msg('success', '{{ config('app.name') }}', response.message, 2000);
 
   })
@@ -174,7 +174,7 @@ function property_CRUD(id){
         .done(function(response) {
           $('#btn_submit').attr('disabled', false);
           $('#modalProperty').modal('toggle');
-          $('#properties-table').DataTable().draw(); 
+          $('#properties-table').DataTable().draw(false); 
           toastr_msg('success', '{{ config('app.name') }}', response.message, 2000);
         })
         .fail(function(response) {

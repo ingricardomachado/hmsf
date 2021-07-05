@@ -44,17 +44,6 @@
                                 <label>Logo </label><small> (Sólo formatos jpg, png. Máx. 2Mb.) Recomendación Máx. 200px por 200px</small>
                                 <input id="logo" name="logo" class="file" type="file">
                             </div>
-                            <h3><i class="fa fa-bell-o" aria-hidden="true"></i> Notificaciones de Registros</h3>
-                            <div class="form-group">
-                                <p>{!! Form::checkbox('create_notification', null,  $condominium->create_notification, ['id'=>'create_notification', 'class'=>'js-switch']) !!}&nbsp;&nbsp;Al agregar registro.</p>
-                            </div>
-                            <div class="form-group">
-                                <p>{!! Form::checkbox('update_notification', null,  $condominium->update_notification, ['id'=>'update_notification', 'class'=>'js-switch']) !!}&nbsp;&nbsp;Al modificar registro.</p>
-                            </div>
-                            <div class="form-group">
-                                <p>{!! Form::checkbox('delete_notification', null,  $condominium->delete_notification, ['id'=>'delete_notification', 'class'=>'js-switch']) !!}&nbsp;&nbsp;Al eliminar registro.</p>
-                            </div>
-                             
                         </div>
                         <div class="col-sm-8">
                             <div class="form-group col-sm-6">
@@ -200,17 +189,7 @@ $(document).ready(function() {
         allowClear: false,
         width: '100%'
     });
-
-    // Switchery
-    var elem = document.querySelector('#create_notification');
-    var init = new Switchery(elem, { size: 'small', color: '#1AB394' });
-
-    var elem = document.querySelector('#update_notification');
-    var init = new Switchery(elem, { size: 'small', color: '#1AB394' });
-
-    var elem = document.querySelector('#delete_notification');
-    var init = new Switchery(elem, { size: 'small', color: '#1AB394' });
-
+    
 });
 </script>
 @endpush

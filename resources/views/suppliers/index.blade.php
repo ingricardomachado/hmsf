@@ -137,7 +137,7 @@ function change_status(id){
       },
   })
   .done(function(response) {
-      $('#suppliers-table').DataTable().draw();
+      $('#suppliers-table').DataTable().draw(false);
       toastr_msg('success', '{{ config('app.name') }}', response.message, 2000);
   })
   .fail(function() {
@@ -173,7 +173,7 @@ function supplier_delete(id){
   })
   .done(function(response) {
       $('#modalDeleteSupplier').modal('toggle');
-      $('#suppliers-table').DataTable().draw();
+      $('#suppliers-table').DataTable().draw(false);
       toastr_msg('success', '{{ config('app.name') }}', response.message, 2000);
 
   })
@@ -201,7 +201,7 @@ function supplier_CRUD(id){
         .done(function(response) {
           $('#btn_submit').attr('disabled', false);
           $('#modalSupplier').modal('toggle');
-          $('#suppliers-table').DataTable().draw(); 
+          $('#suppliers-table').DataTable().draw(false); 
           toastr_msg('success', '{{ config('app.name') }}', response.message, 2000);
         })
         .fail(function(response) {
@@ -220,7 +220,7 @@ function supplier_CRUD(id){
 }
 
 $("#supplier_category_filter").change( event => {
-  $('#suppliers-table').DataTable().draw();
+  $('#suppliers-table').DataTable().draw(false);
 });
 
 $(document).ready(function(){

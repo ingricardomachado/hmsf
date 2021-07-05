@@ -25,10 +25,16 @@ class Income extends Model
         return $this->belongsTo('App\Models\IncomeType');
     }
 
+    public function movement()
+    {
+        return $this->hasOne('App\Models\Movement');
+    }    
+    
     public function property(){
    
         return $this->belongsTo('App\Models\Property');
     }
+    
 
     //*** Accesors ***   
     public function getPaymentMethodDescriptionAttribute(){

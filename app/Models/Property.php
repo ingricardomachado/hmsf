@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Models;
+use Carbon\Carbon;
 
 use Illuminate\Database\Eloquent\Model;
 
@@ -19,6 +20,16 @@ class Property extends Model
         return $this->belongsTo('App\Models\Condominium');
     }
 
+    public function fees(){
+   
+        return $this->hasMany('App\Models\Fee');
+    }
+
+    public function payments(){
+   
+        return $this->hasMany('App\Models\Payment');
+    }
+    
     public function reservations(){
    
         return $this->hasMany('App\Models\Reservation');
@@ -30,20 +41,39 @@ class Property extends Model
     }
 
     //*** Accesors ***   
+    public function getDebtAttribute(){
+        $today=Carbon::now();
+
+        return $this->fees()
+                        ->where('balance','>',0)
+                        ->whereDate('due_date','>=',$today)
+                        ->sum('balance');
+    }    
+
+    public function getDueDebtAttribute(){
+        $today=Carbon::now();
+
+        return $this->fees()
+                        ->where('balance','>',0)
+                        ->whereDate('due_date','<',$today)
+                        ->sum('balance');
+    }    
+
+    public function getTotalDebtAttribute(){
+        return $this->debt+$this->due_debt;
+    }    
+
     public function getStatusLabelAttribute(){
         
-        $status_lbl = '';
-        if($this->status=='S'){
-            $status_lbl = "<span class='label label-primary' style='font-weight:normal'>Solvente</span>";
-        }elseif($this->status=='P'){
-            $status_lbl = "<span class='label label-warning' style='font-weight:normal'>Pendiente</span>";
-        }elseif($this->status=='M'){
-            $status_lbl = "<span class='label label-danger' style='font-weight:normal'>Moroso</span>";
+        if($this->total_debt==0){
+            return "<span class='label label-primary' style='font-weight:normal'>Solvente</span>";
         }else{
-        	return $this->status;
+            if($this->due_debt>0){
+                return "<span class='label label-danger' style='font-weight:normal'>Moroso</span>";
+            }else{
+                return "<span class='label label-warning' style='font-weight:normal'>Pendiente</span>";
+            }
         }
-
-        return $status_lbl;
     }    
 
 }

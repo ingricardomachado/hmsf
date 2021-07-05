@@ -126,7 +126,7 @@ function change_status(id){
       },
   })
   .done(function(response) {
-      $('#document_types-table').DataTable().draw();
+      $('#document_types-table').DataTable().draw(false);
       toastr_msg('success', '{{ config('app.name') }}', response.message, 2000);
   })
   .fail(function() {
@@ -162,7 +162,7 @@ function document_type_delete(id){
   })
   .done(function(response) {
       $('#modalDeleteDocumentType').modal('toggle');
-      $('#document_types-table').DataTable().draw();
+      $('#document_types-table').DataTable().draw(false);
       toastr_msg('success', '{{ config('app.name') }}', response.message, 2000);
 
   })
@@ -190,7 +190,7 @@ function document_type_CRUD(id){
         .done(function(response) {
           $('#btn_submit').attr('disabled', false);
           $('#modalDocumentType').modal('toggle');
-          $('#document_types-table').DataTable().draw(); 
+          $('#document_types-table').DataTable().draw(false); 
           toastr_msg('success', '{{ config('app.name') }}', response.message, 2000);
         })
         .fail(function(response) {

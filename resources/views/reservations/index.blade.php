@@ -105,19 +105,19 @@
       <form action="" id="form_select_facility" method="POST" role="form">
         <input type="hidden" name="_token" value="{{{ csrf_token() }}}" />
         <div class="modal-header">
-          <h5 class="modal-title"><strong>Instalación</strong></h5>
+          <h5 class="modal-title"><i class="fa fa-umbrella" aria-hidden="true"></i> Instalación</h5>
         </div>      
         <div class="modal-body">
           <div class="row">
             <div class="form-group col-sm-12">  
-              <label>Instalación *</label>
+              <label>Instalación *</label> <small>Selecione la instalación a reservar.</small>
               {{ Form::select('facility', $facilities, null, ['id'=>'facility', 'class'=>'select2 form-control form-control-sm', 'tabindex'=>'-1', 'placeholder'=>'', 'required'])}}
             </div>          
           </div>
         </div>
         <div class="modal-footer">
-          <button type="button" id="btn_close" class="btn btn-default" data-dismiss="modal">Cerrar</button>        
-          <button type="button" id="btn_next" class="btn btn-primary">Siguiente</button>
+          <button type="button" id="btn_close" class="btn btn-sm btn-default" data-dismiss="modal">Cerrar</button>        
+          <button type="button" id="btn_next" class="btn btn-sm btn-primary">Siguiente</button>
         </div>
       </form>
     </div>
@@ -181,7 +181,7 @@ function change_status(id){
       },
   })
   .done(function(response) {
-      $('#reservations-table').DataTable().draw();
+      $('#reservations-table').DataTable().draw(false);
       toastr_msg('success', '{{ config('app.name') }}', response.message, 2000);
   })
   .fail(function() {
@@ -217,7 +217,7 @@ function reservation_delete(id){
   })
   .done(function(response) {
       $('#modalDeleteReservation').modal('toggle');
-      $('#reservations-table').DataTable().draw();
+      $('#reservations-table').DataTable().draw(false);
       toastr_msg('success', '{{ config('app.name') }}', response.message, 2000);
 
   })
@@ -228,11 +228,11 @@ function reservation_delete(id){
 }  
 
 $("#property_filter").change( event => {
-  $('#reservations-table').DataTable().draw();
+  $('#reservations-table').DataTable().draw(false);
 });
 
 $("#status_filter").change( event => {
-  $('#reservations-table').DataTable().draw();
+  $('#reservations-table').DataTable().draw(false);
 });
 
 $(document).ready(function(){

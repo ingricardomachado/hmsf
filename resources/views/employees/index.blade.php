@@ -147,7 +147,7 @@ function change_status(id){
       },
   })
   .done(function(response) {
-      $('#employees-table').DataTable().draw();
+      $('#employees-table').DataTable().draw(false);
       toastr_msg('success', '{{ config('app.name') }}', response.message, 2000);
   })
   .fail(function() {
@@ -183,7 +183,7 @@ function employee_delete(id){
   })
   .done(function(response) {
       $('#modalDeleteEmployee').modal('toggle');
-      $('#employees-table').DataTable().draw();
+      $('#employees-table').DataTable().draw(false);
       toastr_msg('success', '{{ config('app.name') }}', response.message, 2000);
 
   })
@@ -211,7 +211,7 @@ function employee_CRUD(id){
         .done(function(response) {
           $('#btn_submit').attr('disabled', false);
           $('#modalEmployee').modal('toggle');
-          $('#employees-table').DataTable().draw(); 
+          $('#employees-table').DataTable().draw(false); 
           toastr_msg('success', '{{ config('app.name') }}', response.message, 2000);
         })
         .fail(function(response) {

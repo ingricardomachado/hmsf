@@ -23,9 +23,6 @@ class CreatePropertiesTable extends Migration
             $table->bigInteger('aux_id')->unsigned()->nullable();
             $table->foreign('aux_id')->references('id')->on('users')->onDelete('cascade');
             $table->float('tax',8,2)->default(0);
-            $table->float('due_debt',11,2)->default(0);
-            $table->float('debt',11,2)->default(0);
-            $table->char('status',1); //S=Solvente P=Pendiente M=Moroso
             $table->timestamps();
         });
     }

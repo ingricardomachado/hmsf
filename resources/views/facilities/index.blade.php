@@ -141,7 +141,7 @@ function facility_delete(id){
   })
   .done(function(response) {
       $('#modalDeleteFacility').modal('toggle');
-      $('#facilities-table').DataTable().draw();
+      $('#facilities-table').DataTable().draw(false);
       toastr_msg('success', '{{ config('app.name') }}', response.message, 2000);
 
   })
@@ -169,7 +169,7 @@ function facility_CRUD(id){
         .done(function(response) {
           $('#btn_submit').attr('disabled', false);
           $('#modalFacility').modal('toggle');
-          $('#facilities-table').DataTable().draw(); 
+          $('#facilities-table').DataTable().draw(false); 
           toastr_msg('success', '{{ config('app.name') }}', response.message, 2000);
         })
         .fail(function(response) {

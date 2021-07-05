@@ -1,9 +1,16 @@
+<!-- International Phones -->
+<link href="{{ URL::asset('js/plugins/intl-tel-input-master/build/css/intlTelInput.css') }}" rel="stylesheet">
+<!-- Esta instruccion es para que input del cell sea 100% width-->
+<style type="text/css">
+    .iti { width: 100%; }
+</style>
 <!-- Fileinput -->
 <link href="{{ URL::asset('js/plugins/kartik-fileinput/css/fileinput.min.css') }}" media="all" rel="stylesheet" type="text/css" />
     <form action="" id="form_employee" method="POST">
         <input type="hidden" name="_token" value="{{{ csrf_token() }}}" />
         {!! Form::hidden('condominium_id', ($employee->id)?$employee->condominium_id:session('condominium')->id, ['id'=>'condominium_id']) !!}
         {!! Form::hidden('employee_id', ($employee->id)?$employee->id:0, ['id'=>'employee_id']) !!}
+        {!! Form::hidden('cell', ($employee->id)?$employee->cell:null, ['id'=>'cell']) !!}
         @if($employee->id)                
             {{ Form::hidden ('_method', 'PUT') }}
         @endif
@@ -34,7 +41,8 @@
                         </div>
                         <div class="form-group col-sm-12">
                             <label>Celular *</label>
-                            {!! Form::text('cell', $employee->cell, ['id'=>'cell', 'class'=>'form-control', 'type'=>'text', 'placeholder'=>'', 'maxlength'=>'10', 'required']) !!}
+                            {!! Form::tel('national_cell', $employee->cell, ['id'=>'national_cell', 'class'=>'form-control', 'placeholder'=>'', 'required']) !!}
+                            <span id="error-msg" style="color:#cc5965;font-weight:bold"></span>
                         </div>
                         <div class="form-group col-sm-12">
                             <label>Nro Identificación</label>
@@ -71,6 +79,9 @@
 <script src="{{ URL::asset('js/plugins/kartik-fileinput/js/fileinput_locale_es.js') }}"></script>
 <!-- Maxlenght -->
 <script src="{{ asset('js/plugins/bootstrap-character-counter/dist/bootstrap-maxlength.min.js') }}"></script>
+<!-- International Phones --> 
+<script src="{{ URL::asset('js/plugins/intl-tel-input-master/build/js/intlTelInput.js') }}"></script>
+<script src="{{ URL::asset('js/plugins/intl-tel-input-master/build/js/utils.js') }}"></script>
 <script>
                   
 var employee_id = "{{$employee->id}}";
@@ -96,6 +107,28 @@ $('#avatar').fileinput({
     ]      
 });            
         
+var input = document.querySelector("#national_cell"),
+output = document.querySelector("#error-msg");
+
+var iti = window.intlTelInput(input, {
+  initialCountry:'{{ session('condominium')->country->iso }}',
+  onlyCountries: ['ar', 'bo', 'br', 'cl', 'co', 'cr', 'cu', 'sv', 'ec', 'es', 'gt', 'hn', 'mx', 'ni', 'pa', 'py', 'pe', 'pr', 'do', 'uy', 've'],
+  nationalMode: true,
+  utilsScript: "../../build/js/utils.js?1590403638580" // just for formatting/placeholders etc
+});
+
+var handleChange = function() {
+    var text="";
+    (iti.isValidNumber()) ? $('#cell').val(iti.getNumber()) : text="Introduzca un número válido";
+    var textNode = document.createTextNode(text);
+    output.innerHTML = "";
+    output.appendChild(textNode);
+};
+
+// listen to "keyup", but also "change" to update when the user selects a country
+input.addEventListener('change', handleChange);
+input.addEventListener('keyup', handleChange);
+
 $(document).ready(function() {
 
     $('#notes').maxlength({

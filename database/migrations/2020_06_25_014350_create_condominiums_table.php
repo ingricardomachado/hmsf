@@ -27,8 +27,8 @@ class CreateCondominiumsTable extends Migration
             $table->string('address',400)->nullable();
             $table->integer('max_properties')->unsigned();
             $table->String('contact');
-            $table->String('phone', 25)->nullable();
-            $table->String('cell', 25);
+            $table->String('phone', 15)->nullable();
+            $table->String('cell', 15);
             $table->String('email', 100);
             $table->char('money_format',3)->default('PC2');
             $table->string('coin',10)->default('$');

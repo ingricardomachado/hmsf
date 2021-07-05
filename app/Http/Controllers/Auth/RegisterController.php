@@ -97,9 +97,6 @@ class RegisterController extends Controller
         Session::put('condominium', $condominium);
         Session::put('coin', $condominium->coin);
         Session::put('money_format', $condominium->money_format);
-        Session::put('create_notification', true);
-        Session::put('update_notification', true);
-        Session::put('delete_notification', true);
         //Enviar correos de notificacion al administrador y a SmartCond
         SendWelcomeEmails::dispatch($user);
         //Mail::to('ing.ricardo.machado@gmail.com')->send(new SignedupCondominium($condominium));

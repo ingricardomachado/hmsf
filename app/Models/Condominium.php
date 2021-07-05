@@ -49,6 +49,11 @@ class Condominium extends Model
         return $this->hasMany('App\Models\Employee');
     }
 
+    public function expenses(){
+   
+        return $this->hasMany('App\Models\Expense');
+    }
+
     public function facilities(){
    
         return $this->hasMany('App\Models\Facility');
@@ -62,6 +67,16 @@ class Condominium extends Model
     public function incomes(){
    
         return $this->hasMany('App\Models\Income');
+    }
+
+    public function payments(){
+   
+        return $this->hasMany('App\Models\Payment');
+    }
+
+    public function projects(){
+   
+        return $this->hasMany('App\Models\Project');
     }
 
     public function properties(){

@@ -19,7 +19,7 @@ class CreatePaymentFeeTable extends Migration
             $table->foreign('payment_id')->references('id')->on('payments')->onDelete('cascade');
             $table->bigInteger('fee_id')->unsigned()->nullable();
             $table->foreign('fee_id')->references('id')->on('fees')->onDelete('cascade');
-            $table->float('amount',11,2)->unsigned();
+            $table->float('amount',11,2)->unsigned()->nullable();
             $table->timestamps();
         });
     }

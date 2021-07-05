@@ -145,7 +145,7 @@ function change_status(id){
       },
   })
   .done(function(response) {
-      $('#contacts-table').DataTable().draw();
+      $('#contacts-table').DataTable().draw(false);
       toastr_msg('success', '{{ config('app.name') }}', response.message, 2000);
   })
   .fail(function() {
@@ -181,7 +181,7 @@ function contact_delete(id){
   })
   .done(function(response) {
       $('#modalDeleteContact').modal('toggle');
-      $('#contacts-table').DataTable().draw();
+      $('#contacts-table').DataTable().draw(false);
       toastr_msg('success', '{{ config('app.name') }}', response.message, 2000);
 
   })
@@ -209,7 +209,7 @@ function contact_CRUD(id){
         .done(function(response) {
           $('#btn_submit').attr('disabled', false);
           $('#modalContact').modal('toggle');
-          $('#contacts-table').DataTable().draw(); 
+          $('#contacts-table').DataTable().draw(false); 
           toastr_msg('success', '{{ config('app.name') }}', response.message, 2000);
         })
         .fail(function(response) {

@@ -15,23 +15,19 @@ use App\Models\PropertyType;
 |
 */
 
-/*Route::get('/', function () {
-    return view('welcome');
-});
 
 Auth::routes();
-
-Route::get('/home', 'HomeController@index')->name('home');*/
+Route::get('/', 'HomeController@index')->name('home');
 
 //Landing
-Route::get('/', function () {
+/*Route::get('/', function () {
     $countries=Country::orderBy('name')->pluck('name','id');
     $property_types=PropertyType::orderBy('name')->pluck('name','id');
 
     return view('landing')->with('messages', array())
     					  ->with('countries', $countries)
     					  ->with('property_types', $property_types);
-});
+});*/
 
 //Accounts
 Route::resource("accounts","AccountController");
@@ -39,6 +35,10 @@ Route::get('accounts.datatable', 'AccountController@datatable')->name('accounts.
 Route::get('accounts.load/{id}', 'AccountController@load')->name('properties.load');
 Route::get('accounts.status/{id}', 'AccountController@status')->name('accounts.status');
 Route::get('accounts.rpt_accounts', 'AccountController@rpt_accounts')->name('accounts.rpt_accounts');
+Route::get('accounts.statement/{id}', 'AccountController@statement')->name('accounts.statement');
+Route::post('accounts.movements', 'AccountController@movements')->name('accounts.movements');
+Route::post('accounts.xls_movements', 'AccountController@xls_movements')->name('accounts.xls_movements');
+
 
 //Assets
 Route::resource("assets","AssetController");
@@ -83,6 +83,12 @@ Route::get('employees.load/{id}', 'EmployeeController@load')->name('employees.lo
 Route::get('employees.status/{id}', 'EmployeeController@status')->name('employees.status');
 Route::get('employees.rpt_employees', 'EmployeeController@rpt_employees')->name('employees.rpt_employees');
 
+//Expenses
+Route::resource("expenses","ExpenseController");
+Route::post('expenses.datatable', 'ExpenseController@datatable')->name('expenses.datatable');
+Route::get('expenses.load/{id}', 'ExpenseController@load')->name('expenses.load');
+Route::get('expenses.download/{id}', ['as' => 'expenses.download', 'uses' => 'ExpenseController@download_file']);
+
 //ExpenseTypes
 Route::resource("expense_types","ExpenseTypeController");
 Route::get('expense_types.datatable', 'ExpenseTypeController@datatable')->name('expense_types.datatable');
@@ -101,12 +107,14 @@ Route::post('facilities/{id}/reservations', 'FacilityController@reservations');
 //Fees
 Route::resource("fees","FeeController");
 Route::post('fees.datatable', 'FeeController@datatable')->name('fees.datatable');
+Route::get('fees.info/{id}', 'FeeController@info')->name('fees.info');
 Route::get('fees.load/{id}', 'FeeController@load')->name('fees.load');
 Route::get('fees.create_multiple', 'FeeController@create_multiple')->name('fees.create_multiple');
 Route::post('fees.store_multiple', 'FeeController@store_multiple')->name('fees.store_multiple');
 
 //Home
 //Route::get('/', 'HomeController@index');
+//*** Home ***
 Route::get('home', ['as' => 'home', 'uses' => 'HomeController@index']);
 
 //Img
@@ -116,12 +124,14 @@ Route::get('employee_avatar/{id}', 'ImgController@showEmployeeAvatar');
 Route::get('condominium_logo/{id}', 'ImgController@showCondominiumLogo');
 Route::get('document_image/{id}', 'ImgController@showDocumentImage')->name('document_image');
 Route::get('income_image/{id}', 'ImgController@showIncomeImage')->name('income_image');
+Route::get('expense_image/{id}', 'ImgController@showExpenseImage')->name('expense_image');
+Route::get('payment_image/{id}', 'ImgController@showPaymentImage')->name('payment_image');
 Route::get('facility_photo/{id}', 'ImgController@showFacilityPhoto');
 
 //Income
 Route::resource("incomes","IncomeController");
 Route::get('incomes.datatable', 'IncomeController@datatable')->name('incomes.datatable');
-Route::get('incomes.load/{id}', 'IncomeController@load')->name('properties.load');
+Route::get('incomes.load/{id}', 'IncomeController@load')->name('incomes.load');
 Route::get('incomes.download/{id}', ['as' => 'incomes.download', 'uses' => 'IncomeController@download_file']);
 
 
@@ -139,6 +149,18 @@ Route::get('owners.datatable', 'OwnerController@datatable')->name('owners.datata
 Route::get('owners.load/{id}', 'OwnerController@load')->name('owners.load');
 Route::get('owners.rpt_owners', 'OwnerController@rpt_owners')->name('owners.rpt_owners');
 Route::get('owners.xls_owners', 'OwnerController@xls_owners')->name('owners.xls_owners');
+
+//Payments
+Route::resource("payments","PaymentController");
+Route::post('payments.datatable', 'PaymentController@datatable')->name('payments.datatable');
+Route::get('payments.info/{id}', 'PaymentController@info')->name('payments.info');
+Route::get('payments.load/{id}', 'PaymentController@load')->name('payments.load');
+Route::get('payments.load_pending_fees/{id}', 'PaymentController@load_pending_fees')->name('payments.load_pending_fees');
+Route::get('payments.download/{id}', ['as' => 'payments.download', 'uses' => 'PaymentController@download_file']);
+Route::get('payments.load_confirm/{id}', 'PaymentController@load_confirm')->name('payments.load_confirm');
+Route::post('payments.confirm/{id}', 'PaymentController@confirm')->name('payments.confirm');
+Route::get('payments.rpt_payment/{id}', 'PaymentController@rpt_payment')->name('payments.rpt_payment');
+
 
 //Properties
 Route::resource("properties","PropertyController");
@@ -182,6 +204,9 @@ Route::get('suppliers.rpt_suppliers', 'SupplierController@rpt_suppliers')->name(
 //Tools
 Route::get('get_states/{id}', 'ToolController@get_states');
 
-//*** Home ***
-Auth::routes();
+//Fix
+Route::get('update_balance_accounts', 'FixController@update_balance_accounts');
+Route::get('test_polimorf', 'FixController@test_polimorf');
+
+
 

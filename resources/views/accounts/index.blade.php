@@ -51,8 +51,10 @@
                 <thead>
                   <tr>
                     <th text-align="center" width="5%"></th>
-                    <th width="25%">Nombre</th>
-                    <th width="30%">Banco</th>
+                    <th width="25%">Cuenta</th>
+                    <th width="10%">Inicial</th>
+                    <th width="10%">Ingresos</th>
+                    <th width="10%">Egresos</th>
                     <th width="10%">Saldo</th>
                     <th width="10%">Estado</th>
                   </tr>
@@ -60,8 +62,10 @@
                 <tfoot>
                   <tr>
                     <th></th>
-                    <th>Nombre</th>
-                    <th>Banco</th>
+                    <th>Cuenta</th>
+                    <th>Inicial</th>
+                    <th>Ingresos</th>
+                    <th>Egresos</th>
                     <th>Saldo</th>
                     <th>Estado</th>
                   </tr>
@@ -130,7 +134,7 @@ function change_status(id){
       },
   })
   .done(function(response) {
-      $('#accounts-table').DataTable().draw();
+      $('#accounts-table').DataTable().draw(false);
       toastr_msg('success', '{{ config('app.name') }}', response.message, 2000);
   })
   .fail(function() {
@@ -166,7 +170,7 @@ function account_delete(id){
   })
   .done(function(response) {
       $('#modalDeleteAccount').modal('toggle');
-      $('#accounts-table').DataTable().draw();
+      $('#accounts-table').DataTable().draw(false);
       toastr_msg('success', '{{ config('app.name') }}', response.message, 2000);
 
   })
@@ -194,7 +198,7 @@ function account_CRUD(id){
         .done(function(response) {
           $('#btn_submit').attr('disabled', false);
           $('#modalAccount').modal('toggle');
-          $('#accounts-table').DataTable().draw(); 
+          $('#accounts-table').DataTable().draw(false); 
           toastr_msg('success', '{{ config('app.name') }}', response.message, 2000);
         })
         .fail(function(response) {
@@ -224,8 +228,10 @@ $(document).ready(function(){
         columns: [
             { data: 'action', name: 'action', orderable: false, searchable: false},
             { data: 'aliase',   name: 'aliase', orderable: false, searchable: true},
-            { data: 'bank',   name: 'bank', orderable: false, searchable: true},
-            { data: 'balance',   name: 'balance', orderable: false, searchable: true},
+            { data: 'initial_balance',   name: 'initial_balance', orderable: false, searchable: false},
+            { data: 'credits',   name: 'credits', orderable: false, searchable: false},
+            { data: 'debits',   name: 'debits', orderable: false, searchable: false},
+            { data: 'balance',   name: 'balance', orderable: false, searchable: false},
             { data: 'status', name: 'status', orderable: false, searchable: false }
         ]
     });

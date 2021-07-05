@@ -44,8 +44,7 @@
             </div>
             <div class="col-sm-9 col-xs-12 text-right">
                 <a href="#" class="btn btn-sm btn-primary" onclick="showModalIncome(0);"><i class="fa fa-plus-circle"></i> Nuevo Ingreso Extraordinario</a>
-                <a href="{{ url('incomes.rpt_incomes') }}" class="btn btn-sm btn-default" target="_blank" title="Imprimir PDF"><i class="fa fa-print"></i></a>
-                <br><br>
+                <br>
             </div>
             <div class="col-sm-12">
               @include('partials.errors')
@@ -100,12 +99,12 @@
   <div class="modal-dialog">
     <div class="modal-content animated fadeIn">
       <div class="modal-header">
-        <h5 class="modal-title"><i class="fa fa-trash" aria-hidden="true"></i> <strong>Eliminar Tipo de Ingreso</strong></h5>
+        <h5 class="modal-title"><i class="fa fa-trash" aria-hidden="true"></i> <strong>Eliminar Ingreso</strong></h5>
         <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
       </div>      
       <div class="modal-body">
           <input type="hidden" id="hdd_income_id" value=""/>
-          <p>Esta seguro que desea eliminar el ingreso extraordinario<b><span id="income_name"></span></b> ?</p>
+          <p>Esta seguro que desea eliminar el ingreso extraordinario <b><span id="income_name"></span></b> ?</p>
       </div>
       <div class="modal-footer">
         <button type="button" id="btn_close" class="btn btn-default" data-dismiss="modal">Cerrar</button>        
@@ -133,31 +132,6 @@ function showModalIncome(id){
   $("#modalIncome").modal("show");
 }
  
-function change_status(id){
-  $.ajax({
-      url: `{{URL::to("incomes.status")}}/${id}`,
-      type: 'GET',
-      data: {
-        _token: "{{ csrf_token() }}", 
-      },
-  })
-  .done(function(response) {
-      $('#incomes-table').DataTable().draw();
-      toastr_msg('success', '{{ config('app.name') }}', response.message, 2000);
-  })
-  .fail(function() {
-    if(response.status == 422){
-      var errorsHtml='';
-      $.each(response.responseJSON.errors, function (key, value) {
-        errorsHtml += '<li>' + value[0] + '</li>'; 
-      });          
-      toastr_msg('error', '{{ config('app.name') }}', errorsHtml, 3000);
-    }else{
-      toastr_msg('error', '{{ config('app.name') }}', response.responseJSON.message, 2000);
-    }  
-  });
-}  
-
 function showModalDelete(id, name){
   $('#hdd_income_id').val(id);
   $('#income_name').html(name);
@@ -178,7 +152,7 @@ function income_delete(id){
   })
   .done(function(response) {
       $('#modalDeleteIncome').modal('toggle');
-      $('#incomes-table').DataTable().draw();
+      $('#incomes-table').DataTable().draw(false);
       toastr_msg('success', '{{ config('app.name') }}', response.message, 2000);
 
   })
@@ -206,7 +180,7 @@ function income_CRUD(id){
         .done(function(response) {
           $('#btn_submit').attr('disabled', false);
           $('#modalIncome').modal('toggle');
-          $('#incomes-table').DataTable().draw(); 
+          $('#incomes-table').DataTable().draw(false); 
           toastr_msg('success', '{{ config('app.name') }}', response.message, 2000);
         })
         .fail(function(response) {

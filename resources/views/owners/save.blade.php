@@ -1,5 +1,3 @@
-<!-- International Phones -->
-<link href="{{ URL::asset('js/plugins/intl-tel-input-master/build/css/intlTelInput.css') }}" rel="stylesheet">
 <!-- Magicsuggest -->
 <link rel="stylesheet" type="text/css" href="{{ URL::asset('js/plugins/magicsuggest/magicsuggest-min.css') }}">
 <!-- iCheck -->
@@ -7,17 +5,17 @@
 <!-- Select2 -->
 <link href="{{ URL::asset('js/plugins/select2/dist/css/select2.min.css') }}" rel="stylesheet">
 <link href="{{ URL::asset('css/style.css') }}" rel="stylesheet">
-<!-- Esta instruccion es para que Select2 funcione dentro del Modal-->
+<!-- International Phones -->
+<link href="{{ URL::asset('js/plugins/intl-tel-input-master/build/css/intlTelInput.css') }}" rel="stylesheet">
+<!-- Esta instruccion es para que input del cell sea 100% width-->
 <style type="text/css">
-  .select2-dropdown{
-    z-index: 3051;
-} 
+    .iti { width: 100%; }
 </style>
     
     <form action="{{url('owners/'.$owner->id)}}" id="form_owner" method="POST">
         <input type="hidden" name="_token" value="{{{ csrf_token() }}}" />
         {!! Form::hidden('owner_id', ($owner->id)?$owner->id:0, ['id'=>'owner_id']) !!}
-        {!! Form::hidden('hdd_cell', ($owner->id)?$owner->cell:null, ['id'=>'hdd_cell']) !!}
+        {!! Form::hidden('cell', ($owner->id)?$owner->cell:null, ['id'=>'cell']) !!}
         @if($owner->id)                
             {{ Form::hidden ('_method', 'PUT') }}
         @endif
@@ -38,10 +36,9 @@
                 </div>
                 <div class="form-group col-sm-6">
                     <label>Celular</label>
-                    {!! Form::tel('cell', $owner->cell, ['id'=>'cell', 'class'=>'form-control', 'placeholder'=>'']) !!}
+                    {!! Form::tel('national_cell', $owner->cell, ['id'=>'national_cell', 'class'=>'form-control', 'placeholder'=>'']) !!}
                     <span id="error-msg" style="color:#cc5965;font-weight:bold"></span>
                 </div>
-
                 <div class="form-group col-sm-6">
                     <label>Teléfono</label>
                     {!! Form::text('phone', $owner->phone, ['id'=>'phone', 'class'=>'form-control', 'type'=>'text', 'placeholder'=>'', 'maxlength'=>'30']) !!}
@@ -63,8 +60,6 @@
             <button type="button" id="btn_close" class="btn btn-sm btn-default" data-dismiss="modal">Cerrar</button>
         </div>
     </form>
-<!-- International Phones --> 
-<script src="{{ URL::asset('js/plugins/intl-tel-input-master/build/js/intlTelInput.js') }}"></script>
 <script src="{{ URL::asset('js/plugins/intl-tel-input-master/build/js/utils.js') }}"></script>
 <!-- Magicsuggest -->
 <script type="text/javascript" src="{{ URL::asset('js/plugins/magicsuggest/magicsuggest.js') }}"></script>
@@ -73,11 +68,32 @@
 <!-- Select2 -->
 <script src="{{ URL::asset('js/plugins/select2/dist/js/select2.full.min.js') }}"></script>
 <script src="{{ URL::asset('js/plugins/select2/dist/js/i18n/es.js') }}"></script>
-<!-- Jquery Validate -->
-<script src="{{ URL::asset('js/plugins/jquery-validation-1.16.0/jquery.validate.min.js') }}"></script>
-<script src="{{ URL::asset('js/plugins/jquery-validation-1.16.0/messages_es.js') }}"></script>
-<script src="{{ URL::asset('js/plugins/nit_validation/calcularDigitoVerificacion.js') }}"></script>
+<!-- International Phones --> 
+<script src="{{ URL::asset('js/plugins/intl-tel-input-master/build/js/intlTelInput.js') }}"></script>
+<script src="{{ URL::asset('js/plugins/intl-tel-input-master/build/js/utils.js') }}"></script>
 <script>
+
+var input = document.querySelector("#national_cell"),
+output = document.querySelector("#error-msg");
+
+var iti = window.intlTelInput(input, {
+  initialCountry:'{{ session('condominium')->country->iso }}',
+  onlyCountries: ['ar', 'bo', 'br', 'cl', 'co', 'cr', 'cu', 'sv', 'ec', 'es', 'gt', 'hn', 'mx', 'ni', 'pa', 'py', 'pe', 'pr', 'do', 'uy', 've'],
+  nationalMode: true,
+  utilsScript: "../../build/js/utils.js?1590403638580" // just for formatting/placeholders etc
+});
+
+var handleChange = function() {
+    var text="";
+    (iti.isValidNumber()) ? $('#cell').val(iti.getNumber()) : text="Introduzca un número válido";
+    var textNode = document.createTextNode(text);
+    output.innerHTML = "";
+    output.appendChild(textNode);
+};
+
+// listen to "keyup", but also "change" to update when the user selects a country
+input.addEventListener('change', handleChange);
+input.addEventListener('keyup', handleChange);
 
 // Magicsuggest
 var ms_properties=$('#properties').magicSuggest({
@@ -93,29 +109,6 @@ var ms_properties=$('#properties').magicSuggest({
     valueField: 'id',
     displayField: 'number',
 });
-
-var input = document.querySelector("#cell"),
-output = document.querySelector("#error-msg");
-
-var iti = window.intlTelInput(input, {
-  initialCountry:"{{ session()->get('condominium')->country->iso }}",
-  onlyCountries: ['ar', 'bo', 'br', 'cl', 'co', 'cr', 'cu', 'sl', 'ec', 'es', 'gt', 'hn', 'mx', 'ni', 'pa', 'py', 'pe', 'pr', 'do', 'uy', 've'],
-  nationalMode: true,
-  utilsScript: "../../build/js/utils.js?1590403638580" // just for formatting/placeholders etc
-});
-
-var handleChange = function() {
-    var text="";
-    (iti.isValidNumber()) ? $('#hdd_cell').val(iti.getNumber()) : text="Introduzca un número válido";
-    var textNode = document.createTextNode(text);
-    output.innerHTML = "";
-    output.appendChild(textNode);
-};
-
-// listen to "keyup", but also "change" to update when the user selects a country
-input.addEventListener('change', handleChange);
-input.addEventListener('keyup', handleChange);
-
 
 $(document).ready(function() {
     $('#name').focus();

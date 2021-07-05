@@ -16,58 +16,58 @@
 @section('content')
 <div class="wrapper wrapper-content">
 	<div class="row">
-            <div class="col-lg-3">
-                <div class="widget style1 yellow-bg">
-                    <div class="row">
-                        <div class="col-xs-4">
-                            <i class="fa fa-users fa-4x"></i>
-                        </div>
-                        <div class="col-xs-8 text-right">
-                            <span> Clientes </span>
-                            <h2 class="font-bold">{{ $tot_customers }}</h2>
-                        </div>
+        <div class="col-lg-3">
+            <div class="widget style1 navy-bg">
+                <div class="row">
+                    <div class="col-xs-4">
+                        <i class="fa fa-users fa-4x"></i>
+                    </div>
+                    <div class="col-xs-8 text-right">
+                        <span> Sooventes </span>
+                        <h2 class="font-bold">99</h2>
                     </div>
                 </div>
             </div>
-            <div class="col-lg-3">
-                <div class="widget style1 style1 lazur-bg">
-                    <div class="row">
-                        <div class="col-xs-4">
-                            <i class="fa fa-money fa-4x"></i>
-                        </div>
-                        <div class="col-xs-8 text-right">
-                            <span> Compras </span>
-                            <h2 class="font-bold">{{ $tot_purchases }}</h2>
-                        </div>
+        </div>
+        <div class="col-lg-3">
+            <div class="widget style1 yellow-bg">
+                <div class="row">
+                    <div class="col-xs-4">
+                        <i class="fa fa-users fa-4x"></i>
+                    </div>
+                    <div class="col-xs-8 text-right">
+                        <span> Pendientes </span>
+                        <h2 class="font-bold">99</h2>
                     </div>
                 </div>
             </div>
-            <div class="col-lg-3">
-                <div class="widget style1 navy-bg">
-                    <div class="row">
-                        <div class="col-xs-4">
-                            <i class="fa fa-gift fa-4x"></i>
-                        </div>
-                        <div class="col-xs-8 text-right">
-                            <span> Ptos. Acreditados </span>
-                            <h2 class="font-bold">{{ $tot_credit_points }}</h2>
-                        </div>
+        </div>
+        <div class="col-lg-3">
+            <div class="widget style1 red-bg">
+                <div class="row">
+                    <div class="col-xs-4">
+                        <i class="fa fa-users fa-4x"></i>
+                    </div>
+                    <div class="col-xs-8 text-right">
+                        <span> Morosos </span>
+                        <h2 class="font-bold">99</h2>
                     </div>
                 </div>
             </div>
-            <div class="col-lg-3">
-                <div class="widget style1 red-bg">
-                    <div class="row">
-                        <div class="col-xs-4">
-                            <i class="fa fa-gift fa-4x"></i>
-                        </div>
-                        <div class="col-xs-8 text-right">
-                            <span> Ptos. Consumidos </span>
-                            <h2 class="font-bold">{{ $tot_debit_points }}</h2>
-                        </div>
+        </div>
+        <div class="col-lg-3">
+            <div class="widget style1 style1 lazur-bg">
+                <div class="row">
+                    <div class="col-xs-4">
+                        <i class="fa fa-money fa-4x"></i>
+                    </div>
+                    <div class="col-xs-8 text-right">
+                        <span> Cta x Cobrar </span>
+                        <h2 class="font-bold">999 {{ session('coin') }}</h2>
                     </div>
                 </div>
             </div>
+        </div>
 	</div>
 
     <div class="row">
@@ -75,8 +75,8 @@
             <div class="ibox float-e-margins">
                 <div class="ibox-content">
                     <div>
-                        <span class="pull-right text-right">Total puntos otorgados : {{ $tot_credit_points_year }}</span>
-                        <h3 class="font-bold no-margins"><i class="fa fa-gift" aria-hidden="true"></i> Puntos otorgados en el {{ $today->year }}</h3>
+                        <span class="pull-right text-right">Total ingresos : 999</span>
+                        <h3 class="font-bold no-margins"><i class="fa fa-money" aria-hidden="true"></i> Ingresos en el {{ $today->year }}</h3>
                     </div>
                     <div class="m-t-sm">
                         <div class="row">
@@ -90,7 +90,7 @@
                             <i class="fa fa-clock-o"></i> Actualizado al {{ $today->format('d.m.Y') }}
                         </small>
                         <small>
-                            <strong>Puntos semestrales</strong>.
+                            <strong>Ingresos semestrales</strong>.
                         </small>
                     </div>
                 </div>
@@ -100,8 +100,8 @@
             <div class="ibox float-e-margins">
                 <div class="ibox-content">
                     <div>
-                        <span class="pull-right text-right">Total puntos consumidos: {{ $tot_debit_points_year }}</span>
-                        <h3 class="font-bold no-margins"><i class="fa fa-gift" aria-hidden="true"></i> Puntos consumidos en el {{ $today->year }}</h3>
+                        <span class="pull-right text-right">Total egresos: 9999</span>
+                        <h3 class="font-bold no-margins"><i class="fa fa-money" aria-hidden="true"></i> Egresos en el {{ $today->year }}</h3>
                     </div>
                     <div class="m-t-sm">
                         <div class="row">
@@ -115,76 +115,13 @@
                             <i class="fa fa-clock-o"></i> Actualizado al {{ $today->format('d.m.Y') }}
                         </small>
                         <small>
-                            <strong>Puntos semestrales</strong>.
+                            <strong>Egresos semestrales</strong>.
                         </small>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-
-	<div class="row">
-		<div class="col-lg-12">
-        <div class="ibox float-e-margins">
-        <div class="ibox-title">
-            <h5>Los mejores 10 Clientes </h5>
-            <div class="ibox-tools">
-                <a class="collapse-link">
-                    <i class="fa fa-chevron-up"></i>
-                </a>
-                <a class="dropdown-toggle" data-toggle="dropdown" href="#">
-                    <i class="fa fa-wrench"></i>
-                </a>
-                <ul class="dropdown-menu dropdown-user">
-                    <li><a href="#">Config option 1</a>
-                    </li>
-                    <li><a href="#">Config option 2</a>
-                    </li>
-                </ul>
-                <a class="close-link">
-                    <i class="fa fa-times"></i>
-                </a>
-            </div>
-        </div>
-        <div class="ibox-content">
-            <div class="table-responsive">
-                <table class="table table-striped">
-                    <thead>
-                    <tr>
-                        <th width="5%" class="text-center">Número</th>
-                        <th width="20%">Nombre</th>
-                        <th width="10%">Celular</th>
-                        <th width="10%" class="text-center">Iniciales</th>
-                        <th width="10%" class="text-center">Otorgados</th>
-                        <th width="10%" class="text-center">Consumidos</th>
-                        <th width="10%" class="text-center">Disponibles</th>
-                        <th width="10%" class="text-center">Compras</th>
-                        <th width="10%" class="text-right">Monto</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                            <tr>
-                        	   <td class="text-center"><b></b></td>
-                        	   <td></td>
-                        	   <td></td>
-                               <td class="text-center"></td>
-                               <td class="text-center"></td>
-                               <td class="text-center"></td>
-                               <td class="text-center"></td>
-                               <td class="text-center"></td>
-                               <td class="text-right"></td>
-                    	   </tr>
-                    </tbody>
-                </table>
-            </div>
-
-        </div>
-        </div>
-        </div>
-
-        </div>
-
-
 </div>
 
 @endsection

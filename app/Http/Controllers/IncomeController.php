@@ -10,6 +10,7 @@ use App\Models\Income;
 use App\Models\IncomeType;
 use App\Models\Property;
 use App\Models\Setting;
+use App\Models\Movement;
 use Illuminate\Support\Facades\Crypt;
 use Yajra\Datatables\Datatables;
 use Maatwebsite\Excel\Facades\Excel;
@@ -66,7 +67,7 @@ class IncomeController extends Controller
                             </li>
                             <li class="divider"></li>
                             <li>
-                                <a href="#" onclick="showModalDelete(`'.$income->id.'`, `'.$income->name.'`)"><i class="fa fa-trash-o"></i> Eliminiar</a>                                
+                                <a href="#" onclick="showModalDelete(`'.$income->id.'`, `'.$income->concept.'`)"><i class="fa fa-trash-o"></i> Eliminiar</a>                                
                             </li>
                         </ul>
                     </div>';
@@ -115,6 +116,8 @@ class IncomeController extends Controller
                      })->pluck('name','id');
         
         $accounts=$this->condominium->accounts()->orderBy('aliase')->pluck('aliase','id');
+        $projects=$this->condominium->projects()->orderBy('name')->pluck('name','id');
+
         $today=Carbon::now();
 
         if($id==0){
@@ -126,7 +129,8 @@ class IncomeController extends Controller
         return view('incomes.save')->with('income', $income)
                                 ->with('today', $today)
                                 ->with('income_types', $income_types)
-                                ->with('accounts', $accounts);
+                                ->with('accounts', $accounts)
+                                ->with('projects', $projects);
     }
 
     /**
@@ -140,6 +144,7 @@ class IncomeController extends Controller
         try {
             $income = new Income();
             $income->condominium_id=$request->condominium_id;
+            $income->project_id=($request->project)?$request->project:null;
             $income->income_type_id=$request->income_type;
             $income->account_id=$request->account;
             $income->payment_method=$request->payment_method;
@@ -156,7 +161,16 @@ class IncomeController extends Controller
                 $income->file=$this->upload_file($income->condominium_id.'/incomes/', $file);
             }
             $income->save();
-            $income->account->update_credits();
+            //se registra el movimiento
+            Movement::create([
+                'type' => 'C',
+                'account_id' => $income->account_id,
+                'income_id' => $income->id,
+                'date' => $income->date,
+                'amount' => $income->amount
+            ]);
+            //se actualizan los saldos de la cuenta
+            $income->account->update_balance();                       
             
             return response()->json([
                     'success' => true,
@@ -184,6 +198,7 @@ class IncomeController extends Controller
         try {
             $income = Income::find($id);
             $income->condominium_id=$request->condominium_id;
+            $income->project_id=($request->project)?$request->project:null;            
             $income->income_type_id=$request->income_type;
             $income->account_id=$request->account;
             $income->payment_method=$request->payment_method;
@@ -194,14 +209,24 @@ class IncomeController extends Controller
             $income->notes=$request->notes;
             $file = $request->file;
             if (File::exists($file)){
+                if($income->file){
+                    Storage::delete($income->condominium_id.'/incomes/'.$income->file);
+                    Storage::delete($income->condominium_id.'/incomes/thumbs/'.$income->file);
+                }
                 $income->file_name = $file->getClientOriginalName();
                 $income->file_type = $file->getClientOriginalExtension();
                 $income->file_size = $file->getSize();
                 $income->file=$this->upload_file($income->condominium_id.'/incomes/', $file);
             }
             $income->save();
-            $income->account->update_credits();
-
+            //se actualiza el movimiento
+            $income->movement->account_id=$income->account_id;
+            $income->movement->date=$income->date;
+            $income->movement->amount=$income->amount;
+            $income->movement->save();
+            //se actualizan los saldos de la cuenta
+            $income->account->update_balance();            
+            
             return response()->json([
                     'success' => true,
                     'message' => 'Ingreso extraordinario actualizado exitosamente',
@@ -231,11 +256,11 @@ class IncomeController extends Controller
             Storage::delete($income->condominium_id.'/incomes/thumbs/'.$income->file);
 
             $income->delete();
-            $income->account->update_credits();
+            $income->account->update_balance();
             
             return response()->json([
                 'success' => true,
-                'message' => 'Tipo de ingreso eliminado exitosamente'
+                'message' => 'Ingreso extraordinario eliminado exitosamente'
             ], 200);
 
         } catch (Exception $e) {

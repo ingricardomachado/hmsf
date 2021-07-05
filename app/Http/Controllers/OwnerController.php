@@ -100,8 +100,8 @@ class OwnerController extends Controller
         }
         
         return view('owners.save')->with('owner', $owner)
-                                ->with('properties', $properties)
-                                ->with('owner_properties', $owner_properties);
+                            ->with('properties', $properties)
+                            ->with('owner_properties', $owner_properties);
     }
 
     /**

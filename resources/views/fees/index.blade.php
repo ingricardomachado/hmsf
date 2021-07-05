@@ -59,7 +59,9 @@
                     <th text-align="center" width="5%"></th>
                     <th width="30%">Cuota</th>
                     <th width="10%">Propiedad</th>
-                    <th width="15%">Monto</th>
+                    <th width="10%">Monto</th>
+                    <th width="10%">Pagado</th>
+                    <th width="10%">Por pagar</th>
                     <th width="10%">Aplicación</th>
                     <th width="10%">Vencimiento</th>
                     <th width="10%">Estado</th>
@@ -71,6 +73,8 @@
                     <th>Cuota</th>
                     <th>Propiedad</th>
                     <th>Monto</th>
+                    <th>Pagado</th>
+                    <th>Por pagar</th>
                     <th>Aplicación</th>
                     <th>Vencimiento</th>
                     <th>Estado</th>
@@ -88,6 +92,16 @@
   </div>
 </div>
   
+<!-- Modal para mostrar -->
+<div class="modal inmodal" id="modalFeeInfo" tabindex="-1" role="dialog"  aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content animated fadeIn">
+      <div id="fee_info"></div>
+    </div>
+  </div>
+</div>
+<!-- /Modal para mostrar -->
+
 <!-- Modal para Datos -->
 <div class="modal inmodal" id="modalFee" tabindex="-1" role="dialog"  aria-hidden="true">
   <div class="modal-dialog">
@@ -143,6 +157,12 @@
 <script src="{{ asset('js/plugins/dataTables/datatables.min.js') }}"></script>
 <script>
   
+function showModalFeeInfo(id){
+  url = '{{URL::to("fees.info")}}/'+id;
+  $('#fee_info').load(url);  
+  $("#modalFeeInfo").modal("show");
+}
+
 function showModalFee(id){
   url = '{{URL::to("fees.load")}}/'+id;
   $('#fee').load(url);  
@@ -177,7 +197,7 @@ function fee_delete(id){
   })
   .done(function(response) {
       $('#modalDeleteFee').modal('toggle');
-      $('#fees-table').DataTable().draw();
+      $('#fees-table').DataTable().draw(false);
       toastr_msg('success', '{{ config('app.name') }}', response.message, 2000);
 
   })
@@ -205,7 +225,7 @@ function fee_CRUD(id){
         .done(function(response) {
           $('#btn_submit').attr('disabled', false);
           $('#modalFee').modal('toggle');
-          $('#fees-table').DataTable().draw(); 
+          $('#fees-table').DataTable().draw(false); 
           toastr_msg('success', '{{ config('app.name') }}', response.message, 2000);
         })
         .fail(function(response) {
@@ -224,11 +244,11 @@ function fee_CRUD(id){
 }
 
 $("#property_filter").change( event => {
-  $('#fees-table').DataTable().draw();
+  $('#fees-table').DataTable().draw(false);
 });
 
 $("#income_type_filter").change( event => {
-  $('#fees-table').DataTable().draw();
+  $('#fees-table').DataTable().draw(false);
 });
 
 $(fee).ready(function(){
@@ -253,6 +273,8 @@ $(fee).ready(function(){
             { data: 'fee', name: 'concept', orderable: false, searchable: true },
             { data: 'property',   name: 'property', orderable: false, searchable: false},
             { data: 'amount', name: 'amount', orderable: false, searchable: false },
+            { data: 'paid', name: 'paid', orderable: false, searchable: false },
+            { data: 'balance', name: 'balance', orderable: false, searchable: false },
             { data: 'date',   name: 'date', orderable: false, searchable: false},
             { data: 'due_date', name: 'due_date', orderable: false, searchable: false },
             { data: 'status', name: 'status', orderable: false, searchable: false }

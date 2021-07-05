@@ -23,10 +23,11 @@ class CreateFeesTable extends Migration
             $table->foreign('income_type_id')->references('id')->on('income_types')->onDelete('cascade');
             $table->date('date');
             $table->date('due_date');            
-            $table->string('concept',500)->nullabel();
+            $table->string('concept',200);
             $table->float('amount',11,2)->unsigned();
             $table->float('balance',11,2)->nullable();
             $table->string('created_by',100)->nullable();
+            $table->boolean('locked')->default(false);
             $table->timestamps();
         });
     }

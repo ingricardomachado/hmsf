@@ -126,7 +126,7 @@ function change_status(id){
       },
   })
   .done(function(response) {
-      $('#income_types-table').DataTable().draw();
+      $('#income_types-table').DataTable().draw(false);
       toastr_msg('success', '{{ config('app.name') }}', response.message, 2000);
   })
   .fail(function() {
@@ -162,7 +162,7 @@ function income_type_delete(id){
   })
   .done(function(response) {
       $('#modalDeleteIncomeType').modal('toggle');
-      $('#income_types-table').DataTable().draw();
+      $('#income_types-table').DataTable().draw(false);
       toastr_msg('success', '{{ config('app.name') }}', response.message, 2000);
 
   })
@@ -190,7 +190,7 @@ function income_type_CRUD(id){
         .done(function(response) {
           $('#btn_submit').attr('disabled', false);
           $('#modalIncomeType').modal('toggle');
-          $('#income_types-table').DataTable().draw(); 
+          $('#income_types-table').DataTable().draw(false); 
           toastr_msg('success', '{{ config('app.name') }}', response.message, 2000);
         })
         .fail(function(response) {

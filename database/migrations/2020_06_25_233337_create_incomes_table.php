@@ -17,6 +17,8 @@ class CreateIncomesTable extends Migration
             $table->bigIncrements('id');
             $table->bigInteger('condominium_id')->unsigned()->nullable();
             $table->foreign('condominium_id')->references('id')->on('condominiums')->onDelete('cascade');
+            $table->bigInteger('project_id')->unsigned()->nullable();
+            $table->foreign('project_id')->references('id')->on('projects')->onDelete('cascade');
             $table->bigInteger('property_id')->unsigned()->nullable();
             $table->foreign('property_id')->references('id')->on('properties')->onDelete('cascade');
             $table->bigInteger('income_type_id')->unsigned()->nullable();
@@ -24,7 +26,7 @@ class CreateIncomesTable extends Migration
             $table->bigInteger('account_id')->unsigned()->nullable();
             $table->foreign('account_id')->references('id')->on('accounts')->onDelete('cascade');
             $table->date('date');
-            $table->string('concept');
+            $table->string('concept',200);
             $table->char('payment_method',2);
             $table->string('reference',50)->nullable();
             $table->float('amount',11,2)->unsigned();

@@ -140,7 +140,7 @@ function change_visibility(id){
       },
   })
   .done(function(response) {
-      $('#documents-table').DataTable().draw();
+      $('#documents-table').DataTable().draw(false);
       toastr_msg('success', '{{ config('app.name') }}', response.message, 2000);
   })
   .fail(function() {
@@ -176,7 +176,7 @@ function document_delete(id){
   })
   .done(function(response) {
       $('#modalDeleteDocument').modal('toggle');
-      $('#documents-table').DataTable().draw();
+      $('#documents-table').DataTable().draw(false);
       toastr_msg('success', '{{ config('app.name') }}', response.message, 2000);
 
   })
@@ -204,7 +204,7 @@ function document_CRUD(id){
         .done(function(response) {
           $('#btn_submit').attr('disabled', false);
           $('#modalDocument').modal('toggle');
-          $('#documents-table').DataTable().draw(); 
+          $('#documents-table').DataTable().draw(false); 
           toastr_msg('success', '{{ config('app.name') }}', response.message, 2000);
         })
         .fail(function(response) {
@@ -223,7 +223,7 @@ function document_CRUD(id){
 }
 
 $("#document_type_filter").change( event => {
-  $('#documents-table').DataTable().draw();
+  $('#documents-table').DataTable().draw(false);
 });
 
 $(document).ready(function(){

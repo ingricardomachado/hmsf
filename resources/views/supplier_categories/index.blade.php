@@ -126,7 +126,7 @@ function change_status(id){
       },
   })
   .done(function(response) {
-      $('#supplier_categories-table').DataTable().draw();
+      $('#supplier_categories-table').DataTable().draw(false);
       toastr_msg('success', '{{ config('app.name') }}', response.message, 2000);
   })
   .fail(function() {
@@ -162,7 +162,7 @@ function supplier_category_delete(id){
   })
   .done(function(response) {
       $('#modalDeleteSupplierCategory').modal('toggle');
-      $('#supplier_categories-table').DataTable().draw();
+      $('#supplier_categories-table').DataTable().draw(false);
       toastr_msg('success', '{{ config('app.name') }}', response.message, 2000);
 
   })
@@ -190,7 +190,7 @@ function supplier_category_CRUD(id){
         .done(function(response) {
           $('#btn_submit').attr('disabled', false);
           $('#modalSupplierCategory').modal('toggle');
-          $('#supplier_categories-table').DataTable().draw(); 
+          $('#supplier_categories-table').DataTable().draw(false); 
           toastr_msg('success', '{{ config('app.name') }}', response.message, 2000);
         })
         .fail(function(response) {

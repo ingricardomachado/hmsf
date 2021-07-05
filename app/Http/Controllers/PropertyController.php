@@ -22,6 +22,7 @@ use File;
 use DB;
 use PDF;
 use Auth;
+use Carbon\Carbon;
 
 class PropertyController extends Controller
 {
@@ -121,7 +122,6 @@ class PropertyController extends Controller
             $property->number=$request->number;
             $property->condominium_id=$request->condominium_id;
             $property->user_id=($request->user)?$request->user:null;
-            $property->status= 'S'; //S=Solvente
             $property->save();
             
             return response()->json([

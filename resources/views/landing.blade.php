@@ -438,7 +438,7 @@
             <div class="col-lg-12 col-lg-offset-2">
         <form class="form-horizontal" id="form" method="POST" action="{{ route('register') }}">
             {{ csrf_field() }}
-            <input type="hidden" name="hdd_cell" id="hdd_cell" class="form-control" value="">
+            <input type="hidden" name="cell" id="cell" class="form-control" value="">
             <div class="col-sm-4">
                         <div class="col-sm-12">
                             <p>Llene el formulario. <b/>(*) Campos Obligatorios</b></p>
@@ -467,7 +467,7 @@
                           <input id="contact" class="form-control" name="contact" placeholder="Persona contacto *" required="required" type="text">
                         </div>
                         <div class="col-sm-12" style="padding-top: 1mm">
-                          <input id="cell" class="form-control" name="cell" placeholder="" required="required" type="text">
+                          <input id="national_cell" class="form-control" name="national_cell" placeholder="" required="required" type="text">
                           <span id="error-msg" style="color:#cc5965;font-weight:bold"></span>
                         </div>
                         <div class="col-sm-12" style="padding-top: 1mm">
@@ -529,11 +529,11 @@
 <script src="{{ URL::asset('js/plugins/intl-tel-input-master/build/js/utils.js') }}"></script>
 <script>
    
-var input = document.querySelector("#cell"),
+var input = document.querySelector("#national_cell"),
 output = document.querySelector("#error-msg");
 
 var iti = window.intlTelInput(input, {
-  onlyCountries: ['ar', 'bo', 'br', 'cl', 'co', 'cr', 'cu', 'sl', 'ec', 'es', 'gt', 'hn', 'mx', 'ni', 'pa', 'py', 'pe', 'pr', 'do', 'uy', 've'],
+  onlyCountries: ['ar', 'bo', 'br', 'cl', 'co', 'cr', 'cu', 'sv', 'ec', 'es', 'gt', 'hn', 'mx', 'ni', 'pa', 'py', 'pe', 'pr', 'do', 'uy', 've'],
   initialCountry: "auto",
   geoIpLookup: function(callback) {
     $.get('https://ipinfo.io', function() {}, "jsonp").always(function(resp) {
@@ -548,7 +548,7 @@ var iti = window.intlTelInput(input, {
 var handleChange = function() {
     var text="";
     if(iti.getNumber()!=''){
-        (iti.isValidNumber()) ? $('#hdd_cell').val(iti.getNumber()) : text="Introduzca un número válido";
+        (iti.isValidNumber()) ? $('#cell').val(iti.getNumber()) : text="Introduzca un número válido";
         var textNode = document.createTextNode(text);
         output.innerHTML = "";
         output.appendChild(textNode);        

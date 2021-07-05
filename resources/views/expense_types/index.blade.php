@@ -126,7 +126,7 @@ function change_status(id){
       },
   })
   .done(function(response) {
-      $('#expense_types-table').DataTable().draw();
+      $('#expense_types-table').DataTable().draw(false);
       toastr_msg('success', '{{ config('app.name') }}', response.message, 2000);
   })
   .fail(function() {
@@ -162,7 +162,7 @@ function expense_type_delete(id){
   })
   .done(function(response) {
       $('#modalDeleteExpenseType').modal('toggle');
-      $('#expense_types-table').DataTable().draw();
+      $('#expense_types-table').DataTable().draw(false);
       toastr_msg('success', '{{ config('app.name') }}', response.message, 2000);
 
   })
@@ -190,7 +190,7 @@ function expense_type_CRUD(id){
         .done(function(response) {
           $('#btn_submit').attr('disabled', false);
           $('#modalExpenseType').modal('toggle');
-          $('#expense_types-table').DataTable().draw(); 
+          $('#expense_types-table').DataTable().draw(false); 
           toastr_msg('success', '{{ config('app.name') }}', response.message, 2000);
         })
         .fail(function(response) {

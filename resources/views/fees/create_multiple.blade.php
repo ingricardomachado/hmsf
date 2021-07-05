@@ -45,7 +45,7 @@
                     </div>
                     <div class="form-group col-sm-12">
                         <label>Concepto *</label><small> Máx. 150 caracteres</small>
-                        {!! Form::textarea('concept', $fee->concept, ['id'=>'concept', 'class'=>'form-control', 'type'=>'text', 'rows'=>'2', 'style'=>'font-size:12px', 'placeholder'=>'Escribe aqui un concepto que describa la cuota a cobrar ...', 'maxlength'=>'150', 'required']) !!}
+                        {!! Form::text('concept', $fee->concept, ['id'=>'concept', 'class'=>'form-control', 'type'=>'text', 'style'=>'font-size:12px', 'placeholder'=>'Escribe aqui un concepto que describa la cuota a cobrar ...', 'maxlength'=>'150', 'required']) !!}
                     </div>
                 </div>
                 <div class="col-sm-7">

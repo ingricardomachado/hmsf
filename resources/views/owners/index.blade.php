@@ -131,7 +131,7 @@ function change_status(id){
       },
   })
   .done(function(response) {
-      $('#owners-table').DataTable().draw();
+      $('#owners-table').DataTable().draw(false);
       toastr_msg('success', '{{ config('app.name') }}', response.message, 2000);
   })
   .fail(function() {
@@ -167,7 +167,7 @@ function owner_delete(id){
   })
   .done(function(response) {
       $('#modalDeleteOwner').modal('toggle');
-      $('#owners-table').DataTable().draw();
+      $('#owners-table').DataTable().draw(false);
       toastr_msg('success', '{{ config('app.name') }}', response.message, 2000);
 
   })
@@ -195,7 +195,7 @@ function owner_CRUD(id){
         .done(function(response) {
           $('#btn_submit').attr('disabled', false);
           $('#modalOwner').modal('toggle');
-          $('#owners-table').DataTable().draw(); 
+          $('#owners-table').DataTable().draw(false); 
           toastr_msg('success', '{{ config('app.name') }}', response.message, 2000);
         })
         .fail(function(response) {

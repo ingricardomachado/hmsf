@@ -73,7 +73,7 @@
                     </li>
                 </ul>
             </li>
-            <li class="{{ set_active(['accounts', 'income_types', 'payments', 'incomes']) }}">
+            <li class="{{ set_active(['accounts', 'income_types', 'payments', 'incomes', 'expense_types', 'expenses']) }}">
                 <a href="#"><i class="fa fa-line-chart"></i><span class="nav-label">Finanzas</span> <span class="fa arrow"></span></a>
                 <ul class="nav nav-second-level collapse">
                     <li class="{{ set_active(['accounts']) }}">
@@ -93,14 +93,14 @@
                             </li>
                         </ul>
                     </li>
-                    <li class="{{ set_active(['income_types', 'payments', 'incomes']) }}">
+                    <li class="{{ set_active(['expense_types', 'expenses']) }}">
                         <a href="#">Egresos <span class="fa arrow"></span></a>
                         <ul class="nav nav-third-level">
                             <li class="{{ set_active(['expense_types']) }}">
                                 <a href="{{url('expense_types')}}">Tipos de Egresos</a>
                             </li>
                             <li class="{{ set_active(['expenses']) }}">
-                                <a href="{{url('espenses')}}">Egresos</a>
+                                <a href="{{url('expenses')}}">Egresos</a>
                             </li>
                         </ul>
                     </li>

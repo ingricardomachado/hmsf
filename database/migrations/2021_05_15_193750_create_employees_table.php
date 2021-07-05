@@ -21,8 +21,8 @@ class CreateEmployeesTable extends Migration
             $table->string('NIT',15)->nullable();
             $table->string('position',200)->nullable();
             $table->string('address',500)->nullable();
-            $table->string('phone',50)->nullable();
-            $table->string('cell',50);
+            $table->string('phone',15)->nullable();
+            $table->string('cell',15);
             $table->string('email',50)->nullable();
             $table->string('notes',500)->nullable();
             $table->string('avatar_name',100)->nullable();
