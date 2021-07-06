@@ -23,6 +23,8 @@ class CreateMovementsTable extends Migration
             $table->foreign('payment_id')->references('id')->on('payments')->onDelete('cascade');
             $table->bigInteger('expense_id')->unsigned()->nullable();
             $table->foreign('expense_id')->references('id')->on('expenses')->onDelete('cascade');
+            $table->bigInteger('transfer_id')->unsigned()->nullable();
+            $table->foreign('transfer_id')->references('id')->on('transfers')->onDelete('cascade');
             $table->char('type',1); //C=Creditos D=Debitos
             $table->date('date');
             $table->string('reference',200)->nullable();

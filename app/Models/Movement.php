@@ -31,6 +31,11 @@ class Movement extends Model
         return $this->belongsTo('App\Models\Payment');
     }
 
+    public function transfer(){
+   
+        return $this->belongsTo('App\Models\Transfer');
+    }
+
     //*** Accesors ***   
     public function getTypeDescriptionAttribute(){
         return ($this->type=='D')?'Débito':'Crédito';        
@@ -43,6 +48,8 @@ class Movement extends Model
             return $this->expense->reference;
         }elseif($this->payment_id){
             return $this->payment->reference;
+        }elseif($this->transfer_id){
+            return $this->transfer->reference;
         }        
     }
 
@@ -53,6 +60,8 @@ class Movement extends Model
             return (($this->expense->supplier_id)?$this->expense->supplier->name.' - ':'').$this->expense->concept;
         }elseif($this->payment_id){
             return $this->payment->property->number.' - '.$this->payment->concept;
+        }elseif($this->transfer_id){
+            return $this->transfer->concept;
         }        
     }
 

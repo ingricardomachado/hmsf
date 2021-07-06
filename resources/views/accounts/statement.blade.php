@@ -53,8 +53,8 @@
             </div>
             {{ Form::close() }}
             <div class="col-sm-8 col-xs-12 text-right">
-                <button type="button" id="btn_xls" class="btn btn-sm btn-primary btn-outline" title="Exportar Excel">XLS</button>                 
-                <a href="{{ url('accounts.rpt_movements') }}" class="btn btn-sm btn-default" target="_blank" title="Imprimir PDF"><i class="fa fa-print"></i></a>
+                <button type="button" id="btn_xls" class="btn btn-sm btn-primary btn-outline" title="Exportar Excel">XLS</button>
+                <button type="button" id="btn_rpt" class="btn btn-sm btn-default" title="Imprimir PDF"><i class="fa fa-print"></i></button>
                 <a href="{{URL::to('accounts')}}" class="btn btn-sm btn-default">Regresar</a>
                 <br><br>
             </div>
@@ -84,6 +84,14 @@ $('#btn_xls').on("click", function (e) {
   url = `{{URL::to('accounts.xls_movements')}}`;
   $('#form').attr('method', 'POST');
   $('#form').attr('target', '_self');
+  $('#form').attr('action', url);
+  $('#form').submit();
+});
+
+$('#btn_rpt').on("click", function (e) { 
+  url = `{{URL::to('accounts.rpt_movements')}}`;
+  $('#form').attr('method', 'POST');
+  $('#form').attr('target', '_blank');
   $('#form').attr('action', url);
   $('#form').submit();
 });

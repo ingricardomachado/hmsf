@@ -38,7 +38,7 @@ Route::get('accounts.rpt_accounts', 'AccountController@rpt_accounts')->name('acc
 Route::get('accounts.statement/{id}', 'AccountController@statement')->name('accounts.statement');
 Route::post('accounts.movements', 'AccountController@movements')->name('accounts.movements');
 Route::post('accounts.xls_movements', 'AccountController@xls_movements')->name('accounts.xls_movements');
-
+Route::post('accounts.rpt_movements', 'AccountController@rpt_movements')->name('accounts.rpt_movements');
 
 //Assets
 Route::resource("assets","AssetController");
@@ -126,6 +126,7 @@ Route::get('document_image/{id}', 'ImgController@showDocumentImage')->name('docu
 Route::get('income_image/{id}', 'ImgController@showIncomeImage')->name('income_image');
 Route::get('expense_image/{id}', 'ImgController@showExpenseImage')->name('expense_image');
 Route::get('payment_image/{id}', 'ImgController@showPaymentImage')->name('payment_image');
+Route::get('transfer_image/{id}', 'ImgController@showTransferImage')->name('transfer_image');
 Route::get('facility_photo/{id}', 'ImgController@showFacilityPhoto');
 
 //Income
@@ -200,6 +201,12 @@ Route::post('suppliers.datatable', 'SupplierController@datatable')->name('suppli
 Route::get('suppliers.load/{id}', 'SupplierController@load')->name('suppliers.load');
 Route::get('suppliers.status/{id}', 'SupplierController@status')->name('suppliers.status');
 Route::get('suppliers.rpt_suppliers', 'SupplierController@rpt_suppliers')->name('suppliers.rpt_suppliers');
+
+//Transfer
+Route::resource("transfers","TransferController");
+Route::get('transfers.datatable', 'TransferController@datatable')->name('transfers.datatable');
+Route::get('transfers.load/{id}', 'TransferController@load')->name('transfers.load');
+Route::get('transfers.download/{id}', ['as' => 'transfers.download', 'uses' => 'TransferController@download_file']);
 
 //Tools
 Route::get('get_states/{id}', 'ToolController@get_states');

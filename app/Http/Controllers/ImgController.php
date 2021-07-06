@@ -15,6 +15,7 @@ use App\Models\Document;
 use App\Models\Income;
 use App\Models\Expense;
 use App\Models\Payment;
+use App\Models\Transfer;
 use File;
 use Image;
 use Illuminate\Support\Facades\Redirect;
@@ -177,6 +178,16 @@ class ImgController extends Controller
         return $response;
     }
 
+    public function showTransferImage($id)
+    {
+        $transfer = Transfer::findOrFail($id);
+        $picture = Image::make(storage_path('app/'.$transfer->condominium_id.'/transfers/'.$transfer->file));
+        $response = Response::make($picture->encode('jpg'));
+        $response->header('Content-Type', 'image/jpeg');
+
+        return $response;
+    }
+
     public function showPaymentImage($id)
     {
         $payment = Payment::findOrFail($id);
@@ -186,7 +197,6 @@ class ImgController extends Controller
 
         return $response;
     }
-
 }
 
 ?>

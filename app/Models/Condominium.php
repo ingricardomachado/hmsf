@@ -109,12 +109,15 @@ class Condominium extends Model
         return $this->hasMany('App\Models\Supplier');
     }
 
+    public function transfers(){
+   
+        return $this->hasMany('App\Models\Transfer');
+    }
+    
     public function users(){
    
         return $this->hasMany('App\User');
     }
-
-
 
     //*** Accesors ***   
     public function getTypeDescriptionAttribute(){

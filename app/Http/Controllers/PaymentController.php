@@ -340,11 +340,14 @@ class PaymentController extends Controller
     {
         try {
             $payment = Payment::find($id);
+            $account=Account::find($payment->account_id);
+
             Storage::delete($payment->condominium_id.'/payments/'.$payment->file);
             Storage::delete($payment->condominium_id.'/payments/thumbs/'.$payment->file);
-
             $payment->delete();
-            $payment->account->update_balance();
+            
+            //se actualiza el saldo de la cuenta afectada
+            $account->update_balance();
             
             return response()->json([
                 'success' => true,

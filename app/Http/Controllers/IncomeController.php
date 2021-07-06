@@ -252,11 +252,14 @@ class IncomeController extends Controller
     {
         try {
             $income = Income::find($id);
+            $account=Account::find($income->account_id);
+            
             Storage::delete($income->condominium_id.'/incomes/'.$income->file);
             Storage::delete($income->condominium_id.'/incomes/thumbs/'.$income->file);
-
             $income->delete();
-            $income->account->update_balance();
+            
+            //se actualiza el saldo de la cuenta afectada
+            $account->update_balance();
             
             return response()->json([
                 'success' => true,

@@ -64,7 +64,7 @@ class AccountController extends Controller
                                     <a href="#" name="href_cancel" class="modal-class" onclick="showModalAccount('.$account->id.')"><i class="fa fa-pencil-square-o"></i> Editar</a>
                                 </li>
                                 <li>
-                                    <a href="'.url('accounts.statement',$account->id).'" name="href_cancel" class="modal-class"><i class="fa fa-pencil-square-o"></i> Estado de Cuenta</a>
+                                    <a href="'.url('accounts.statement',$account->id).'" name="href_cancel" class="modal-class"><i class="fa fa-th-list"></i> Estado de Cuenta</a>
                                 </li>
 
                                 <li>
@@ -306,17 +306,23 @@ class AccountController extends Controller
     }
 
 
+    public function get_movements($account_id, $start, $end){
+        
+        $movements = Movement::where('account_id', $account_id)
+                        ->whereDate('date', '>=', $start)
+                        ->whereDate('date', '<=', $end)
+                        ->orderBy('date')->orderBy('id')->get();        
+
+        return $movements;
+    }
+    
     public function movements(Request $request)
     {        
         $account=Account::find($request->account);
         $start=Carbon::createFromFormat('d/m/Y', $request->start);
         $end=Carbon::createFromFormat('d/m/Y', $request->end);
+        $movements=$this->get_movements($account->id, $start, $end);
 
-        $movements = Movement::where('account_id', $account->id)
-                        ->whereDate('date', '>=', $start)
-                        ->whereDate('date', '<=', $end)
-                        ->orderBy('date')->orderBy('id')->get();        
-        
         return view('accounts.movements')->with('account', $account)
                     ->with('start', $start)
                     ->with('end', $end)
@@ -328,13 +334,34 @@ class AccountController extends Controller
         $account=Account::find($request->account);
         $start=Carbon::createFromFormat('d/m/Y', $request->start);
         $end=Carbon::createFromFormat('d/m/Y', $request->end);
-
-        $movements = Movement::where('account_id', $account->id)
-                        ->whereDate('date', '>=', $start)
-                        ->whereDate('date', '<=', $end)
-                        ->orderBy('date')->orderBy('id')->get();        
+        $movements=$this->get_movements($account->id, $start, $end);
 
         return Excel::download(new MovementsExport($start, $account, $movements), 'Estado de Cuenta '.$account->aliase.'.xlsx');        
+    }
+
+    public function rpt_movements(Request $request)
+    {        
+        $logo=($this->condominium->logo)?realpath(storage_path()).'/app/'.$this->condominium->id.'/'.$this->condominium->logo:public_path().'/img/company_logo.png';
+        $company=$this->condominium->name;
+        
+        $account=Account::find($request->account);
+        $start=Carbon::createFromFormat('d/m/Y', $request->start);
+        $end=Carbon::createFromFormat('d/m/Y', $request->end);
+        $movements=$this->get_movements($account->id, $start, $end);
+
+        $data=[
+            'company' => $this->condominium->name,
+            'logo' => $logo,            
+            'account' => $account,
+            'start' => $start,
+            'end' => $end,
+            'movements' => $movements
+        ];
+
+        $pdf = PDF::loadView('reports/rpt_movements', $data);
+        
+        return $pdf->stream('Estado de Cuenta '.$account->aliase.'.pdf');
+    
     }
 
 }

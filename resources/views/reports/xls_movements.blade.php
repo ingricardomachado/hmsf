@@ -9,7 +9,7 @@
 </div>    
 @if($movements->count()>0)
 <div>
-    <table class="table table-hover">
+    <table class="table">
         <thead>
             <tr>
                 <th>Fecha</th>
@@ -36,5 +36,4 @@
         </tbody>
     </table>    
 </div>    
-@else
 @endif

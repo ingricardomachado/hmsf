@@ -279,11 +279,14 @@ class ExpenseController extends Controller
     {
         try {
             $expense = Expense::find($id);
+            $account=Account::find($expense->account_id);
+            
             Storage::delete($expense->condominium_id.'/expenses/'.$expense->file);
             Storage::delete($expense->condominium_id.'/expenses/thumbs/'.$expense->file);
-
             $expense->delete();
-            $expense->account->update_balance();
+            
+            //se actualiza el saldo de la cuenta
+            $account->update_balance();
             
             return response()->json([
                 'success' => true,
