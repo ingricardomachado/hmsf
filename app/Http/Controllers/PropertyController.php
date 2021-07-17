@@ -17,6 +17,7 @@ use Illuminate\Support\Facades\Response;
 use App\Http\Controllers\ImgController;
 //Export
 use App\Exports\PropertiesExport;
+use App\Exports\StatementExport;
 use Image;
 use File;
 use DB;
@@ -64,6 +65,10 @@ class PropertyController extends Controller
                                 <li>
                                     <a href="#" name="href_cancel" class="modal-class" onclick="showModalProperty('.$property->id.')"><i class="fa fa-pencil-square-o"></i> Editar</a>
                                 </li>
+                                <li>
+                                    <a href="'.url('properties.statement', Crypt::encrypt($property->id)).'" class="modal-class"><i class="fa fa-file-text-o"></i> Estado de Cuenta</a>
+                                </li>
+
                                 <li class="divider"></li>
                                 <li>
                                     <a href="#" onclick="showModalDelete(`'.$property->id.'`, `'.$property->number.'`)"><i class="fa fa-trash-o"></i> Eliminiar</a>                                
@@ -72,7 +77,7 @@ class PropertyController extends Controller
                         </div>';
                 })           
             ->editColumn('number', function ($property) {                    
-                    return '<a href="#"  onclick="showModalProperty('.$property->id.')" class="modal-class" style="color:inherit"  title="Click para editar"><b>'.$property->number.'</b></a>';
+                    return '<a href="'.url('properties.statement', Crypt::encrypt($property->id)).'" class="modal-class" style="color:inherit"  title="Click para editar"><b>'.$property->number.'</b></a>';
                 })
             ->editColumn('due_debt', function ($property) {                    
                     return money_fmt($property->due_debt);
@@ -252,4 +257,46 @@ class PropertyController extends Controller
     
     }
 
+    /**
+     * Display the specified account.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function statement($id)
+    {
+        $property=Property::findOrFail(Crypt::decrypt($id));
+        $fees=$property->fees()->where('balance', '>',0)->get();
+        
+        return view('properties.statement')->with('property', $property)
+                                    ->with('fees', $fees);
+    }
+
+    public function rpt_statement($id)
+    {        
+        $logo=($this->condominium->logo)?realpath(storage_path()).'/app/'.$this->condominium->id.'/'.$this->condominium->logo:public_path().'/img/company_logo.png';
+        $company=$this->condominium->name;
+        
+        $property=Property::find(Crypt::decrypt($id));
+        $fees=$property->fees()->where('balance', '>',0)->get();
+
+        $data=[
+            'company' => $this->condominium->name,
+            'logo' => $logo,            
+            'property' => $property,
+            'fees' => $fees
+        ];
+
+        $pdf = PDF::loadView('reports/rpt_statement', $data);
+        
+        return $pdf->stream('Estado de Cuenta '.$property->number.'.pdf');
+    }
+
+    public function xls_statement($id)
+    {        
+        $property=Property::find(Crypt::decrypt($id));
+        $fees=$property->fees()->where('balance', '>',0)->get();
+
+        return Excel::download(new StatementExport($property, $fees), 'Estado de Cuenta '.$property->number.'.xlsx');        
+    }
 }

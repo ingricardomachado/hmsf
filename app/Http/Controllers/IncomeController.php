@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 
 use App\Http\Requests;
 use App\Http\Requests\IncomeRequest;
+use App\Models\Account;
 use App\Models\Income;
 use App\Models\IncomeType;
 use App\Models\Property;

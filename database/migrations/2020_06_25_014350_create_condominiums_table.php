@@ -41,6 +41,7 @@ class CreateCondominiumsTable extends Migration
             $table->string('logo',100)->nullable();
             $table->string('logo_name',100)->nullable();
             $table->string('logo_type',10)->nullable();
+            $table->boolean('active')->default(true);            
             $table->timestamps();
         });
     }

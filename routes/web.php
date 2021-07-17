@@ -54,12 +54,24 @@ Route::get('cars.load/{id}', 'CarController@load')->name('properties.load');
 Route::get('cars.status/{id}', 'CarController@status')->name('cars.status');
 Route::get('cars.rpt_cars', 'CarController@rpt_cars')->name('cars.rpt_cars');
 
+//Condominiums
+Route::resource("condominiums","CondominiumController");
+Route::get('condominiums.datatable', 'CondominiumController@datatable')->name('condominiums.datatable');
+Route::get('condominiums.load/{id}', 'CondominiumController@load')->name('condominiums.load');
+Route::get('condominiums.status/{id}', 'CondominiumController@status')->name('condominiums.status');
+Route::get('condominiums.rpt_condominiums', 'CondominiumController@rpt_condominiums')->name('condominiums.rpt_condominiums');
+Route::post('condominiums/{id}/events', 'CondominiumController@events');
+
 //Contacts
 Route::resource("contacts","ContactController");
 Route::post('contacts.datatable', 'ContactController@datatable')->name('contacts.datatable');
 Route::get('contacts.load/{id}', 'ContactController@load')->name('contacts.load');
 Route::get('contacts.status/{id}', 'ContactController@status')->name('contacts.status');
 Route::get('contacts.rpt_contacts', 'ContactController@rpt_contacts')->name('contacts.rpt_contacts');
+
+//Countries
+Route::resource("countries","CountryController");
+
 
 //DocumentTypes
 Route::resource("document_types","DocumentTypeController");
@@ -95,6 +107,11 @@ Route::get('expense_types.datatable', 'ExpenseTypeController@datatable')->name('
 Route::get('expense_types.load/{id}', 'ExpenseTypeController@load')->name('expense_types.load');
 Route::get('expense_types.status/{id}', 'ExpenseTypeController@status')->name('expense_types.status');
 Route::get('expense_types.rpt_expense_types', 'ExpenseTypeController@rpt_expense_types')->name('expense_types.rpt_expense_types');
+
+//Events
+Route::resource("events","EventController");
+Route::post('events.drop/{id}', 'EventController@drop')->name('events.drop');
+Route::get('events.load/{id}', 'EventController@load')->name('events.load');
 
 //Facilities
 Route::resource("facilities","FacilityController");
@@ -143,6 +160,11 @@ Route::get('income_types.load/{id}', 'IncomeTypeController@load')->name('income_
 Route::get('income_types.status/{id}', 'IncomeTypeController@status')->name('income_types.status');
 Route::get('income_types.rpt_income_types', 'IncomeTypeController@rpt_income_types')->name('income_types.rpt_income_types');
 
+//Notifications
+Route::get('emails', 'NotificationController@email')->name('emails');
+Route::post('notifications.send_email', 'NotificationController@send_email')->name('notifications.send_email');
+Route::get('billing', 'NotificationController@billing')->name('billing');
+
 //Owners
 Route::resource("owners","OwnerController");
 Route::post('owners.status', ['as' => 'owners.status', 'uses' => 'OwnerController@status']);
@@ -162,6 +184,31 @@ Route::get('payments.load_confirm/{id}', 'PaymentController@load_confirm')->name
 Route::post('payments.confirm/{id}', 'PaymentController@confirm')->name('payments.confirm');
 Route::get('payments.rpt_payment/{id}', 'PaymentController@rpt_payment')->name('payments.rpt_payment');
 
+//Projects
+Route::resource("projects","ProjectController");
+Route::post('projects.datatable', 'ProjectController@datatable')->name('projects.datatable');
+Route::get('projects.load/{id}', 'ProjectController@load')->name('projects.load');
+Route::get('projects.load_progress/{id}', 'ProjectController@load_progress')->name('projects.load_progress');
+Route::get('projects.load_finish/{id}', 'ProjectController@load_finish')->name('projects.load_finish');
+Route::get('projects.detail/{id}', 'ProjectController@detail')->name('projects.detail');
+Route::get('projects.gallery/{id}', 'ProjectController@gallery')->name('projects.gallery');
+Route::post('projects.status/{id}', 'ProjectController@status')->name('projects.status');
+Route::get('projects.rpt_project/{id}', 'ProjectController@rpt_project')->name('projects.rpt_project');
+Route::get('projects.rpt_projects', 'ProjectController@rpt_projects')->name('projects.rpt_projects');
+
+Route::get('projects.load_btn_status/{id}', 'ProjectController@load_btn_status')->name('projects.load_btn_status');
+
+//ProjectActivities
+Route::resource("project_activities","ProjectActivityController");
+Route::get('project_activities.index/{id}', ['as' => 'project_activities.index', 'uses' => 'ProjectActivityController@index']);
+Route::get('project_activities.load/{project}/{activity}', ['as' => 'project_activities.load', 'uses' => 'ProjectActivityController@load']);
+
+
+//ProjectComments
+Route::resource("project_comments","ProjectCommentController");
+Route::get('project_comments.index/{id}', ['as' => 'project_comments.index', 'uses' => 'ProjectCommentController@index']);
+Route::get('project_comments.load/{project}/{comment}', ['as' => 'project_comments.load', 'uses' => 'ProjectCommentController@load']);
+
 
 //Properties
 Route::resource("properties","PropertyController");
@@ -171,6 +218,11 @@ Route::get('properties.rpt_properties', 'PropertyController@rpt_properties')->na
 Route::get('properties.xls_properties', 'PropertyController@xls_properties')->name('properties.xls_properties');
 Route::get('taxes', 'PropertyController@taxes')->name('properties.taxes');
 Route::post('properties.update_taxes', 'PropertyController@update_taxes')->name('properties.update_taxes');
+Route::get('properties.statement/{id}', 'PropertyController@statement')->name('properties.statement');
+Route::get('properties.rpt_statement/{id}', 'PropertyController@rpt_statement')->name('properties.rpt_statement');
+Route::get('properties.xls_statement/{id}', 'PropertyController@xls_statement')->name('properties.xls_statement');
+
+
 
 //Reservations
 Route::resource("reservations","ReservationController");

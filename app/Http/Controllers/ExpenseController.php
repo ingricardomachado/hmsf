@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 
 use App\Http\Requests;
 use App\Http\Requests\ExpenseRequest;
+use App\Models\Account;
 use App\Models\Expense;
 use App\Models\ExpenseType;
 use App\Models\Property;

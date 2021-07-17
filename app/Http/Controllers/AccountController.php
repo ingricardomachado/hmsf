@@ -64,7 +64,7 @@ class AccountController extends Controller
                                     <a href="#" name="href_cancel" class="modal-class" onclick="showModalAccount('.$account->id.')"><i class="fa fa-pencil-square-o"></i> Editar</a>
                                 </li>
                                 <li>
-                                    <a href="'.url('accounts.statement',$account->id).'" name="href_cancel" class="modal-class"><i class="fa fa-th-list"></i> Estado de Cuenta</a>
+                                    <a href="'.url('accounts.statement',$account->id).'" name="href_cancel" class="modal-class"><i class="fa fa-file-text-o"></i> Estado de Cuenta</a>
                                 </li>
 
                                 <li>

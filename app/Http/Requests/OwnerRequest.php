@@ -28,9 +28,13 @@ class OwnerRequest extends FormRequest
 
         $owner_id= $this->request->get('owner_id');
         if($owner_id>0){
-          $rules['email'] = 'email|max:50|unique:users,email,'.$owner_id;
+            $rules['email'] = 'email|max:50|unique:users,email,'.$owner_id;
+            if ($this->request->get('change_password')){        
+                $rules['password'] = 'min:6|max:15|required_with:password_confirmation|string|confirmed';
+            }
         }else{
-          $rules['email'] = 'email|max:50|unique:users';
+            $rules['email'] = 'email|max:50|unique:users';
+            $rules['password'] = 'min:6|max:15|required_with:password_confirmation|string|confirmed';
         }
         
         return $rules;
@@ -40,6 +44,7 @@ class OwnerRequest extends FormRequest
     {
         return [
           'email.unique' => 'El correo ya ha sido registrado',
+          'password.confirmed' => 'La confirmación de la contraseña no coincide',
         ];
     }
 }

@@ -65,6 +65,17 @@ class Fee extends Model
         }
     }    
 
+    public function getStatusDescriptionAttribute(){
+                
+        if($this->balance<=0){
+            return "Solvente";
+        }elseif($this->balance>0 && $this->remainig_days<=0){
+            return "Pendiente";
+        }elseif($this->balance>0 && $this->remainig_days>0){
+            return "Morosa";
+        }
+    }    
+
     public function getBulletAttribute(){
                 
         if($this->balance<=0){

@@ -19,7 +19,7 @@
         
         <!-- ibox-title -->
         <div class="ibox-title">
-          <h5><i class="fa fa-th-list" aria-hidden="true"></i> Estado de Cuenta</h5>
+          <h5><i class="fa fa-file-text-o" aria-hidden="true"></i> Estado de Cuenta</h5>
             <div class="ibox-tools">
               <a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
               <a class="dropdown-toggle" data-toggle="dropdown" href="#"><i class="fa fa-wrench"></i></a>

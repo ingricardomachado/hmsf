@@ -48,11 +48,29 @@
                     {!! Form::text('properties', null, ['id'=>'properties', 'class'=>'form-control', 'type'=>'text', 'required']) !!}
                     <span id="msj_error_properties" style="color:#cc5965;font-weight:bold"></span>
                 </div>
-                <div class="form-group col-sm-12">
+                <div class="form-group col-sm-12" style="display:{{ ($owner->id)?'solid':'none' }}">
+                    <div class="i-checks">
+                        <label>{!! Form::checkbox('change_password', null,  false, ['id'=>'change_password']) !!} Cambiar la contraseña</label>
+                    </div>
+                </div>
+                <div class="form-group col-sm-6" id='div_password' style='display:{{ ($owner->id)?'none':'solid' }};'>
+                    <label>Contraseña *</label><small> De 6 a 15 caracteres.</small>
+                    <input type="password" class="form-control" name="password" id="password" placeholder="" minlength="6" maxlength="15" required>
+                </div>
+                <div class="form-group col-sm-6" id='div_password_confirmation' style='display:{{ ($owner->id)?'none':'solid' }};'>
+                    <label>Confirmar Contraseña *</label>
+                    <input type="password" class="form-control" name="password_confirmation" id="password_confirmation" placeholder="" minlength="6" maxlength="15" required>
+                </div>
+                <div class="form-group col-sm-6">
                     <div class="i-checks">
                         <label>{!! Form::checkbox('committee', null,  $owner->committee, ['id'=>'committee']) !!} Pertenece al comité</label>
                     </div>
-                </div>      
+                </div>
+                <div class="form-group col-sm-6" id="div_notification" style="display:{{ ($owner->id)?'none':'solid' }}">
+                    <div class="i-checks">
+                        <label>{!! Form::checkbox('notification', null,  false, ['id'=>'notification']) !!} <span id="label_notification">Notificar por correo al propietario</label>
+                    </div>
+                </div>
             </div>
         </div>
         <div class="modal-footer">
@@ -72,6 +90,20 @@
 <script src="{{ URL::asset('js/plugins/intl-tel-input-master/build/js/intlTelInput.js') }}"></script>
 <script src="{{ URL::asset('js/plugins/intl-tel-input-master/build/js/utils.js') }}"></script>
 <script>
+
+$('#change_password').on('ifChanged', function(event){
+  if(event.target.checked){
+    $('#div_password').show();
+    $('#div_password_confirmation').show();
+    $('#label_notification').html('Notificar el cambio de contraseña'); 
+    $('#div_notification').show();    
+  }else{
+    $('#div_password').hide();
+    $('#div_password_confirmation').hide();
+    $('#label_notification').html('Notificar por correo al propietario');
+    $('#div_notification').hide();    
+  }  
+});
 
 var input = document.querySelector("#national_cell"),
 output = document.querySelector("#error-msg");

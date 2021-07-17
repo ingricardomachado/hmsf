@@ -16,7 +16,7 @@ class Country extends Model
 
     public function states(){
    
-        return $this->hasMany('App\Models\States');
+        return $this->hasMany('App\Models\State');
     }
 
     //*** Methods ***

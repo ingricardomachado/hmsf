@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 
 use App\Http\Requests;
 use App\Http\Requests\PaymentRequest;
+use App\Models\Account;
 use App\Models\Payment;
 use App\Models\Fee;
 use App\Models\IncomeType;

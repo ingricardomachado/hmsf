@@ -87,6 +87,14 @@
                                 <label>Dirección *</label>
                                 {!! Form::text('address', $condominium->address, ['id'=>'address', 'class'=>'form-control', 'type'=>'text', 'placeholder'=>'', 'maxlength'=>'200', 'required']) !!}
                             </div>
+                            <div class="form-group col-sm-6">
+                                <label>Símbolo de moneda *</label>
+                                {!! Form::text('coin', $condominium->coin, ['id'=>'coin', 'class'=>'form-control', 'type'=>'text', 'placeholder'=>'Ej. MXN', 'maxlength'=>'10', 'required']) !!}
+                            </div>                            
+                            <div class="form-group col-sm-6">
+                                <label>Formato de moneda *</label>
+                                {!! Form::select('money_format', ['PC2'=>'1.000,00', 'CP2' => '1,000.00'], $condominium->money_format, ['id'=>'money_format', 'class'=>'select2_single form-control', 'tabindex'=>'-1', 'placeholder'=>'', 'required']) !!}
+                            </div>
                         </div>
                         <div class="col-sm-12">
                         </div>

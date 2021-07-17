@@ -1,10 +1,10 @@
 <?php
 
-use Illuminate\Support\Facades\Schema;
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
 
-class CreatePhotoProjectTable extends Migration
+class CreateProjectPhotoTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,7 +13,7 @@ class CreatePhotoProjectTable extends Migration
      */
     public function up()
     {
-        Schema::create('photo_project', function (Blueprint $table) {
+        Schema::create('project_photo', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->bigInteger('project_id')->unsigned()->nullable();
             $table->foreign('project_id')->references('id')->on('projects')->onDelete('cascade');
@@ -21,8 +21,8 @@ class CreatePhotoProjectTable extends Migration
             $table->string('file_name',255)->nullable();
             $table->string('file_type',10)->nullable();
             $table->string('file',255)->nullable();
+            $table->integer('file_size')->unsigned()->nullable();            
             $table->char('stage',2)->default('AN'); //AN=Antes, DU=Durante, DE=Despuest
-            $table->timestamps();
         });
     }
 
@@ -33,6 +33,6 @@ class CreatePhotoProjectTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('photo_project');
+        Schema::dropIfExists('project_photo');
     }
 }

@@ -19,15 +19,15 @@ class CreateProjectsTable extends Migration
             $table->foreign('condominium_id')->references('id')->on('condominiums')->onDelete('cascade');
             $table->string('name', 100);
             $table->string('description', 250);
-            $table->date('start');
-            $table->date('end');
-            $table->date('real_start');
-            $table->date('real_end');
-            $table->float('budget',11,2);
-            $table->integer('advance');
-            $table->char('status', 1)->default('P'); //P=Pendiente C=Curso F=Finalizado
+            $table->date('planned');
+            $table->date('planned_end');
+            $table->date('started')->nullable();
+            $table->date('finished')->nullable();
+            $table->float('budget',11,2)->nullable();
+            $table->integer('advance')->default(0);
+            $table->char('status', 1)->default('P'); //P=Pendiente E=Ejecucion F=Finalizado C=Cancelado
+            $table->string('hash',35)->nullable();
             $table->string('created_by', 100)->nullable();
-
             $table->timestamps();
         });
     }

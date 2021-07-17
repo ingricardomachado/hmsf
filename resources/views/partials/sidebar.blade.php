@@ -34,7 +34,7 @@
                 <a href="{{url('home')}}"><i class="fa fa-laptop"></i> <span class="nav-label">Dashboard</span></a>
             </li>
             <li class="{{ set_active(['condominiums']) }}">
-                <a href="{{url('users')}}"><i class="fa fa-user"></i> <span class="nav-label">Condominios</span></a>
+                <a href="{{url('condominiums')}}"><i class="fa fa-building-o"></i> <span class="nav-label">Condominios</span></a>
             </li>
             <li class="{{ set_active(['settings']) }}">
                 <a href="{{url('settings')}}"><span class="nav-label"><i class="fa fa-cogs"></i> Configuraciones</span></a>
@@ -112,7 +112,6 @@
                     </li>
                 </ul>
             </li>
-            
             <li class="{{ set_active(['supplier_categories', 'suppliers', 'services', 'contacts', 'employees']) }}">
                 <a href="#"><i class="fa fa-address-book-o"></i><span class="nav-label">Directorios</span> <span class="fa arrow"></span></a>
                 <ul class="nav nav-second-level collapse">
@@ -135,6 +134,9 @@
                     </li>
                 </ul>
             </li>
+            <li class="{{ set_active(['projects']) }}">
+                <a href="{{url('projects')}}"><i class="fa fa-wrench"></i> <span class="nav-label">Proyectos</span></a>
+            </li>
             <li class="{{ set_active(['document_types', 'documents']) }}">
                 <a href="#"><i class="fa fa-folder-o"></i><span class="nav-label">Documentos</span> <span class="fa arrow"></span></a>
                 <ul class="nav nav-second-level collapse">
@@ -146,11 +148,34 @@
                     </li>
                 </ul>
             </li>
+            <li class="{{ set_active(['emails']) }}">
+                <a href="#"><i class="fa fa-envelope-o"></i><span class="nav-label">Correos</span> <span class="fa arrow"></span></a>
+                <ul class="nav nav-second-level collapse">
+                    <li class="{{ set_active(['emails']) }}">
+                        <a href="{{url('emails')}}">Correo Libre</a>
+                    </li>
+                    <li class="{{ set_active(['emails']) }}">
+                        <a href="{{url('emails')}}">Avisos de Cobro</a>
+                    </li>
+                </ul>
+            </li>
+            <li class="{{ set_active(['events']) }}">
+                <a href="{{url('events')}}"><i class="fa fa-calendar-o"></i> <span class="nav-label">Calendario</span></a>
+            </li>
+
             <li class="{{ set_active(['settings.condominium']) }}">
                 <a href="{{url('settings.condominium')}}"><i class="fa fa-cogs"></i> <span class="nav-label">Configuración</span></a>
             </li>
         @endif
         <!-- /Menu ADM Administrador -->        
+        
+        <!-- Menu OWN Propietario -->
+        @if(session('role')=='OWN')
+            <li class="{{ set_active(['home']) }}">
+                <a href="{{url('home')}}"><i class="fa fa-laptop"></i> <span class="nav-label">Dashboard</span></a>
+            </li>
+        @endif
+        <!-- /Menu OWN Propietario -->
         
         </ul>
     </div>

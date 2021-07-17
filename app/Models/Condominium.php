@@ -54,6 +54,11 @@ class Condominium extends Model
         return $this->hasMany('App\Models\Expense');
     }
 
+    public function events(){
+   
+        return $this->hasMany('App\Models\Event');
+    }
+
     public function facilities(){
    
         return $this->hasMany('App\Models\Facility');
@@ -131,27 +136,12 @@ class Condominium extends Model
         }
     }    
     
-    public function getActiveLabelAttribute(){
+    public function getStatusLabelAttribute(){
         
         if($this->active){
             return "<span class='label label-primary' style='font-weight:normal'>Activo</span>";
         }else{
             return "<span class='label label-danger' style='font-weight:normal'>Inactivo</span>";
         }
-    }    
-
-    public function getStatusLabelAttribute(){
-        
-        $status_lbl = '';
-        
-        if($this->status == 'A'){
-        	$status_lbl = "<span class='label label-primary' style='font-weight:normal'>Activo</span>";
-        }elseif($this->status == 'D'){
-			$status_lbl = "<span class='label label-danger' style='font-weight:normal'>Inactivo</span>";
-        }
-
-        return $status_lbl;
-    }    
-
-
+    }
 }

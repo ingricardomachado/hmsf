@@ -21,6 +21,9 @@ use File;
 use DB;
 use PDF;
 use Auth;
+use Mail;
+use App\Mail\SignedupOwner;
+use App\Mail\ChangePassword;
 
 class OwnerController extends Controller
 {
@@ -124,6 +127,9 @@ class OwnerController extends Controller
             $owner->committee=($request->committee)?true:false;
             $owner->save();
             Property::whereIn('id', $request->properties)->update(['user_id' => $owner->id]);
+            if($request->notification){
+                Mail::to($owner->email)->send(new SignedupOwner($owner, $request->password));
+            }
             
             return response()->json([
                     'success' => true,
@@ -155,6 +161,12 @@ class OwnerController extends Controller
             $owner->cell=$request->cell;
             $owner->phone=$request->phone;
             $owner->committee=($request->committee)?true:false;
+            if($request->change_password){
+                $owner->password=bcrypt($request->password);
+                if($request->notification){
+                    Mail::to($owner->email)->send(new ChangePassword($owner, $request->password));
+                }
+            }
             $owner->save();
             Property::where('user_id', $owner->id)->update(['user_id' => null]);
             Property::whereIn('id', $request->properties)->update(['user_id' => $owner->id]);

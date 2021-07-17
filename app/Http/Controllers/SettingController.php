@@ -59,8 +59,6 @@ class SettingController extends Controller
         $setting->phone= $request->input('phone');
         $setting->email= $request->input('email');
         $setting->app_name= $request->input('app_name');
-        $setting->coin= $request->input('coin');
-        $setting->money_format= $request->input('money_format');
         $setting->save();        
         $this->set_session_global();
         
@@ -102,6 +100,8 @@ class SettingController extends Controller
         $condominium->cell=$request->cell;
         $condominium->phone=$request->phone;
         $condominium->email= $request->email;
+        $condominium->coin= $request->input('coin');
+        $condominium->money_format= $request->input('money_format');        
         $condominium->save();        
         $this->set_session_condominium($condominium->id);
         
@@ -110,13 +110,13 @@ class SettingController extends Controller
 
     public function set_session_global(){
         $setting = Setting::first();
-        Session::put('coin', $setting->coin);
-        Session::put('money_format', $setting->money_format);
     }
 
     public function set_session_condominium($id){
         $condominium = Condominium::find($id);
         Session::put('condominium', $condominium);
+        Session::put('coin', $condominium->coin);
+        Session::put('money_format', $condominium->money_format);
     }
 
 }

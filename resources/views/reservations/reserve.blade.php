@@ -3,6 +3,7 @@
 @push('stylesheets')
 <!-- Full Calendar -->
 <link href="{{ URL::asset('js/plugins/fullcalendar-3.2.0/fullcalendar.min.css') }}" rel="stylesheet">
+<link href="{{ URL::asset('css/style.css') }}" rel="stylesheet">
 <link rel="stylesheet" href="{{ asset("js/plugins/jquery-qtip2-3.0.3/css/jquery.qtip.min.css") }}">
 @endpush
 
