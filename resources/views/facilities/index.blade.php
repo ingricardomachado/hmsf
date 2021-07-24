@@ -38,9 +38,11 @@
             <div class="col-sm-3 col-xs-12">
             </div>
             <div class="col-sm-9 col-xs-12 text-right">
+              @if(session('role')=='ADM')
                 <a href="#" class="btn btn-sm btn-primary" onclick="showModalFacility(0);"><i class="fa fa-plus-circle"></i> Nueva Instalación</a>
                 <a href="{{ url('facilities.rpt_facilities') }}" class="btn btn-sm btn-default" target="_blank" title="Imprimir PDF"><i class="fa fa-print"></i></a>
                 <br><br>
+              @endif
             </div>
             <div class="col-sm-12">
               @include('partials.errors')
@@ -198,9 +200,9 @@ $(document).ready(function(){
         ajax: '{!! route('facilities.datatable') !!}',
         columns: [
             { data: 'action', name: 'action', orderable: false, searchable: false},
-            { data: 'name',   name: 'name', orderable: true, searchable: true},
-            { data: 'more',   name: 'more', orderable: true, searchable: true},
-            { data: 'rules',   name: 'rules', orderable: true, searchable: true},
+            { data: 'name',   name: 'name', orderable: false, searchable: true},
+            { data: 'more',   name: 'more', orderable: false, searchable: false},
+            { data: 'rules',   name: 'rules', orderable: false, searchable: false},
             { data: 'status', name: 'status', orderable: false, searchable: false }
         ]
     });

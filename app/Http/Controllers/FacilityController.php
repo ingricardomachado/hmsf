@@ -56,6 +56,7 @@ class FacilityController extends Controller
         
         return Datatables::of($facilities)
             ->addColumn('action', function ($facility) {
+                    if(session('role')=='ADM'){
                         return '<div class="input-group-btn text-center">
                             <button data-toggle="dropdown" class="btn btn-xs btn-default dropdown-toggle" type="button" title="Acciones"><i class="fa fa-chevron-circle-down" aria-hidden="true"></i></button>
                             <ul class="dropdown-menu">
@@ -68,9 +69,14 @@ class FacilityController extends Controller
                                 </li>
                             </ul>
                         </div>';
+                    }    
                 })           
             ->editColumn('name', function ($facility) {                    
-                    return '<a href="#"  onclick="showModalFacility('.$facility->id.')" class="modal-class" style="color:inherit"  title="Click para editar"><b>'.$facility->name.'</b><br><small><i>De '.$facility->start->format('g:i a').' a '.$facility->end->format('g:i a').'</i></small></a>';
+                    if(session('role')=='OWN'){
+                        return '<b>'.$facility->name.'</b><br><small><i>De '.$facility->start->format('g:i a').' a '.$facility->end->format('g:i a');
+                    }else{
+                        return '<a href="#"  onclick="showModalFacility('.$facility->id.')" class="modal-class" style="color:inherit"  title="Click para editar"><b>'.$facility->name.'</b><br><small><i>De '.$facility->start->format('g:i a').' a '.$facility->end->format('g:i a').'</i></small></a>';
+                    }
                 })
             ->editColumn('more', function ($facility) {                    
                     $defaulters=($facility->defaulters)?'Si':'No';

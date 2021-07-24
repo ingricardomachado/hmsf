@@ -29,12 +29,12 @@
                     
         <!-- ibox-content- -->
         <div class="ibox-content">
-          <form action="#" id="form_sale" method="POST">
           <div class="row">
             <div class="col-sm-6">
               <b>Propiedad:</b> {{ $property->number }}<br>
               <b>Propietario:</b> {{ ($property->user_id)?$property->user->name:'' }}<br>
             </div>
+          @if($fees->count()>0)
             <div class="col-sm-6 col-xs-12 text-right">
                 <a href="{{ url('properties.xls_statement', Crypt::encrypt($property->id)) }}" class="btn btn-sm btn-primary btn-outline" target="_blank" title="Exportar Excel">XLS</a>
                 <a href="{{ url('properties.rpt_statement', Crypt::encrypt($property->id)) }}" class="btn btn-sm btn-default" target="_blank" title="Imprimir PDF"><i class="fa fa-print"></i></a>
@@ -80,6 +80,17 @@
                 </tbody>
               </table>
             </div>
+          @else
+            <div class="col-sm-6 col-xs-12 text-right">
+              <a href="{{URL::to('properties')}}" class="btn btn-sm btn-default">Regresar</a>
+            </div>
+            <div class="col-sm-12 col-xs-12">
+              <div class="alert alert-info" style="margin-top:4mm">
+                <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+                <strong>Atención!</strong> Esta propiedad no tiene cuotas pendientes
+              </div>
+            </div>
+          @endif
           </div>
         </div>
         <!-- /ibox-content- -->

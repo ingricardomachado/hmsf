@@ -1,6 +1,7 @@
 @extends('layouts.app')
-
 @push('stylesheets')
+<!-- Magnific Popup -->
+<link rel="stylesheet" href="{{ URL::asset('js/plugins/magnific-popup/magnific-popup.css') }}">
 @endpush
 
 @section('page-header')
@@ -30,15 +31,18 @@
                         </div>
                     </div>
                     <div class="row">
-                        <div class="col-lg-6">
-                            <dl class="dl-horizontal">
-                                <dt>Creado por:</dt> <dd>{{ $project->created_by }}</dd>
-                            </dl>
-                        </div>
                         <div class="col-lg-6" id="cluster_info">
                             <dl class="dl-horizontal" >
                                 <dt>Inicio estimado:</dt> <dd>{{ $project->planned->format('d.m.Y') }}</dd>
                                 <dt>Fin estimado:</dt> <dd>{{ $project->planned_end->format('d.m.Y') }}</dd>
+                                <dt>Costo estimado:</dt> <dd>{{ session('coin') }} {{ money_fmt($project->budget) }}</dd>
+                            </dl>
+                        </div>
+                        <div class="col-lg-6">
+                            <dl class="dl-horizontal">
+                                <dt>Total Ingresos:</dt> <dd>{{ session('coin') }} {{ money_fmt($tot_incomes) }}</dd>
+                                <dt>Total Egresos:</dt> <dd>{{ session('coin') }} {{ money_fmt($tot_expenses) }}</dd>
+                                <dt>Saldo:</dt> <dd><b>{{ session('coin') }} {{ money_fmt($balance) }}</b></dd>
                             </dl>
                         </div>
                     </div>
@@ -54,42 +58,36 @@
                     </div>
                     <div class="row m-t-sm">
                         <div class="col-lg-12">
-                        <div class="panel blank-panel">
-                        <div class="panel-heading">
-                            <div class="panel-options">
-                                <ul class="nav nav-tabs">
-                                    <li class="active"><a href="#tab-1" data-toggle="tab">Actividades</a></li>
-                                    <li><a href="#tab-2" data-toggle="tab">Cotizaciones</a></li>
-                                    @if(Auth::user()->role!='OPE')
-                                      <li class=""><a href="#tab-3" data-toggle="tab">Facturas</a></li>
-                                      <li class=""><a href="#tab-4" data-toggle="tab">Pagos</a></li>
-                                    @endif
-                                    <li class=""><a href="#tab-5" data-toggle="tab">Comentarios</a></li>
-                                </ul>
-                            </div>
-                        </div>
-
-                            <div class="panel-body">
-                              <div class="tab-content">
-                                <div class="tab-pane active" id="tab-1">
-                                    <div id="activities"></div>
-                                    <br><br>
+                            <div class="panel blank-panel">
+                                <div class="panel-heading">
+                                    <div class="panel-options">
+                                        <ul class="nav nav-tabs">
+                                            <li class="active"><a href="#tab-1" data-toggle="tab">Actividades</a></li>
+                                            <li><a href="#tab-2" data-toggle="tab">Ingresos</a></li>
+                                            @if(Auth::user()->role!='OPE')
+                                              <li class=""><a href="#tab-3" data-toggle="tab">Egresos</a></li>
+                                            @endif
+                                            <li class=""><a href="#tab-4" data-toggle="tab">Comentarios</a></li>
+                                        </ul>
+                                    </div>
                                 </div>
-                                <div class="tab-pane" id="tab-2">
-                                    <div id="budgets"></div>
-                                </div>                                
-                                <div class="tab-pane" id="tab-3">
-                                    <div id="invoices"></div>
+                                <div class="panel-body">
+                                  <div class="tab-content">
+                                    <div class="tab-pane active" id="tab-1">
+                                        <div id="activities"></div>
+                                        <br><br>
+                                    </div>
+                                    <div class="tab-pane" id="tab-2">
+                                        <div id="incomes"></div>
+                                    </div>                                
+                                    <div class="tab-pane" id="tab-3">
+                                        <div id="expenses"></div>
+                                    </div>
+                                    <div class="tab-pane" id="tab-4">
+                                        <div id="comments"></div>
+                                    </div>
+                                  </div>
                                 </div>
-                                <div class="tab-pane" id="tab-4">
-                                    <div id="payments"></div>
-                                </div>
-                                <div class="tab-pane" id="tab-5">
-                                    <div id="comments"></div>
-                                </div>
-                              </div>
-                            </div>
-                            
                             </div>
                         </div>
                     </div>
@@ -128,6 +126,9 @@
 
 @endsection
 @push('scripts')
+<!-- Magnific Popup -->
+<script src="{{ URL::asset('js/plugins/magnific-popup/jquery.magnific-popup.min.js') }}"></script>
+
 <script>
     
 var id={{ $project->id }};
@@ -164,9 +165,14 @@ function project_comments(){
   $('#comments').load(url);  
 }
 
-function project_payments(){
-  url = '{{URL::to("payments.project_payments")}}/'+id;
-  $('#payments').load(url);  
+function project_incomes(){
+  url = '{{URL::to("projects.load_incomes")}}/'+id;
+  $('#incomes').load(url);  
+}
+
+function project_expenses(){
+  url = '{{URL::to("projects.load_expenses")}}/'+id;
+  $('#expenses').load(url);  
 }
 
 function project_documents(){
@@ -178,7 +184,8 @@ $(document).ready(function(){
   project_btn_status();
   project_progress();
   project_activities();
-  //project_payments();
+  project_incomes();
+  project_expenses();
   project_comments();
   //project_documents();
 });

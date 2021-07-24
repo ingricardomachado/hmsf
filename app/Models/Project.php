@@ -31,12 +31,36 @@ class Project extends Model
         return $this->hasMany('App\Models\ProjectDocument');
     }
 
+    public function expenses(){
+   
+        return $this->hasMany('App\Models\Expense');
+    }
+
+    public function fees(){
+   
+        return $this->hasMany('App\Models\Fee');
+    }
+
+    public function incomes(){
+   
+        return $this->hasMany('App\Models\Income');
+    }
+
     public function photos(){
    
         return $this->hasMany('App\Models\ProjectPhoto');
     }
 
-
+    public function payments(){
+        return Payment::
+                join('payment_fee', 'payment_fee.payment_id', '=', 'payments.id')
+                ->join('fees', 'payment_fee.fee_id', '=', 'fees.id')
+                ->join('properties', 'fees.property_id', '=', 'properties.id')
+                ->where('fees.project_id', $this->id)
+                ->where('payments.status', 'A')
+                ->select('payments.id as id', 'payments.date as date', 'properties.number as property', 'fees.concept as concept', 'payment_fee.amount as amount', 'payments.file as file', 'payments.file_type as file_type');
+    }
+    
     //*** Accesors ***   
     public function getStatusBtnClassAttribute(){
         

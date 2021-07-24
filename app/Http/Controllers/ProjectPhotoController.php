@@ -85,6 +85,7 @@ class ProjectPhotoController extends Controller
             $file = Input::file('photo');        
             $project_photo->file_name = $file->getClientOriginalName();
             $project_photo->file_type = $file->getClientOriginalExtension();
+            $project_photo->file_size = $file->getSize();
             $project_photo->file=$this->upload_file($this->center->id.'/projects/', $file);
             $project_photo->save();
             

@@ -16,7 +16,7 @@
                             Soporte <b>+58 5439974</b>
                             <a href="https://wa.me/584265439974" title="Abrir Whatsapp Web" target="_blank"><i class="fa fa-whatsapp"></i></a>
                             @if($global_condominium->demo)
-                                <span class='badge badge-danger'><b>DEMO</b></span>
+                                <span class='badge badge-danger'><b>DEMO</b> <small>Restan {{ $global_condominium->remaining_days }} días</small></span>
                             @endif
                         </span>
                     </li>

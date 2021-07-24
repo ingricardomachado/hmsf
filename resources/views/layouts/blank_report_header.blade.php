@@ -11,22 +11,31 @@
                 top: -20px;
                 left: 0px;
                 right: 0px;
-                height: 50px;
+                height: 100px;
                 text-align: left;
                 line-height: 35px;
+                /*border: solid red;
+                border-width: thin;*/
             }
             footer {
+                margin: 0;                
                 position: fixed; 
-                bottom: -60px; 
+                bottom: -40px; 
                 left: 0px; 
                 right: 0px;
-                height: 50px;
+                height: 30px;
                 text-align:center;
+                /*border: solid red;
+                border-width: thin;*/
             }            
             body {
-                margin-top: 3.0em;
+                margin-top: 80px;
+                margin-bottom: 0px;
                 font-family: "Helvetica Neue", Roboto, Arial, "Droid Sans", sans-serif, "DejaVu Sans Condensed";
-                font-size: 10px;}
+                font-size: 10px;
+                /*border: solid blue;
+                border-width: thin;*/                
+            }
             @page {
                 margin-top: 2.0em;
                 margin-right: 4.0em;

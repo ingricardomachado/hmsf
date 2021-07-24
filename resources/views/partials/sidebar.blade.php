@@ -17,6 +17,9 @@
                     </span> <span class="text-muted text-xs block">{{ Auth::user()->role_description }} <b class="caret"></b></span> </span> </a>
                     <ul class="dropdown-menu animated fadeInRight m-t-xs">
                         <li>
+                            <a class="dropdown-item" href="{{ route('profile') }}"><i class="fa fa-user"></i> Mi perfil</a>
+                        </li>
+                        <li>
                             <a class="dropdown-item" href="{{ route('logout') }}" onclick="event.preventDefault(); document.getElementById('logout-form').submit();"><i class="fa fa-sign-out"></i> Salir</a>
                             <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">@csrf</form>
                         </li>
@@ -30,14 +33,19 @@
         
         <!-- Menu SAM Super Administrador -->
         @if(session('role')=='SAM')
-            <li class="{{ set_active(['home']) }}">
-                <a href="{{url('home')}}"><i class="fa fa-laptop"></i> <span class="nav-label">Dashboard</span></a>
+            <li class="{{ set_active(['condominiums', 'demos']) }}">
+                <a href="#"><i class="fa fa-building-o"></i><span class="nav-label">Condominios</span> <span class="fa arrow"></span></a>
+                <ul class="nav nav-second-level collapse">
+                    <li class="{{ set_active(['condominiums']) }}">
+                        <a href="{{url('condominiums')}}">Permanentes</a>
+                    </li>
+                    <li class="{{ set_active(['demos']) }}">
+                        <a href="{{url('demos')}}">Demos</a>
+                    </li>
+                </ul>
             </li>
-            <li class="{{ set_active(['condominiums']) }}">
-                <a href="{{url('condominiums')}}"><i class="fa fa-building-o"></i> <span class="nav-label">Condominios</span></a>
-            </li>
-            <li class="{{ set_active(['settings']) }}">
-                <a href="{{url('settings')}}"><span class="nav-label"><i class="fa fa-cogs"></i> Configuraciones</span></a>
+            <li class="{{ set_active(['global']) }}">
+                <a href="{{url('global')}}"><span class="nav-label"><i class="fa fa-cogs"></i> Configuraciones</span></a>
             </li>
         @endif
         <!-- /Menu SAM Super Administrador -->
@@ -162,9 +170,8 @@
             <li class="{{ set_active(['events']) }}">
                 <a href="{{url('events')}}"><i class="fa fa-calendar-o"></i> <span class="nav-label">Calendario</span></a>
             </li>
-
-            <li class="{{ set_active(['settings.condominium']) }}">
-                <a href="{{url('settings.condominium')}}"><i class="fa fa-cogs"></i> <span class="nav-label">Configuración</span></a>
+            <li class="{{ set_active(['settings']) }}">
+                <a href="{{url('settings')}}"><i class="fa fa-cogs"></i> <span class="nav-label">Configuración</span></a>
             </li>
         @endif
         <!-- /Menu ADM Administrador -->        
@@ -173,6 +180,30 @@
         @if(session('role')=='OWN')
             <li class="{{ set_active(['home']) }}">
                 <a href="{{url('home')}}"><i class="fa fa-laptop"></i> <span class="nav-label">Dashboard</span></a>
+            </li>
+            @if(Auth::user()->properties()->count()>1)
+                <li class="{{ set_active(['properties']) }}">
+                    <a href="{{url('properties')}}"><i class="fa fa-home"></i> <span class="nav-label">Propiedades</span></a>
+                </li>
+            @else
+                <li class="{{ set_active(['statement']) }}">
+                    <a href="{{url('statement', Crypt::encrypt(Auth::user()->properties()->first()->id) )}}"><i class="fa fa-files-o"></i> <span class="nav-label">Estado de Cuenta</span></a>
+                </li>
+            @endif
+            <li class="{{ set_active(['payments']) }}">
+                <a href="{{url('payments')}}"><i class="fa fa-money"></i> <span class="nav-label">Pagos</span></a>
+            </li>
+            <li class="{{ set_active(['facilities']) }}">
+                <a href="{{url('facilities')}}"><i class="fa fa-umbrella"></i> <span class="nav-label">Instalaciones</span></a>
+            </li>
+            <li class="{{ set_active(['reservations']) }}">
+                <a href="{{url('reservations')}}"><i class="fa fa-calendar-o"></i> <span class="nav-label">Reservaciones</span></a>
+            </li>
+            <li class="{{ set_active(['contacts']) }}">
+                <a href="{{url('contacts')}}"><i class="fa fa-address-book-o"></i> <span class="nav-label">Contactos</span></a>
+            </li>
+            <li class="{{ set_active(['events']) }}">
+                <a href="{{url('events')}}"><i class="fa fa-calendar-o"></i> <span class="nav-label">Calendario</span></a>
             </li>
         @endif
         <!-- /Menu OWN Propietario -->

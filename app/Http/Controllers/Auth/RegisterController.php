@@ -77,7 +77,7 @@ class RegisterController extends Controller
         $condominium->state_id=$data['state'];
         $condominium->max_properties=$data['properties'];
         $condominium->contact=$data['contact'];
-        $condominium->cell=$data['hdd_cell'];
+        $condominium->cell=$data['cell'];
         $condominium->email=$data['email'];
         $condominium->save();
         //Registra el usuario administrador
@@ -85,7 +85,7 @@ class RegisterController extends Controller
         $user->condominium_id=$condominium->id;
         $user->name=$data['contact'];
         $user->email=$data['email'];
-        $user->cell=$data['hdd_cell'];
+        $user->cell=$data['cell'];
         $user->role='ADM';
         $user->active=1;
         $user->password=bcrypt($data['password']);

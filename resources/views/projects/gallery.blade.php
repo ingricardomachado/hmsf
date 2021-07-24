@@ -135,7 +135,7 @@
       <div class="ibox float-e-margins">        
         <!-- ibox-title -->
         <div class="ibox-title">
-          <h5><i class="fa fa-picture-o" aria-hidden="true"></i> Fotos {{ $project->name }}</h5>
+          <h5><i class="fa fa-picture-o" aria-hidden="true"></i> Galería de Fotos</h5>
             <div class="ibox-tools">
               <a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
               <a class="dropdown-toggle" data-toggle="dropdown" href="#"><i class="fa fa-wrench"></i></a>
@@ -150,37 +150,37 @@
                     
         <div class="ibox-content">
           <div class="row">
-          <form action="{{url('assets.add_photo/'.$project->id)}}" id="form" method="POST" enctype="multipart/form-data">
+          <form action="" id="form" method="POST" enctype="multipart/form-data">
           <input type="hidden" name="_token" value="{{{ csrf_token() }}}" />
           <input type="hidden" name="hdd_project_id" value="{{ $project->id }}" />
-          <div class="row">
-          @if(Auth::user()->role!='VIS')
-            <div class="form-group col-sm-4">
-                <label>Foto </label><small> (Sólo formatos jpg, png. Máx. 2Mb.)</small>
-                <input id="photo" name="photo" type="file" required>
+            <div class="form-group col-sm-9">
+              <b>Proyecto:</b> {{ $project->name }}
             </div>
-            <div class="form-group col-sm-4">
-                <label>Título *</label><small> Max. 100 caracteres.</small>
-                {!! Form::text('title', null, ['id'=>'title', 'class'=>'form-control', 'type'=>'text', 'placeholder'=>'', 'maxlength'=>'100', 'required']) !!}
+            <div class="form-group col-sm-3 text-right">
+              <a href="{{URL::previous()}}" class="btn btn-sm btn-default">Regresar</a>
             </div>
-            <div class="form-group col-sm-2">
-              <label>Momento *</label>
-              {{ Form::select('stage', [1=>'Antes', 2=>'Durante', 3=>'Despues'], null, ['id'=>'stage', 'class'=>'select2_single form-control', 'tabindex'=>'-1', 'placeholder'=>'', 'required'])}}
-            </div>
-            <div class="col-sm-2"> 
-              <label><br></label> 
-              <button type="button" id="btn_add" class="btn btn-primary btn-block"><i class="fa fa-plus-circle" aria-hidden="true"></i> Agregar</button>
-            </div>
-            @endif
+              @if(session('role')=='ADM')
+                <div class="form-group col-sm-4">
+                    <label>Foto </label><small> (Sólo formatos jpg, png. Máx. 2Mb.)</small>
+                    <input id="photo" name="photo" type="file" required>
+                </div>
+                <div class="form-group col-sm-4">
+                    <label>Título *</label><small> Max. 50 caracteres.</small>
+                    {!! Form::text('title', null, ['id'=>'title', 'class'=>'form-control', 'type'=>'text', 'placeholder'=>'', 'maxlength'=>'50', 'required']) !!}
+                </div>
+                <div class="form-group col-sm-2">
+                  <label>Momento *</label>
+                  {{ Form::select('stage', [1=>'Antes', 2=>'Durante', 3=>'Despues'], null, ['id'=>'stage', 'class'=>'select2_single form-control', 'tabindex'=>'-1', 'placeholder'=>'', 'required'])}}
+                </div>
+                <div class="col-sm-2"> 
+                  <label><br></label> 
+                  <button type="button" id="btn_add" class="btn btn-sm btn-primary btn-block"><i class="fa fa-plus-circle" aria-hidden="true"></i> Agregar</button>
+                </div>
+              @endif
             <div class="col-sm-12">
               <div id="photos"></div>
             </div>
-          </div>
           </form>
-          <!-- boton pie de formulario-->
-          <div class="form-group pull-right">
-              <a href="{{URL::previous()}}" class="btn btn-default"><i class="fa fa-hand-o-left"></i> Regresar</a>
-          </div>
         </div>
         </div>
       </div>

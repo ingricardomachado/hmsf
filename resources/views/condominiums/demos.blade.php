@@ -17,7 +17,7 @@
         
         <!-- ibox-title -->
         <div class="ibox-title">
-          <h5><i class="fa fa-building-o" aria-hidden="true"></i> Condominios Permanentes</h5>
+          <h5><i class="fa fa-building-o" aria-hidden="true"></i> Condominios Demos</h5>
             <div class="ibox-tools">
               <a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
               <a class="dropdown-toggle" data-toggle="dropdown" href="#"><i class="fa fa-wrench"></i></a>
@@ -33,11 +33,13 @@
         <!-- ibox-content- -->
         <div class="ibox-content">
           <div class="row">
+            {{ Form::open(array('url' => '', 'id' => 'form_rpt', 'method' => 'get'), ['' ])}}
+            {{ Form::close() }}
             <div class="col-sm-3 col-xs-12">
             </div>
             <div class="col-sm-9 col-xs-12 text-right">
                 <a href="#" class="btn btn-sm btn-primary" onclick="showModalCondominium(0);"><i class="fa fa-plus-circle"></i> Nuevo Condominio</a>
-                <a href="{{ url('condominiums.rpt_condominiums') }}" class="btn btn-sm btn-default" target="_blank" title="Imprimir PDF"><i class="fa fa-print"></i></a>
+                <a href="{{ url('condominiums.rpt_demos') }}" class="btn btn-sm btn-default" target="_blank" title="Imprimir PDF"><i class="fa fa-print"></i></a>
                 <br><br>
             </div>
             <div class="col-sm-12">
@@ -53,6 +55,7 @@
                     <th width="10%">Tipo</th>
                     <th width="10%">Max. Propiedades</th>
                     <th width="15%">Contacto</th>
+                    <th width="10%">Días restantes</th>
                     <th width="10%">Estado</th>
                   </tr>
                 </thead>
@@ -63,6 +66,7 @@
                     <th>Tipo</th>
                     <th>Max Propiedades</th>
                     <th>Contacto</th>
+                    <th>Dias restantes</th>
                     <th>Estado</th>
                   </tr>
                 </tfoot>
@@ -108,6 +112,28 @@
   </div>
 </div>
 <!-- /Modal para eliminar-->
+
+<!-- Modal para pasar a permanente -->
+<div class="modal inmodal" id="modalPermanent" tabindex="-1" role="dialog"  aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content animated fadeIn">
+      <div class="modal-header">
+        <h5 class="modal-title"><i class="fa fa-tag" aria-hidden="true"></i> <strong>Pasar a Permanente</strong></h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+      </div>      
+      <div class="modal-body">
+          <input type="hidden" id="hdd_permanent_id" value=""/>
+          <p>Esta seguro que desea pasar a permanente el condominio <b><span id="condominium_permanent_name"></span></b> ?</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" id="btn_close" class="btn btn-default" data-dismiss="modal">Cerrar</button>        
+        <button type="button" id="btn_permanent" class="btn btn-primary">Aceptar</button>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- /Modal para pasar a permanente -->
+
 @endsection
 
 @push('scripts')
@@ -121,15 +147,19 @@ function showModalCondominium(id){
   $("#modalCondominium").modal("show");
 }
  
-function change_status(id){
+function showModalPermanent(id, name){
+  $('#hdd_permanent_id').val(id);
+  $('#condominium_permanent_name').html(name);
+  $("#modalPermanent").modal("show");    
+};
+
+$("#btn_permanent").on('click', function(event) {    
+  var id=$('#hdd_permanent_id').val();
   $.ajax({
-      url: `{{URL::to("condominiums.status")}}/${id}`,
-      type: 'GET',
-      data: {
-        _token: "{{ csrf_token() }}", 
-      },
+      url: `{{URL::to("condominiums.permanent")}}/${id}`,
   })
   .done(function(response) {
+      $('#modalPermanent').modal('toggle');
       $('#condominiums-table').DataTable().draw(false);
       toastr_msg('success', '{{ config('app.name') }}', response.message, 2000);
   })
@@ -144,7 +174,7 @@ function change_status(id){
       toastr_msg('error', '{{ config('app.name') }}', response.responseJSON.message, 2000);
     }  
   });
-}  
+});
 
 function showModalDelete(id, name){
   $('#hdd_condominium_id').val(id);
@@ -173,6 +203,31 @@ function condominium_delete(id){
   .fail(function(response) {
       $('#modalDeleteCondominium').modal('toggle');
       toastr_msg('error', '{{ config('app.name') }}', response.responseJSON.message, 4000);
+  });
+}  
+
+function change_status(id){
+  $.ajax({
+      url: `{{URL::to("condominiums.status")}}/${id}`,
+      type: 'GET',
+      data: {
+        _token: "{{ csrf_token() }}", 
+      },
+  })
+  .done(function(response) {
+      $('#condominiums-table').DataTable().draw(false);
+      toastr_msg('success', '{{ config('app.name') }}', response.message, 2000);
+  })
+  .fail(function() {
+    if(response.status == 422){
+      var errorsHtml='';
+      $.each(response.responseJSON.errors, function (key, value) {
+        errorsHtml += '<li>' + value[0] + '</li>'; 
+      });          
+      toastr_msg('error', '{{ config('app.name') }}', errorsHtml, 3000);
+    }else{
+      toastr_msg('error', '{{ config('app.name') }}', response.responseJSON.message, 2000);
+    }  
   });
 }  
 
@@ -225,7 +280,7 @@ $(document).ready(function(){
             type: "POST",
             data: function(d) {
                 d._token= "{{ csrf_token() }}";
-                d.demo = 0;
+                d.demo = 1;
             }
         },        
         columns: [
@@ -234,6 +289,7 @@ $(document).ready(function(){
             { data: 'type',   name: 'type', orderable: false, searchable: false},
             { data: 'max_properties',   name: 'max_properties', orderable: false, searchable: false},
             { data: 'contact', name: 'contact', orderable: false, searchable: false },
+            { data: 'remaining_days', name: 'remaining_days', orderable: false, searchable: false },
             { data: 'status', name: 'status', orderable: false, searchable: false }
         ]
     });

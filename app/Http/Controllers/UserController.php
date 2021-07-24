@@ -125,6 +125,7 @@ class UserController extends Controller
         {        
             $user->avatar_name = $file->getClientOriginalName();
             $user->avatar_type = $file->getClientOriginalExtension();
+            $user->avatar_size = $file->getSize();
             $user->avatar=$this->upload_file('/users/', $file);
         }        
         $user->name= $request->input('name');
@@ -154,6 +155,7 @@ class UserController extends Controller
             ($user->file)?Storage::delete('/users/'.$user->file):'';
             $user->avatar_name = $file->getClientOriginalName();
             $user->avatar_type = $file->getClientOriginalExtension();
+            $user->avatar_size = $file->getSize();
             $user->avatar=$this->upload_file('/users/', $file);
         }
         $user->name= $request->input('name');

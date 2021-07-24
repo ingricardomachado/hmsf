@@ -33,8 +33,6 @@
         <!-- ibox-content- -->
         <div class="ibox-content">
           <div class="row">
-            {{ Form::open(array('url' => '', 'id' => 'form_rpt', 'method' => 'get'), ['' ])}}
-            {{ Form::close() }}
             <div class="col-sm-3 col-xs-12">
             </div>
             <div class="col-sm-9 col-xs-12 text-right">

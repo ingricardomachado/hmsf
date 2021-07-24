@@ -87,6 +87,10 @@ class Fee extends Model
         }
     }    
 
+    public function getFullConceptAttribute(){
+        return $this->property->number.' - '.$this->concept;                
+    }    
+
 
     public function getRemainigDaysDescriptionAttribute(){
         

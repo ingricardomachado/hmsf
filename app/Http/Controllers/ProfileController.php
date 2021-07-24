@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 
 use App\Http\Requests;
-use App\Http\Requests\Profile\ProfileRequestUpdate;
+use App\Http\Requests\ProfileRequest;
 use App\User;
 use App\Models\Doctor;
 use Illuminate\Support\Facades\Crypt;
@@ -18,6 +18,8 @@ use Session;
 use Image;
 use File;
 use DB;
+use Auth;
+use Storage;
 
 
 class ProfileController extends Controller
@@ -27,36 +29,6 @@ class ProfileController extends Controller
     {
         $this->middleware('auth', ['only' => ['edit']]);
     }    
-
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function index()
-    {
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function store(Request $request)
-    {
-        //
-    }
 
     /**
      * Display the specified resource.
@@ -75,10 +47,10 @@ class ProfileController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function edit($id)
+    public function edit()
     {
-        $doctor = Doctor::find(Crypt::decrypt($id));
-        return view('profiles.save')->with('doctor', $doctor);
+        $user=User::find(Auth::user()->id);
+        return view('profiles.save')->with('user', $user);
     }
 
     /**
@@ -88,31 +60,47 @@ class ProfileController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(ProfileRequestUpdate $request, $id)
+    public function update(ProfileRequest $request)
     {
-        //1. Actualizacion del Doctor
-        $doctor = Doctor::find($id);
-        $doctor->name= $request->input('name');
-        $doctor->email= $request->input('email');
-        $doctor->phone= $request->input('phone');
-        $doctor->mobile= $request->input('mobile');
-        $doctor->save();
-        //2. Actualizacion de su usuario
-        $user = User::find($doctor->user_id);
-        $user->name=$request->input('name');
-        $user->email=$request->input('email');
-        $file = Input::file('avatar');        
-        if (File::exists($file))
-        {        
-            $img = Image::make($file)->encode('jpeg');
-            $user->avatar = base64_encode((new ImgController)->resize_image($img, 'jpg', 200, 200)); 
+        try {
+            
+            $user = User::find(Auth::user()->id);
+            $user->name=$request->name;
+            $user->email=$request->email;
+            $user->cell=$request->cell;
+            $user->phone=$request->phone;
+            ($request->change_password)?$user->password=bcrypt($request->password):'';
+            $file = $request->avatar;
+            if (File::exists($file)){
+                if($user->condominium_id){
+                    Storage::delete($user->condominium_id.'/users/'.$user->avatar);
+                    Storage::delete($user->condominium_id.'/users/thumbs/'.$user->avatar);
+                    $user->avatar_name = $file->getClientOriginalName();
+                    $user->avatar_type = $file->getClientOriginalExtension();
+                    $user->avatar_size = $file->getSize();
+                    $user->avatar=$this->upload_file($user->condominium_id.'/users', $file);
+                }else{
+                    Storage::delete('global/users'.$user->avatar);
+                    Storage::delete('/global/users/thumbs/'.$user->avatar);
+                    $user->avatar_name = $file->getClientOriginalName();
+                    $user->avatar_type = $file->getClientOriginalExtension();
+                    $user->avatar_size = $file->getSize();
+                    $user->avatar=$this->upload_file('global', $file);                
+                }
+            }
+            $user->save();
+            
+            return response()->json([
+                    'success' => true,
+                    'message' => 'Perfil actualizado exitosamente'
+                ], 200);
+            
+        } catch (Exception $e) {
+            return response()->json([
+                    'success' => false,
+                    'message' => $e->getMessage()
+                ], 500);
         }        
-        if($request->input('change_password')){
-            $user->password= password_hash($request->input('password'), PASSWORD_DEFAULT);
-        }
-        $user->save();
-        
-        return redirect()->route('home');
     }
 
     /**

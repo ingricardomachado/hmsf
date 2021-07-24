@@ -23,7 +23,7 @@ class CreateDocumentsTable extends Migration
             $table->string('description',500)->nullable();
             $table->string('file_name',255);
             $table->string('file_type',10);
-            $table->Integer('file_size')->nullable();
+            $table->Integer('file_size')->unsigned()->nullable();
             $table->string('file',255);
             $table->boolean('public')->default(true);
             $table->string('created_by',100);

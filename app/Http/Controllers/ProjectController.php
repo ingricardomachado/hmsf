@@ -7,9 +7,8 @@ use Illuminate\Http\Request;
 use App\Http\Requests;
 use App\Http\Requests\ProjectRequest;
 use App\User;
-use App\Models\Asset;
-use App\Models\Group;
 use App\Models\Project;
+use App\Models\Payment;
 use App\Models\Supplier;
 use App\Models\PhotoProject;
 use App\Models\Company;
@@ -113,8 +112,15 @@ class ProjectController extends Controller
     public function detail($id)
     {
         $project = Project::find(Crypt::decrypt($id));
+
+        $tot_incomes=$project->incomes()->sum('amount')+$project->payments()->sum('payment_fee.amount');
+        $tot_expenses=$project->expenses()->sum('amount');
+        $balance=$tot_incomes-$tot_expenses;
         
-        return view('projects.detail')->with('project', $project);
+        return view('projects.detail')->with('project', $project)
+                            ->with('tot_incomes', $tot_incomes)
+                            ->with('tot_expenses', $tot_expenses)
+                            ->with('balance', $balance);
     }
         
     /**
@@ -319,6 +325,7 @@ class ProjectController extends Controller
         try {
             $project=Project::find($id);
             $project->status=$request->status;
+            ($project->status=='E' && $project->started==null)?$project->started=Carbon::now():'';
 
             $project->save();
             
@@ -337,6 +344,33 @@ class ProjectController extends Controller
     {
         $project = Project::find($id);        
         return view('projects.progress')->with('project', $project);
+    }
+
+    public function load_expenses($id)
+    {
+        $project = Project::find($id);
+        $expenses=$project->expenses()->get();        
+        return view('projects.expenses')->with('expenses', $expenses);
+    }
+
+    public function load_incomes($id)
+    {
+        $project = Project::find($id);
+        $incomes=$project->incomes()->select('id', 'date', 'concept', 'amount', 'file', 'file_type')->get();
+        
+        foreach($incomes as $income){
+            $income['url']=$income->download_file;
+        } 
+
+        $payments=$project->payments()->get();
+
+        foreach($payments as $payment){
+            $payment['url']=$payment->download_file;
+        } 
+
+        $incomes=$incomes->concat($payments)->sortBy('date');
+
+        return view('projects.incomes')->with('incomes', $incomes);
     }
 
 }

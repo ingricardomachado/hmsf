@@ -571,6 +571,10 @@ $("#country").change( event => {
     });
     $('#state').val(null).trigger('change');
   });
+  url = `{{URL::to('countries')}}/${event.target.value}`;                    
+  $.get(url, function(response){
+    iti.setCountry(response.data.iso);  
+  });
 });
 
 $(document).ready(function() {

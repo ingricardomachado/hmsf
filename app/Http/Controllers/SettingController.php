@@ -43,26 +43,38 @@ class SettingController extends Controller
 
     public function update_global(Request $request)
     {
-        $setting = Setting::first();        
-        // Codigo para el logo
-        $file = Input::file('logo');
-        if (File::exists($file))
-        {        
-            //$img = Image::make($file)->encode('jpg');
-            $img = Image::make($file)->encode('jpg');
-            //$setting->logo = base64_encode((new ImgController)->resize_image($img, 'jpg', 200, 200));
-            $setting->logo = base64_encode($img); 
-        }        
-        $setting->company= $request->input('company');
-        $setting->NIT= $request->input('NIT');
-        $setting->address= $request->input('address');
-        $setting->phone= $request->input('phone');
-        $setting->email= $request->input('email');
-        $setting->app_name= $request->input('app_name');
-        $setting->save();        
-        $this->set_session_global();
-        
-        return redirect()->route('settings.global')->with('notify', 'update');
+        try {
+    
+            $setting = Setting::first();        
+            $file = $request->logo;
+            if (File::exists($file)){
+                Storage::delete('global/'.$setting->logo);
+                Storage::delete('global/thumbs/'.$setting->logo);
+                $setting->logo_name = $file->getClientOriginalName();
+                $setting->logo_type = $file->getClientOriginalExtension();
+                $setting->logo_size = $file->getSize();
+                $setting->logo=$this->upload_file('global', $file);
+            }
+            $setting->company= $request->input('company');
+            $setting->NIT= $request->input('NIT');
+            $setting->address= $request->input('address');
+            $setting->phone= $request->input('phone');
+            $setting->email= $request->input('email');
+            $setting->app_name= $request->input('app_name');
+            $setting->save();        
+            $this->set_session_global();
+            
+            return response()->json([
+                    'success' => true,
+                    'message' => 'Configuraciones actualizadas exitosamente'
+                ], 200);
+            
+        } catch (Exception $e) {
+            return response()->json([
+                    'success' => false,
+                    'message' => $e->getMessage()
+                ], 500);
+        }
     }
 
     public function condominium()
@@ -81,31 +93,43 @@ class SettingController extends Controller
     
     public function update_condominium(Request $request)
     {
-        $condominium=Condominium::find($this->condominium->id);
-        $file = $request->logo;
-        if (File::exists($file)){
-            Storage::delete($condominium->id.'/'.$condominium->logo);
-            Storage::delete($condominium->id.'/thumbs/'.$condominium->logo);
-            $condominium->logo_name = $file->getClientOriginalName();
-            $condominium->logo_type = $file->getClientOriginalExtension();
-            $condominium->logo=$this->upload_file($condominium->id, $file);
+        try {
+            $condominium=Condominium::find($this->condominium->id);
+            $file = $request->logo;
+            if (File::exists($file)){
+                Storage::delete($condominium->id.'/'.$condominium->logo);
+                Storage::delete($condominium->id.'/thumbs/'.$condominium->logo);
+                $condominium->logo_name = $file->getClientOriginalName();
+                $condominium->logo_type = $file->getClientOriginalExtension();
+                $condominium->logo_size = $file->getSize();
+                $condominium->logo=$this->upload_file($condominium->id, $file);
+            }
+            $condominium->name= $request->name;
+            $condominium->property_type_id=$request->property_type;
+            $condominium->country_id=$request->country;
+            $condominium->state_id= $request->state;
+            $condominium->city=$request->city;
+            $condominium->address=$request->address;
+            $condominium->contact=$request->contact;
+            $condominium->cell=$request->cell;
+            $condominium->phone=$request->phone;
+            $condominium->email= $request->email;
+            $condominium->coin= $request->input('coin');
+            $condominium->money_format= $request->input('money_format');
+            $condominium->save();        
+            $this->set_session_condominium($condominium->id);        
+            
+            return response()->json([
+                    'success' => true,
+                    'message' => 'Configuraciones actualizadas exitosamente'
+                ], 200);
+            
+        } catch (Exception $e) {
+            return response()->json([
+                    'success' => false,
+                    'message' => $e->getMessage()
+                ], 500);
         }
-        $condominium->name= $request->name;
-        $condominium->property_type_id=$request->property_type;
-        $condominium->country_id=$request->country;
-        $condominium->state_id= $request->state;
-        $condominium->city=$request->city;
-        $condominium->address=$request->address;
-        $condominium->contact=$request->contact;
-        $condominium->cell=$request->cell;
-        $condominium->phone=$request->phone;
-        $condominium->email= $request->email;
-        $condominium->coin= $request->input('coin');
-        $condominium->money_format= $request->input('money_format');        
-        $condominium->save();        
-        $this->set_session_condominium($condominium->id);
-        
-        //return redirect()->route('settings.condominium')->with('notify', 'update');
     }
 
     public function set_session_global(){

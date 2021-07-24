@@ -23,13 +23,13 @@ class CreateFacilitiesTable extends Migration
             $table->time('end');
             $table->boolean('defaulters')->default(true);
             $table->boolean('rent')->default(false);
-            $table->float('day_cost',8,2);
-            $table->float('hour_cost',8,2);
+            $table->float('day_cost',8,2)->default(0)->unsigned();
+            $table->float('hour_cost',8,2)->default(0)->unsigned();
             $table->char('status', 1)->default('O');
             $table->string('photo',100)->nullable();
             $table->string('photo_name',100)->nullable();
             $table->string('photo_type',10)->nullable();
-            $table->Integer('photo_size')->nullable();
+            $table->Integer('photo_size')->unsigned()->nullable();
             $table->timestamps();
         });
     }

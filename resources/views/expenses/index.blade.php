@@ -40,10 +40,13 @@
           <div class="row">
             {{ Form::open(array('url' => '', 'id' => 'form_rpt', 'method' => 'get'), ['' ])}}
             {{ Form::close() }}
-            <div class="col-sm-4 col-xs-12">
+            <div class="col-sm-3 col-xs-12">
                 {{ Form::select('expense_type_filter', $expense_types, null, ['id'=>'expense_type_filter', 'class'=>'select2 form-control-sm', 'tabindex'=>'-1', 'placeholder'=>''])}}
             </div>
-            <div class="col-sm-8 col-xs-12 text-right">
+            <div class="col-sm-3 col-xs-12">
+                {{ Form::select('supplier_filter', $suppliers, null, ['id'=>'supplier_filter', 'class'=>'select2 form-control-sm', 'tabindex'=>'-1', 'placeholder'=>''])}}
+            </div>
+            <div class="col-sm-6 col-xs-12 text-right">
                 <a href="#" class="btn btn-sm btn-primary" onclick="showModalExpense(0);"><i class="fa fa-plus-circle"></i> Nuevo Egreso</a>
                 <br><br>
             </div>
@@ -203,6 +206,10 @@ $("#expense_type_filter").change( event => {
   $('#expenses-table').DataTable().draw(false);
 });
 
+$("#supplier_filter").change( event => {
+  $('#expenses-table').DataTable().draw(false);
+});
+
 $(document).ready(function(){
                       
     path_str_language = "{{URL::asset('js/plugins/dataTables/es_ES.txt')}}";          
@@ -217,6 +224,7 @@ $(document).ready(function(){
             data: function(d) {
                 d._token= "{{ csrf_token() }}";
                 d.expense_type_filter = $('#expense_type_filter').val();
+                d.supplier_filter = $('#supplier_filter').val();
             }
         },        
         columns: [
@@ -245,6 +253,15 @@ $(document).ready(function(){
       allowClear: true,
       width: '100%'
     });
+
+    $("#supplier_filter").select2({
+      language: "es",
+      placeholder: "Proveedores - Todos",
+      minimumResultsForSearch: 10,
+      allowClear: true,
+      width: '100%'
+    });
+
 });
 </script>
 @endpush

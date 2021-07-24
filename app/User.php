@@ -53,10 +53,12 @@ class User extends Authenticatable
     //*** Accesors ***
     public function getRoleDescriptionAttribute(){
         
-        if($this->role == 'ADM'){
+        if($this->role == 'SAM'){
+            return "Super Administrador";
+        }else if($this->role == 'ADM'){
             return "Administrador";
-        }else if($this->role == 'CAJ'){
-            return "Cajero";
+        }else if($this->role == 'OWN'){
+            return "Propietario";
         }else{
             return $this->role;
         }

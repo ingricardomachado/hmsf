@@ -1,5 +1,7 @@
 <!-- DatePicker -->
 <link href="{{ URL::asset('css/plugins/datapicker/datepicker3.css') }}" rel="stylesheet">
+<!-- iCheck -->
+<link href="{{ URL::asset('css/plugins/iCheck/custom.css') }}" rel="stylesheet">
     
     <form action="#" id="form_fee" method="POST">
         <input type="hidden" name="_token" value="{{{ csrf_token() }}}" />
@@ -15,6 +17,15 @@
         </div>
         <div class="modal-body">
             <div class="row">            
+                <div class="form-group col-sm-12">
+                    <div class="i-checks">
+                        {!! Form::checkbox('to_project', null, ($fee->id)?($fee->project_id)?true:false:false, ['id'=>'to_project', 'class'=>'i-checks']) !!} <label>Asociarla a un proyecto</label>
+                    </div>
+                </div>
+                <div class="form-group col-sm-12" id="div_projects" style="display:{{ ($fee->id)?($fee->project_id)?'solid':'none':'none' }}">  
+                  <label>Proyectos *</label>
+                  {{ Form::select('project', $projects, $fee->project_id, ['id'=>'project', 'class'=>'select2 form-control', 'tabindex'=>'-1', 'placeholder'=>'', 'required'])}}
+                </div>
                 <div class="form-group col-sm-6">  
                   <label>Propiedad *</label>
                   {{ Form::select('property', $properties, $fee->property_id, ['id'=>'property', 'class'=>'select2 form-control form-control-sm', 'tabindex'=>'-1', 'placeholder'=>'', 'required'])}}
@@ -60,8 +71,13 @@
 <!-- DatePicker --> 
 <script src="{{ URL::asset('js/plugins/datapicker/bootstrap-datepicker.js') }}"></script>
 <script src="{{ URL::asset('js/plugins/datapicker/bootstrap-datepicker.es.min.js') }}"></script>
+<!-- iCheck -->
+<script src="{{ URL::asset('js/plugins/iCheck/icheck.min.js') }}"></script>
 <script>
 
+$('#to_project').on('ifChanged', function(event){
+  (event.target.checked)?$('#div_projects').show():$('#div_projects').hide();
+});
 
 $(document).ready(function() {
     
@@ -78,6 +94,12 @@ $(document).ready(function() {
             }
         }
    });*/
+    
+    // iCheck
+    $('.i-checks').iCheck({
+        checkboxClass: 'icheckbox_square-green',
+        radioClass: 'iradio_square-green',
+    });
     
     //Datepicker 
     var d = new Date();
@@ -100,6 +122,15 @@ $(document).ready(function() {
         language: 'es',
         startDate: d
     })
+
+    $("#project").select2({
+        language: "es",
+        placeholder: "Seleccione",
+        minimumResultsForSearch: 10,
+        allowClear: false,
+        dropdownParent: $('#modalFee .modal-content'),
+        width: '100%'
+    });
 
     $("#property").select2({
         language: "es",

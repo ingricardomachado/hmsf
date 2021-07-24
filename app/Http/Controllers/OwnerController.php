@@ -196,6 +196,11 @@ class OwnerController extends Controller
     {
         try {
             $owner = User::find($id);
+            if($owner->avatar){
+                Storage::delete($owner->condominium_id.'/users/'.$user->avatar);
+                Storage::delete($owner->condominium_id.'/users/thumbs/'.$user->avatar);
+            }
+
             Property::where('user_id', $owner->id)->update(['user_id' => null]);
             $owner->delete();
             

@@ -167,6 +167,7 @@ class FeeController extends Controller
                            $query_two->whereNull('condominium_id');
                            });
                      })->orderBy('name')->pluck('name','id');
+        $projects=$this->condominium->projects()->orderBy('name')->pluck('name','id');
 
         $today=Carbon::now()->format('d/m/Y');
         $last_day_of_month=Carbon::now()->lastOfMonth()->format('d/m/Y'); 
@@ -177,7 +178,8 @@ class FeeController extends Controller
                         ->with('today', $today)
                         ->with('last_day_of_month', $last_day_of_month)
                         ->with('income_types', $income_types)
-                        ->with('properties', $properties);
+                        ->with('properties', $properties)
+                        ->with('projects', $projects);
     }
 
     /**
@@ -195,6 +197,7 @@ class FeeController extends Controller
                            $query_two->whereNull('condominium_id');
                            });
                      })->orderBy('name')->pluck('name','id');
+        $projects=$this->condominium->projects()->orderBy('name')->pluck('name','id');        
 
         $today=Carbon::now()->format('d/m/Y');
         $last_day_of_month=Carbon::now()->lastOfMonth()->format('d/m/Y'); 
@@ -209,7 +212,8 @@ class FeeController extends Controller
                         ->with('today', $today)
                         ->with('last_day_of_month', $last_day_of_month)
                         ->with('income_types', $income_types)
-                        ->with('properties', $properties);
+                        ->with('properties', $properties)
+                        ->with('projects', $projects);
     }
 
     
@@ -227,6 +231,7 @@ class FeeController extends Controller
             $fee->condominium_id=$request->condominium_id;
             $fee->income_type_id=$request->income_type;
             $fee->property_id=$request->property;
+            $fee->project_id=($request->project)?$request->project:null;
             $fee->date=Carbon::createFromFormat('d/m/Y', $request->date);
             $fee->due_date=Carbon::createFromFormat('d/m/Y', $request->due_date);
             $fee->concept=$request->concept;
@@ -267,6 +272,7 @@ class FeeController extends Controller
                 $fee->created_by=Auth::user()->name;
                 $fee->condominium_id=$request->condominium_id;
                 $fee->income_type_id=$request->income_type;
+                $fee->project_id=($request->project)?$request->project:null;
                 $fee->property_id=$array_properties[$i];
                 $fee->date=Carbon::createFromFormat('d/m/Y', $request->date);
                 $fee->due_date=Carbon::createFromFormat('d/m/Y', $request->due_date);
@@ -316,6 +322,7 @@ class FeeController extends Controller
             $fee = Fee::find($id);
             $fee->income_type_id=$request->income_type;
             $fee->property_id=$request->property;
+            $fee->project_id=($request->project)?$request->project:null;
             $fee->date=Carbon::createFromFormat('d/m/Y', $request->date);
             $fee->due_date=Carbon::createFromFormat('d/m/Y', $request->due_date);
             $fee->concept=$request->concept;

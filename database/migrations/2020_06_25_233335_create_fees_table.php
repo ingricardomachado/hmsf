@@ -21,6 +21,8 @@ class CreateFeesTable extends Migration
             $table->foreign('property_id')->references('id')->on('properties')->onDelete('cascade');
             $table->bigInteger('income_type_id')->unsigned()->nullable();
             $table->foreign('income_type_id')->references('id')->on('income_types')->onDelete('cascade');
+            $table->bigInteger('project_id')->unsigned()->nullable();
+            $table->foreign('project_id')->references('id')->on('projects')->onDelete('cascade');
             $table->date('date');
             $table->date('due_date');            
             $table->string('concept',200);

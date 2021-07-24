@@ -86,16 +86,7 @@ class IncomeController extends Controller
                     return money_fmt($income->amount);
                 })
             ->addColumn('file', function ($income) {
-                    if($income->file_name){                    
-                        $ext=$income->file_type;
-                        if($ext=='jpg'||$ext=='jpeg'||$ext=='png'||$ext=='bmp'){
-                            $url_show_file = url('income_image', $income->id);
-                            return '<div class="text-center"><a class="popup-link" href="'.$url_show_file.'" title="'.$income->file_name.'"><i class="fa fa-picture-o"></i></a></div>';
-                        }else{
-                            $url_download_file = route('incomes.download', $income->id);
-                            return '<div class="text-center"><a href="'.$url_download_file.'" title="'.$income->file_name.'"><i class="fa fa-cloud-download"></i></a></div>';
-                        }
-                    }
+                    return $income->download_file;
                 })
             ->rawColumns(['action', 'income', 'account', 'file'])
             ->make(true);

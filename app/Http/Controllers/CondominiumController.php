@@ -9,6 +9,7 @@ use App\Http\Requests\CondominiumRequest;
 use App\User;
 use App\Models\Condominium;
 use App\Models\Country;
+use App\Models\Setting;
 use App\Models\PropertyType;
 use Illuminate\Support\Facades\Crypt;
 use Yajra\Datatables\Datatables;
@@ -24,6 +25,7 @@ use File;
 use DB;
 use PDF;
 use Auth;
+use Storage;
 
 class CondominiumController extends Controller
 {
@@ -48,15 +50,27 @@ class CondominiumController extends Controller
         return view('condominiums.index');
     }
 
-    public function datatable()
-    {        
+    /**
+     * Display a listing of the condominium.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function demos()
+    {                
+        return view('condominiums.demos');
+    }
 
-        $condominiums = Condominium::all();        
+    public function datatable(Request $request)
+    {        
+        $condominiums = Condominium::where('demo', $request->demo);        
         
         return Datatables::of($condominiums)
-            ->addColumn('action', function ($condominium) {
+            ->addColumn('action', function ($condominium){
                 $condominium_id = Crypt::encrypt($condominium->id);
-                $url_edit = route('condominiums.edit', $condominium_id);
+                $opt_permanent = ($condominium->demo)?
+                        '<li>
+                            <a href="#" name="href_cancel" class="modal-class" onclick="showModalPermanent(`'.$condominium->id.'`, `'.$condominium->name.'`)"><i class="fa fa-tag"></i> Pasar a permanente</a>
+                        </li>':'';
                     if($condominium->active){
                         return '<div class="input-group-btn text-center">
                             <button data-toggle="dropdown" class="btn btn-xs btn-default dropdown-toggle" type="button" title="Acciones"><i class="fa fa-chevron-circle-down" aria-hidden="true"></i></button>
@@ -64,12 +78,13 @@ class CondominiumController extends Controller
                                 <li>
                                     <a href="#" name="href_cancel" class="modal-class" onclick="showModalCondominium('.$condominium->id.')"><i class="fa fa-pencil-square-o"></i> Editar</a>
                                 </li>
+                                '.$opt_permanent.'
                                 <li>
                                     <a href="#" name="href_status" class="modal-class" onclick="change_status('.$condominium->id.')"><i class="fa fa-ban"></i> Deshabilitar</a>
                                 </li>
                                 <li class="divider"></li>
                                 <li>
-                                    <a href="#" onclick="showModalDelete(`'.$condominium->id.'`, `'.$condominium->plate.'`)"><i class="fa fa-trash-o"></i> Eliminiar</a>                                
+                                    <a href="#" onclick="showModalDelete(`'.$condominium->id.'`, `'.$condominium->name.'`)"><i class="fa fa-trash-o"></i> Eliminiar</a>                                
                                 </li>
                             </ul>
                         </div>';
@@ -148,6 +163,7 @@ class CondominiumController extends Controller
             $condominium->cell=$request->cell;
             $condominium->phone=$request->phone;
             $condominium->email=$request->email;
+            ($request->remaining_days)?$condominium->remaining_days=$request->remaining_days:'';
             $condominium->save();
             //Registra el usuario administrador
             $user=new User();
@@ -195,6 +211,7 @@ class CondominiumController extends Controller
             $condominium->cell=$request->cell;
             $condominium->phone=$request->phone;
             $condominium->email=$request->email;
+            ($request->remaining_days)?$condominium->remaining_days=$request->remaining_days:'';
             $condominium->save();
 
             return response()->json([
@@ -222,6 +239,7 @@ class CondominiumController extends Controller
     {
         try {
             $condominium = Condominium::find($id);
+            Storage::deleteDirectory($condominium->id);
             $condominium->delete();
             
             return response()->json([
@@ -259,20 +277,61 @@ class CondominiumController extends Controller
         }
     }
     
+    public function permanent($id)
+    {
+        try {
+            $condominium = Condominium::find($id);
+            $condominium->demo=false;
+            $condominium->save();
+
+            return response()->json([
+                    'success' => true,
+                    'message' => 'Condominio pasado a permanente exitosamente',
+                ], 200);                        
+
+        } catch (Exception $e) {
+            
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage()
+            ], 500);            
+        }
+    }
+
     public function rpt_condominiums()
     {        
-        $logo=($this->condominium->logo)?realpath(storage_path()).'/app/'.$this->condominium->id.'/'.$this->condominium->logo:public_path().'/img/company_logo.png';
-        $company=$this->condominium->name;
+        $setting=Setting::first();
+        $condominiums=Condominium::where('demo', false)->get();
+        $logo=($setting->logo)?realpath(storage_path()).'/app/global/'.$setting->logo:public_path().'/img/company_logo.png';
         
         $data=[
-            'company' => $this->condominium->name,
-            'condominiums' => $this->condominium->condominiums()->get(),
+            'company' => $setting->company,
+            'condominiums' => $condominiums,
             'logo' => $logo
         ];
 
+
         $pdf = PDF::loadView('reports/rpt_condominiums', $data);
         
-        return $pdf->stream('Condominios.pdf');
+        return $pdf->stream('Condominios Permanentes.pdf');
+
+    }
+    
+    public function rpt_demos()
+    {        
+        $setting=Setting::first();
+        $condominiums=Condominium::where('demo', true)->get();
+        
+        $data=[
+            'company' => $setting->company,
+            'condominiums' => $condominiums,
+            'logo' => ''
+        ];
+
+
+        $pdf = PDF::loadView('reports/rpt_demos', $data);
+        
+        return $pdf->stream('Condominios Demos.pdf');
 
     }
 
@@ -281,9 +340,16 @@ class CondominiumController extends Controller
         $start=Carbon::createFromFormat('Y-m-d', $request->start)->format('Y-m-d');
         $end=Carbon::createFromFormat('Y-m-d', $request->end)->format('Y-m-d');
         $condominium=Condominium::find($id);
-        $events=$condominium->events()
-                            ->whereDate('start','>=',$start)
-                            ->whereDate('start','<=',$end)->get();
+        if(session('role')=='OWN'){
+            $events=$condominium->events()
+                        ->where('private', false)
+                        ->whereDate('start','>=',$start)
+                        ->whereDate('start','<=',$end)->get();
+        }else{
+            $events=$condominium->events()
+                        ->whereDate('start','>=',$start)
+                        ->whereDate('start','<=',$end)->get();
+        }
         
         $data = array();
         $i=0;

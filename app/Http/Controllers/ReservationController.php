@@ -50,8 +50,14 @@ class ReservationController extends Controller
      */
     public function index()
     {                        
-        $facilities=$this->condominium->facilities()->orderBy('name')->pluck('name','id');
-        $properties=$this->condominium->properties()->orderBy('number')->pluck('number','id');
+        $facilities=$this->condominium->facilities()->where('status', 'O')
+                                ->orderBy('name')->pluck('name','id');
+                                
+        if(session('role')=='OWN'){
+            $properties=Auth::user()->properties()->orderBy('number')->pluck('number','id');
+        }else{
+            $properties=$this->condominium->properties()->orderBy('number')->pluck('number','id');
+        }
         
         return view('reservations.index')->with('properties', $properties)
                                         ->with('facilities', $facilities);
@@ -65,32 +71,43 @@ class ReservationController extends Controller
         if($property_filter!=''){
             if($status_filter!=''){
                 $reservations = $this->condominium->reservations()
-                                    ->where('property_id', $property_filter)
-                                    ->where('status', $status_filter);
+                            ->where('property_id', $property_filter)
+                            ->where('status', $status_filter);
             }else{
                 $reservations = $this->condominium->reservations()
-                                    ->where('property_id', $property_filter);
+                            ->where('property_id', $property_filter);
             }
         }else{
-            if($status_filter!=''){
-                $reservations = $this->condominium->reservations()->where('status', $status_filter);
+            if(session('role')=='OWN'){
+                if($status_filter!=''){
+                    $reservations = $this->condominium->reservations()
+                            ->whereIn('property_id', Auth::user()->properties()->pluck('id'))
+                            ->where('status', $status_filter);
+                }else{
+                    $reservations = $this->condominium->reservations()
+                            ->whereIn('property_id', Auth::user()->properties()->pluck('id'));
+                }
             }else{
-                $reservations = $this->condominium->reservations();
+                if($status_filter!=''){
+                    $reservations = $this->condominium->reservations()
+                            ->where('status', $status_filter);
+                }else{
+                    $reservations = $this->condominium->reservations();
+                }
             }
         }
                 
         return Datatables::of($reservations)
             ->addColumn('action', function ($reservation) {
-                $reservation_id = Crypt::encrypt($reservation->id);
-                $url_edit = route('reservations.edit', $reservation_id);
+                $opt_confirm=(session('role')=='ADM')?
+                    '<li>
+                        <a href="#" class="modal-class" onclick="showModalConfirmReservation('.$reservation->id.')"><i class="fa fa-check-square-o"></i> Confirmar</a>
+                    </li><li class="divider"></li>':'';
                     if($reservation->status=='P'){
                         return '<div class="input-group-btn text-center">
                             <button data-toggle="dropdown" class="btn btn-xs btn-default dropdown-toggle" type="button" title="Acciones"><i class="fa fa-chevron-circle-down" aria-hidden="true"></i></button>
                             <ul class="dropdown-menu">
-                                <li>
-                                    <a href="#" class="modal-class" onclick="showModalConfirmReservation('.$reservation->id.')"><i class="fa fa-check-square-o"></i> Confirmar</a>
-                                </li>
-                                <li class="divider"></li>
+                                '.$opt_confirm.'
                                 <li>
                                     <a href="#" onclick="showModalDelete(`'.$reservation->id.'`, `'.$reservation->name.'`)"><i class="fa fa-trash-o"></i> Eliminiar</a>                                
                                 </li>
@@ -144,7 +161,12 @@ class ReservationController extends Controller
      */
     public function load($id, $facility_id)
     {
-        $properties=$this->condominium->properties()->orderBy('number')->pluck('number','id');
+        if(session('role')=='OWN'){
+            $properties=Auth::user()->properties()->orderBy('number')->pluck('number','id');
+        }else{
+            $properties=$this->condominium->properties()->orderBy('number')->pluck('number','id');
+        }
+        
         $facility=Facility::find($facility_id);
         
         if($id==0){

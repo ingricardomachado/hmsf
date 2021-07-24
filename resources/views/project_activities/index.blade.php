@@ -2,6 +2,7 @@
     <a href="#" class="btn btn-xs btn-primary" onclick="showModalActivity({{ $project->id }}, 0);">Nueva Actividad</a>
 </div>
 @if($activities->count()>0)
+<div class="table-responsive col-sm-12">
 <table class="table">
     <thead>
         <tr>
@@ -16,22 +17,11 @@
     @foreach($activities as $activity)
         <tr>
             <td>
-              @if(Auth::user()->role!='VIS')
-                <div class="input-group-btn text-center">
-                    <button data-toggle="dropdown" class="btn btn-xs btn-default dropdown-toggle" type="button" title="Acciones"><i class="fa fa-chevron-circle-down" aria-hidden="true"></i></button>
-                    <ul class="dropdown-menu">
-                        <li>
-                            <a href="#" name="href_cancel" class="modal-class" onclick="showModalActivity({{ $project->id }}, {{ $activity->id }})"><i class="fa fa-pencil-square-o"></i> Editar</a>
-                        </li>
-                        <li class="divider"></li>
-                        <li>
-                            <a href="#" onclick="showModalDeleteActivity('{{ $activity->id }}', '{{ $activity->name }}')"><i class="fa fa-trash-o"></i> Eliminiar</a>                                
-                        </li>
-                    </ul>
-                </div>
-              @endif                
+              <a href="#" class="text-muted" style="color:inherit" onclick="showModalDeleteActivity('{{ $activity->id }}', '{{ $activity->name }}')" title="Eliminar"><i class="fa fa-trash-o"></i></a>
             </td>
-            <td>{{ $activity->name }}</td>
+            <td>
+              <a href="#" onclick="showModalActivity({{ $project->id }}, {{ $activity->id }})" style="color:inherit"  title="Click para editar">{{ $activity->name }}</a>
+            </td>
             <td>{{ $activity->date->format('d.m.Y') }}</td>
             <td>{{ $activity->advance }}%</td>
             <td><p class="small">{{ $activity->observation }}</p></td>
@@ -39,6 +29,8 @@
     @endforeach
     </tbody>
 </table>
+<br><br><br>
+</div>
 @endif
 
 <!-- Modal para Actividades -->
@@ -56,7 +48,7 @@
   <div class="modal-dialog">
     <div class="modal-content animated fadeIn">
       <div class="modal-header">
-        <h5 class="modal-title"><i class="fa fa-exclamation-triangle"></i> <strong>Eliminar Actividad</strong></h5>
+        <h5 class="modal-title"><i class="fa fa-trash-o"></i> <strong>Eliminar Actividad</strong></h5>
         <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
       </div>      
       <div class="modal-body">

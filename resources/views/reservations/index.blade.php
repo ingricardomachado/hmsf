@@ -39,10 +39,12 @@
             {{ Form::open(array('url' => '', 'id' => 'form_rpt', 'method' => 'get'), ['' ])}}
             {{ Form::close() }}
             <div class="col-sm-3 col-xs-12">
-                {{ Form::select('property_filter', $properties, null, ['id'=>'property_filter', 'class'=>'select2 form-control-sm', 'tabindex'=>'-1', 'placeholder'=>''])}}
-            </div>
-            <div class="col-sm-3 col-xs-12">
                 {{ Form::select('status_filter', ['P'=>'Pendientes', 'A'=>'Aprobadas', 'R'=>'Rechazadas'], null, ['id'=>'status_filter', 'class'=>'select2 form-control-sm', 'tabindex'=>'-1', 'placeholder'=>''])}}
+            </div>
+            <div class="col-sm-3 col-xs-12">                
+                @if($properties->count()>1)
+                  {{ Form::select('property_filter', $properties, null, ['id'=>'property_filter', 'class'=>'select2 form-control-sm', 'tabindex'=>'-1', 'placeholder'=>''])}}
+                @endif
             </div>
             <div class="col-sm-6 col-xs-12 text-right">
                 <a href="#" class="btn btn-sm btn-primary" onclick="showModalSelectFacility();"><i class="fa fa-plus-circle"></i> Reservar</a>

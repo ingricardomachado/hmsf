@@ -63,6 +63,10 @@
                     <label>Teléfono</label>
                     {!! Form::text('phone', $condominium->phone, ['id'=>'phone', 'class'=>'form-control', 'type'=>'text', 'placeholder'=>'', 'maxlength'=>'10']) !!}
                 </div>
+                <div class="form-group col-sm-6" style="display:{{ ($condominium->demo)?'solid':'none' }}">
+                    <label>Días restantes *</label> <small>Max 30 días</small>
+                    {!! Form::number('remaining_days', $condominium->remaining_days, ['id'=>'remaining_days', 'class'=>'form-control', 'type'=>'text', 'placeholder'=>'', 'min'=>'0', 'max'=>'30', 'required']) !!}
+                </div>
             </div>
         </div>
         <div class="modal-footer">

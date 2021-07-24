@@ -21,7 +21,7 @@
                           {{ Form::select('property', $properties, null, ['id'=>'property', 'class'=>'select2 form-control form-control-sm', 'tabindex'=>'-1', 'placeholder'=>'', 'required'])}}
                         </div>
                         <div class="form-group col-sm-12">  
-                          <label>Cuenta origen *</label>
+                          <label>Cuenta destino *</label>
                           {{ Form::select('account', $accounts, null, ['id'=>'account', 'class'=>'select2 form-control form-control-sm', 'tabindex'=>'-1', 'placeholder'=>'', 'required'])}}
                         </div>
                         <div class="form-group col-sm-6">

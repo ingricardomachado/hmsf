@@ -27,29 +27,23 @@ use Storage;
 
 class ImgController extends Controller
 {
+    /*
+     * Extracts picture's data from DB and makes an image 
+    */ 
+    public function showCompanyLogo($id)
+    {
+        $setting=Setting::first();
+        if($setting->logo!=null){
+            $picture=Image::make(Storage::get('global/'.$setting->logo));
+        }else{
+            $picture = Image::make(public_path().'/img/company_logo.png');
+        }
+        $response = Response::make($picture->encode('jpg'));
+        $response->header('Content-Type', 'image/jpeg');
 
-   public function resize_image($img, $ext, $width, $height)
-   {
-      
-        $img_resize = new Image();      
-        //Paso 1: TAMAÑO. Si la imagen es muy grande se hace un resize de ancho y  alto segun parametros como maximo manteniendo su relacion de aspecto.        
-        //$width      = 450;
-        //$height     = 350;
-        $img->resize($width, $height, function ($c) {
-          $c->aspectRatio();
-          $c->upsize();
-        });
-        //Paso 2: PESO. Una vez redimensionada si el archivo pesa mas de 500 Kb se baja la calidad al 90%
-        if ($img->filesize()>500000)
-        {
-          $img = $img->encode($ext,95);
-        } 
-        
-        $img_resize = $img;
-        
-        return $img_resize;
-   }
-
+        return $response;
+    }
+    
     /*
      * Extracts picture's data from DB and makes an image 
     */ 
@@ -57,7 +51,11 @@ class ImgController extends Controller
     {
         $user = User::findOrFail($id);
         if($user->avatar!=null){
-            $picture = Image::make(storage_path('app/users/'.$user->avatar));
+            if($user->condominium_id){
+                $picture = Image::make(Storage::get($user->condominium_id.'/users/'.$user->avatar));
+            }else{
+                $picture = Image::make(Storage::get('global/'.$user->avatar));
+            }
         }else{
             $picture = Image::make(public_path().'/img/avatar_default.png');
         }
@@ -74,7 +72,7 @@ class ImgController extends Controller
     {
         $contact = Contact::findOrFail($id);
         if($contact->avatar!=null){
-            $picture = Image::make(storage_path('app/'.$contact->condominium_id.'/contacts/thumbs/'.$contact->avatar));
+            $picture = Image::make(Storage::get($contact->condominium_id.'/contacts/thumbs/'.$contact->avatar));
         }else{
             $picture = Image::make(public_path().'/img/avatar_default.png');
         }
@@ -91,7 +89,7 @@ class ImgController extends Controller
     {
         $employee = Employee::findOrFail($id);
         if($employee->avatar!=null){
-            $picture = Image::make(storage_path('app/'.$employee->condominium_id.'/employees/thumbs/'.$employee->avatar));
+            $picture = Image::make(Storage::get($employee->condominium_id.'/employees/thumbs/'.$employee->avatar));
         }else{
             $picture = Image::make(public_path().'/img/avatar_default.png');
         }
@@ -108,7 +106,7 @@ class ImgController extends Controller
     {
         $facility = Facility::findOrFail($id);
         if($facility->photo!=null){
-            $picture = Image::make(storage_path('app/'.$facility->condominium_id.'/facilities/thumbs/'.$facility->photo));
+            $picture = Image::make(Storage::get($facility->condominium_id.'/facilities/thumbs/'.$facility->photo));
         }else{
             $picture = Image::make(public_path().'/img/no_image_available.png');
         }
@@ -125,7 +123,7 @@ class ImgController extends Controller
     {
         $condominium=Condominium::findOrFail($id);
         if($condominium->logo!=null){
-            $picture=Image::make(storage_path('app/'.$condominium->id.'/'.$condominium->logo));
+            $picture=Image::make(Storage::get($condominium->id.'/'.$condominium->logo));
         }else{
             $picture = Image::make(public_path().'/img/company_logo.png');
         }
@@ -135,23 +133,10 @@ class ImgController extends Controller
         return $response;
     }
 
-    /*
-     * Extracts picture's data from DB and makes an image 
-    */ 
-    public function showCompanyLogo()
-    {
-        $setting = Setting::first();
-        $picture = Image::make($setting->logo);
-        $response = Response::make($picture->encode('jpg'));
-        $response->header('Content-Type', 'image/jpeg');
-
-        return $response;
-    }
-
     public function showDocumentImage($id)
     {
         $document = Document::findOrFail($id);
-        $picture = Image::make(storage_path('app/'.$document->condominium_id.'/documents/'.$document->file));
+        $picture = Image::make(Storage::get($document->condominium_id.'/documents/'.$document->file));
         $response = Response::make($picture->encode('jpg'));
         $response->header('Content-Type', 'image/jpeg');
 
@@ -161,7 +146,7 @@ class ImgController extends Controller
     public function showIncomeImage($id)
     {
         $income = Income::findOrFail($id);
-        $picture = Image::make(storage_path('app/'.$income->condominium_id.'/incomes/'.$income->file));
+        $picture = Image::make(Storage::get($income->condominium_id.'/incomes/'.$income->file));
         $response = Response::make($picture->encode('jpg'));
         $response->header('Content-Type', 'image/jpeg');
 
@@ -171,7 +156,7 @@ class ImgController extends Controller
     public function showExpenseImage($id)
     {
         $expense = Expense::findOrFail($id);
-        $picture = Image::make(storage_path('app/'.$expense->condominium_id.'/expenses/'.$expense->file));
+        $picture = Image::make(Storage::get($expense->condominium_id.'/expenses/'.$expense->file));
         $response = Response::make($picture->encode('jpg'));
         $response->header('Content-Type', 'image/jpeg');
 
@@ -181,7 +166,7 @@ class ImgController extends Controller
     public function showTransferImage($id)
     {
         $transfer = Transfer::findOrFail($id);
-        $picture = Image::make(storage_path('app/'.$transfer->condominium_id.'/transfers/'.$transfer->file));
+        $picture = Image::make(Storage::get($transfer->condominium_id.'/transfers/'.$transfer->file));
         $response = Response::make($picture->encode('jpg'));
         $response->header('Content-Type', 'image/jpeg');
 
@@ -191,7 +176,7 @@ class ImgController extends Controller
     public function showPaymentImage($id)
     {
         $payment = Payment::findOrFail($id);
-        $picture = Image::make(storage_path('app/'.$payment->condominium_id.'/payments/'.$payment->file));
+        $picture = Image::make(Storage::get($payment->condominium_id.'/payments/'.$payment->file));
         $response = Response::make($picture->encode('jpg'));
         $response->header('Content-Type', 'image/jpeg');
 

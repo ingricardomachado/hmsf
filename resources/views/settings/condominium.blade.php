@@ -167,8 +167,8 @@ $("#country").change( event => {
 $("#btn_submit").on('click', function(event) {    
     var validator = $("#form" ).validate();
     formulario_validado = validator.form();
-        
     if(formulario_validado){
+        $("#btn_submit").attr('disabled',true);
         var form_data = new FormData($("#form")[0]);
         $.ajax({
           url: '{{URL::to("settings.update_condominium")}}',
@@ -179,12 +179,22 @@ $("#btn_submit").on('click', function(event) {
           data: form_data
         })
         .done(function(response) {
-            toastr_msg('success', '{{ config('app.name') }}', 'Datos del condominio actualizados exitosamente', 1000);
+            $("#btn_submit").attr('disabled',false);
+            toastr_msg('success', '{{ config('app.name') }}', response.message, 1000);
         })
-        .fail(function() {
-          toastr_msg('error', '{{ config('app.name') }}', 'Ocurrio un error actualizando los datos del condoniminio', 1000);
+        .fail(function(response) {
+          $("#btn_submit").attr('disabled',false);
+          if(response.status == 422){
+            var errorsHtml='';
+            $.each(response.responseJSON.errors, function (key, value) {
+              errorsHtml += '<li>' + value[0] + '</li>'; 
+            });          
+            toastr_msg('error', '{{ config('app.name') }}', errorsHtml, 3000);
+          }else{
+            toastr_msg('error', '{{ config('app.name') }}', response.responseJSON.message, 2000);
+          }
         });
-      }
+    }
 });
 
 $(document).ready(function() {

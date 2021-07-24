@@ -145,16 +145,7 @@ class PaymentController extends Controller
                     return money_fmt($payment->amount);
                 })
             ->addColumn('file', function ($payment) {
-                    if($payment->file_name){                    
-                        $ext=$payment->file_type;
-                        if($ext=='jpg'||$ext=='jpeg'||$ext=='png'||$ext=='bmp'){
-                            $url_show_file = url('payment_image', $payment->id);
-                            return '<div class="text-center"><a class="popup-link" href="'.$url_show_file.'" title="'.$payment->file_name.'"><i class="fa fa-picture-o"></i></a></div>';
-                        }else{
-                            $url_download_file = route('payments.download', $payment->id);
-                            return '<div class="text-center"><a href="'.$url_download_file.'" title="'.$payment->file_name.'"><i class="fa fa-cloud-download"></i></a></div>';
-                        }
-                    }
+                    return $payment->download_file;
                 })
             ->editColumn('status', function ($payment) {                    
                     return $payment->status_label;

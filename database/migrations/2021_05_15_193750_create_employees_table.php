@@ -27,7 +27,7 @@ class CreateEmployeesTable extends Migration
             $table->string('notes',500)->nullable();
             $table->string('avatar_name',100)->nullable();
             $table->string('avatar_type',10)->nullable();
-            $table->Integer('avatar_size')->nullable();
+            $table->Integer('avatar_size')->unsigned()->nullable();
             $table->string('avatar',100)->nullable();
             $table->boolean('active')->default(true);
             $table->timestamps();

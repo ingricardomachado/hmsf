@@ -38,10 +38,12 @@
             <div class="col-sm-3 col-xs-12">
             </div>
             <div class="col-sm-9 col-xs-12 text-right">
+              @if(session('OWN'))  
                 <a href="#" class="btn btn-sm btn-primary" onclick="showModalProperty(0);"><i class="fa fa-plus-circle"></i> Nueva Propiedad</a>
                 <a href="{{ url('properties.xls_properties') }}" class="btn btn-sm btn-primary btn-outline" target="_self" title="Exportar Excel">XLS</a>
                 <a href="{{ url('properties.rpt_properties') }}" class="btn btn-sm btn-default" target="_blank" title="Imprimir PDF"><i class="fa fa-print"></i></a>
                 <br><br>
+              @endif
             </div>
             <div class="col-sm-12">
               @include('partials.errors')
@@ -204,7 +206,7 @@ $(document).ready(function(){
         columns: [
             { data: 'action', name: 'action', orderable: false, searchable: false},
             { data: 'number',   name: 'number', orderable: true, searchable: true},
-            { data: 'user',   name: 'users.name', orderable: false, searchable: true},
+            { data: 'user',   name: 'users.name', orderable: false, searchable: true, visible:false},
             { data: 'due_debt',   name: 'due_debt', orderable: true, searchable: false},
             { data: 'debt', name: 'debt', orderable: true, searchable: false },
             { data: 'total_debt', name: 'total_debt', orderable: true, searchable: false },

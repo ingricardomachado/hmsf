@@ -25,7 +25,7 @@ class CreateSettingsTable extends Migration
             $table->string('logo',100)->nullable();
             $table->string('logo_name',100)->nullable();
             $table->string('logo_type',10)->nullable();
-            $table->float('logo_size',8,2)->nullable();
+            $table->integer('logo_size')->unsigned()->nullable();
             $table->timestamps();
         });
     }

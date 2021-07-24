@@ -30,7 +30,7 @@ class CreateContactsTable extends Migration
             $table->string('instagram', 50)->nullable();
             $table->string('avatar_name',100)->nullable();
             $table->string('avatar_type',10)->nullable();
-            $table->Integer('avatar_size')->nullable();
+            $table->Integer('avatar_size')->unsigned()->nullable();
             $table->string('avatar',100)->nullable();
             $table->boolean('active')->default(true);
             $table->timestamps();

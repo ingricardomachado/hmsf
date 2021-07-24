@@ -20,14 +20,14 @@ Auth::routes();
 Route::get('/', 'HomeController@index')->name('home');
 
 //Landing
-/*Route::get('/', function () {
+Route::get('/', function () {
     $countries=Country::orderBy('name')->pluck('name','id');
     $property_types=PropertyType::orderBy('name')->pluck('name','id');
 
     return view('landing')->with('messages', array())
     					  ->with('countries', $countries)
     					  ->with('property_types', $property_types);
-});*/
+});
 
 //Accounts
 Route::resource("accounts","AccountController");
@@ -56,10 +56,13 @@ Route::get('cars.rpt_cars', 'CarController@rpt_cars')->name('cars.rpt_cars');
 
 //Condominiums
 Route::resource("condominiums","CondominiumController");
-Route::get('condominiums.datatable', 'CondominiumController@datatable')->name('condominiums.datatable');
+Route::get('demos', 'CondominiumController@demos')->name('demos');
+Route::post('condominiums.datatable', 'CondominiumController@datatable')->name('condominiums.datatable');
 Route::get('condominiums.load/{id}', 'CondominiumController@load')->name('condominiums.load');
 Route::get('condominiums.status/{id}', 'CondominiumController@status')->name('condominiums.status');
+Route::get('condominiums.permanent/{id}', 'CondominiumController@permanent')->name('condominiums.permanent');
 Route::get('condominiums.rpt_condominiums', 'CondominiumController@rpt_condominiums')->name('condominiums.rpt_condominiums');
+Route::get('condominiums.rpt_demos', 'CondominiumController@rpt_demos')->name('condominiums.rpt_demos');
 Route::post('condominiums/{id}/events', 'CondominiumController@events');
 
 //Contacts
@@ -135,6 +138,7 @@ Route::post('fees.store_multiple', 'FeeController@store_multiple')->name('fees.s
 Route::get('home', ['as' => 'home', 'uses' => 'HomeController@index']);
 
 //Img
+Route::get('company_logo/{id}', 'ImgController@showCompanyLogo');
 Route::get('user_avatar/{id}', 'ImgController@showUserAvatar');
 Route::get('contact_avatar/{id}', 'ImgController@showContactAvatar');
 Route::get('employee_avatar/{id}', 'ImgController@showEmployeeAvatar');
@@ -184,6 +188,11 @@ Route::get('payments.load_confirm/{id}', 'PaymentController@load_confirm')->name
 Route::post('payments.confirm/{id}', 'PaymentController@confirm')->name('payments.confirm');
 Route::get('payments.rpt_payment/{id}', 'PaymentController@rpt_payment')->name('payments.rpt_payment');
 
+//Profile
+Route::get('profile', ['as' => 'profile', 'uses' => 'ProfileController@edit']);
+Route::post('profile.update', ['as' => 'profile.update', 'uses' => 'ProfileController@update']);
+
+
 //Projects
 Route::resource("projects","ProjectController");
 Route::post('projects.datatable', 'ProjectController@datatable')->name('projects.datatable');
@@ -195,8 +204,10 @@ Route::get('projects.gallery/{id}', 'ProjectController@gallery')->name('projects
 Route::post('projects.status/{id}', 'ProjectController@status')->name('projects.status');
 Route::get('projects.rpt_project/{id}', 'ProjectController@rpt_project')->name('projects.rpt_project');
 Route::get('projects.rpt_projects', 'ProjectController@rpt_projects')->name('projects.rpt_projects');
-
 Route::get('projects.load_btn_status/{id}', 'ProjectController@load_btn_status')->name('projects.load_btn_status');
+
+Route::get('projects.load_incomes/{id}', 'ProjectController@load_incomes')->name('projects.load_incomes');
+Route::get('projects.load_expenses/{id}', 'ProjectController@load_expenses')->name('projects.load_expenses');
 
 //ProjectActivities
 Route::resource("project_activities","ProjectActivityController");
@@ -218,11 +229,9 @@ Route::get('properties.rpt_properties', 'PropertyController@rpt_properties')->na
 Route::get('properties.xls_properties', 'PropertyController@xls_properties')->name('properties.xls_properties');
 Route::get('taxes', 'PropertyController@taxes')->name('properties.taxes');
 Route::post('properties.update_taxes', 'PropertyController@update_taxes')->name('properties.update_taxes');
-Route::get('properties.statement/{id}', 'PropertyController@statement')->name('properties.statement');
+Route::get('statement/{id}', 'PropertyController@statement')->name('statement');
 Route::get('properties.rpt_statement/{id}', 'PropertyController@rpt_statement')->name('properties.rpt_statement');
 Route::get('properties.xls_statement/{id}', 'PropertyController@xls_statement')->name('properties.xls_statement');
-
-
 
 //Reservations
 Route::resource("reservations","ReservationController");
@@ -235,9 +244,9 @@ Route::get('reservations.load_confirm/{id}', 'ReservationController@load_confirm
 Route::post('reservations.confirm/{id}', 'ReservationController@confirm')->name('reservations.confirm');
 
 //Setting
-Route::get('settings.global', ['as' => 'settings.global', 'uses' => 'SettingController@global']);
+Route::get('global', ['as' => 'global', 'uses' => 'SettingController@global']);
 Route::post('settings.update_global', ['as' => 'settings.update_global', 'uses' => 'SettingController@update_global']);
-Route::get('settings.condominium', ['as' => 'settings.condominium', 'uses' => 'SettingController@condominium']);
+Route::get('settings', ['as' => 'settings', 'uses' => 'SettingController@condominium']);
 Route::post('settings.update_condominium', ['as' => 'settings.update_condominium', 'uses' => 'SettingController@update_condominium']);
 
 //SupplierCategories

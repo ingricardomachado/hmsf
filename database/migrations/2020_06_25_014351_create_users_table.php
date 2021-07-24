@@ -30,6 +30,7 @@ class CreateUsersTable extends Migration
             $table->string('avatar',100)->nullable();
             $table->string('avatar_name',100)->nullable();
             $table->string('avatar_type',10)->nullable();
+            $table->integer('avatar_size')->unsigned()->nullable();
             $table->boolean('active')->default(true);
             $table->timestamps();
         });

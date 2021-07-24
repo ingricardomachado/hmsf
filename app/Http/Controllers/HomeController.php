@@ -43,18 +43,7 @@ class HomeController extends Controller
         $labels=($today->month <= 6)?["Ene", "Feb", "Mar", "Abr", "May", "Jun"]:["Jul", "Ago", "Sep", "Oct", "Nov", "Dic"];
         
         if(Session::get('role')=='SAM'){
-            return view('home')->with('today', $today)
-                        ->with('tot_customers', 0)
-                        ->with('tot_purchases', 0)
-                        ->with('tot_credit_points', 0)
-                        ->with('tot_debit_points', 0)
-                        ->with('top_customers', 0)
-                        ->with('tot_credit_points_year', 0)
-                        ->with('tot_debit_points_year', 0)
-                        ->with('labels', json_encode($labels))
-                        ->with('array_total_credit_points', json_encode($array_total_credit_points))
-                        ->with('array_total_debit_points', json_encode($array_total_debit_points));
-
+            return redirect()->route('condominiums.index');
         }else{
             return view('home')->with('today', $today)
                         ->with('tot_customers', 0)

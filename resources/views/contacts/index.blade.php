@@ -36,7 +36,9 @@
             <div class="col-sm-4 col-xs-12">
             </div>                            
             <div class="col-sm-8 col-xs-12 text-right">
+              @if(session('role')=='ADM')
                 <a href="#" class="btn btn-sm btn-primary" onclick="showModalContact(0);"><i class="fa fa-plus-circle"></i> Nuevo Contacto</a>
+              @endif
               <a href="{{ url('contacts.rpt_contacts') }}" class="btn btn-sm btn-default" target="_blank" title="Imprimir PDF"><i class="fa fa-print"></i></a><br><br>
             </div>
             <div class="col-sm-12">

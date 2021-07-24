@@ -17,8 +17,6 @@
 <div class="wrapper wrapper-content animated fadeInRight">
     <div class="row">
         <div class="ibox float-e-margins">
-                        
-            <!-- ibox-title -->
             <div class="ibox-title">
                 <h5>Configuración General<small> Complete el formulario <b>(*) Campos obligatorios.</b></small></h5>
                 <div class="ibox-tools">
@@ -27,14 +25,10 @@
                     <a class="close-link"><i class="fa fa-times"></i></a>
                 </div>
             </div>
-            <!-- /ibox-title -->
-            
-            @include('partials.errors')
-
             <!-- ibox-content -->
             <div class="ibox-content">
                 <div class="row">
-                    <form action="{{url('settings.update_global')}}" id="form" method="POST" enctype="multipart/form-data">
+                    <form action="" id="form" method="POST">
                         <input type="hidden" name="_token" value="{{{ csrf_token() }}}" />
                         <!-- Columna 1 -->
                         <div class="col-sm-6">                              
@@ -81,16 +75,11 @@
                             </div>
                         </div>
                         <div class="form-group col-sm-12 text-right">
-                            <button type="submit" id="btn_submit" class="btn btn-sm btn-primary">Guardar</button>
-                            <a href="{{URL::to('home')}}" class="btn btn-sm btn-default" title="Regresar"><i class="fa fa-home"></i></a>
+                            <button type="button" id="btn_submit" class="btn btn-sm btn-primary">Guardar</button>
                         </div>
-                    {{ Form::close() }}
-
+                    </form>
                 </div>
             </div>
-            <!-- /ibox-content -->
-
-            
         </div>
     </div>
 </div>
@@ -105,69 +94,70 @@
 <script src="{{ URL::asset('js/plugins/select2/dist/js/i18n/es.js') }}"></script>
 <!-- iCheck -->
 <script src="{{ URL::asset('js/plugins/iCheck/icheck.min.js') }}"></script>
-<!-- Page-Level Scripts -->
 <script>
           
-      var setting_id = "{{$setting->id}}";
-      if( setting_id == "" )
-      {        
-        logo_preview = "<img style='height:150px' src='{{ url('img/avatar_default.png') }}'>";
-      }else{
-        logo_preview = "<img style='height:150px' src= '{{ url('company_logo/'.$setting->id) }}' >";
-      }
-      
-      // Fileinput    
-      $('#logo').fileinput({
-        language: 'es',
-        allowedFileExtensions : ['jpg', 'jpeg', 'png'],
-        previewFileIcon: "<i class='glyphicon glyphicon-king'></i>",
-        showUpload: false,        
-        maxFileSize: 2000,
-        maxFilesNum: 1,
-        overwriteInitial: true,
-        progressClass: true,
-        progressCompleteClass: true,
-        initialPreview: [
-          logo_preview
-        ]      
-      });            
+// Fileinput    
+$('#logo').fileinput({
+    language: 'es',
+    allowedFileExtensions : ['jpg', 'jpeg', 'png'],
+    previewFileIcon: "<i class='glyphicon glyphicon-king'></i>",
+    showUpload: false,        
+    maxFileSize: 2000,
+    maxFilesNum: 1,
+    overwriteInitial: true,
+    progressClass: true,
+    progressCompleteClass: true,
+    initialPreview: [
+      "<img style='height:150px' src= '{{ url('company_logo/'.$setting->id) }}' >"
+    ]      
+});            
     
 
-    $(document).ready(function() {
-                
-        // Validation
-        $("#form").validate({
-            submitHandler: function(form) {
-                $("#btn_submit").attr("disabled",true);
-                form.submit();
-            }        
-        });
+$("#btn_submit").on('click', function(event) {    
+    var validator = $("#form" ).validate();
+    formulario_validado = validator.form();
         
-        // Select2 
-        $("#money_format").select2({
-          language: "es",
-          placeholder: "Seleccione un formato numérico",
-          minimumResultsForSearch: 10,
-          allowClear: false,
-          width: '100%'
+    if(formulario_validado){
+        $("#btn_submit").attr('disabled',true);
+        var form_data = new FormData($("#form")[0]);
+        $.ajax({
+          url: '{{URL::to("settings.update_global")}}',
+          type: 'POST',
+          cache:true,
+          processData: false,
+          contentType: false,      
+          data: form_data
+        })
+        .done(function(response) {
+            $("#btn_submit").attr('disabled',false);
+            toastr_msg('success', '{{ config('app.name') }}', response.message, 1000);
+        })
+        .fail(function(response) {
+          $("#btn_submit").attr('disabled',false);
+          if(response.status == 422){
+            var errorsHtml='';
+            $.each(response.responseJSON.errors, function (key, value) {
+              errorsHtml += '<li>' + value[0] + '</li>'; 
+            });          
+            toastr_msg('error', '{{ config('app.name') }}', errorsHtml, 3000);
+          }else{
+            toastr_msg('error', '{{ config('app.name') }}', response.responseJSON.message, 2000);
+          }
         });
- 
+      }
+});
 
-        //Notifications
-        setTimeout(function() {
-            toastr.options = {
-                closeButton: true,
-                progressBar: true,
-                showMethod: 'slideDown',
-                timeOut: 2000
-            };
-            if('{{ Session::get('notify') }}'=='update' &&  '{{ Session::get('update_notification') }}'=='1'){
-                toastr.success('Configuración actualizada exitosamente', '{{ Session::get('app_name') }}');
-            }
-        }, 1300);        
-
+$(document).ready(function() {
+        
+    // Select2 
+    $("#money_format").select2({
+      language: "es",
+      placeholder: "Seleccione un formato numérico",
+      minimumResultsForSearch: 10,
+      allowClear: false,
+      width: '100%'
     });
-
-
+ 
+});
 </script>
 @endpush

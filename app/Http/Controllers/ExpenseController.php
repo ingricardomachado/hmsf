@@ -59,17 +59,33 @@ class ExpenseController extends Controller
                            });
                      })->pluck('name','id');
         
-        return view('expenses.index')->with('expense_types', $expense_types);
+        $suppliers=$this->condominium->suppliers()->orderBy('name')->pluck('name','id');
+        
+        return view('expenses.index')->with('expense_types', $expense_types)
+                                ->with('suppliers', $suppliers);
     }
 
     public function datatable(Request $request)
     {        
         $expense_type_filter=$request->expense_type_filter;
+        $supplier_filter=$request->supplier_filter;
 
         if($expense_type_filter!=''){
-            $expenses = $this->condominium->expenses()->where('expense_type_id', $expense_type_filter);
+            if($supplier_filter!=''){
+                $expenses = $this->condominium->expenses()
+                                    ->where('expense_type_id', $expense_type_filter)
+                                    ->where('supplier_id', $supplier_filter);
+            }else{
+                $expenses = $this->condominium->expenses()
+                                    ->where('expense_type_id', $expense_type_filter);
+            }
         }else{
-            $expenses = $this->condominium->expenses();
+            if($supplier_filter!=''){
+                $expenses = $this->condominium->expenses()
+                                    ->where('supplier_id', $supplier_filter);
+            }else{
+                $expenses = $this->condominium->expenses();                
+            }
         }
  
         return Datatables::of($expenses)
@@ -88,7 +104,11 @@ class ExpenseController extends Controller
                     </div>';
                 })           
             ->editColumn('expense', function ($expense) {                    
-                    return '<a href="#"  onclick="showModalExpense('.$expense->id.')" class="modal-class" style="color:inherit"  title="Click para editar">'.$expense->concept.'<br><small><i>'.$expense->expense_type->name.'</i></small></a>';
+                    if($expense->supplier_id){
+                        return '<a href="#"  onclick="showModalExpense('.$expense->id.')" class="modal-class" style="color:inherit"  title="Click para editar">'.$expense->supplier->name.'<br><small>'.$expense->concept.'<br><i>'.$expense->expense_type->name.'</i></small></a>';
+                    }else{
+                        return '<a href="#"  onclick="showModalExpense('.$expense->id.')" class="modal-class" style="color:inherit"  title="Click para editar">'.$expense->concept.'<br><small><i>'.$expense->expense_type->name.'</i></small></a>';
+                    }
                 })
             ->editColumn('account', function ($expense) {                    
                     return $expense->account->aliase.'<br><small><i>'.$expense->payment_method_description.'</i></small>';
@@ -100,16 +120,7 @@ class ExpenseController extends Controller
                     return money_fmt($expense->amount);
                 })
             ->addColumn('file', function ($expense) {
-                    if($expense->file_name){                    
-                        $ext=$expense->file_type;
-                        if($ext=='jpg'||$ext=='jpeg'||$ext=='png'||$ext=='bmp'){
-                            $url_show_file = url('expense_image', $expense->id);
-                            return '<div class="text-center"><a class="popup-link" href="'.$url_show_file.'" title="'.$expense->file_name.'"><i class="fa fa-picture-o"></i></a></div>';
-                        }else{
-                            $url_download_file = route('expenses.download', $expense->id);
-                            return '<div class="text-center"><a href="'.$url_download_file.'" title="'.$expense->file_name.'"><i class="fa fa-cloud-download"></i></a></div>';
-                        }
-                    }
+                    return $expense->download_file;
                 })
             ->rawColumns(['action', 'expense', 'account', 'file'])
             ->make(true);

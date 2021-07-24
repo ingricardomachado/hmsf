@@ -51,14 +51,21 @@ class PropertyController extends Controller
     public function datatable()
     {        
 
-        $properties = Property::leftjoin('users', 'properties.user_id', '=', 'users.id')
-                            ->where('properties.condominium_id', $this->condominium->id)
-                            ->select(['properties.*', 'users.name as user', 'users.cell as cell']);        
+        if(session('role')=='OWN'){
+            $properties=Auth::user()->properties()
+                ->leftjoin('users', 'properties.user_id', '=', 'users.id')
+                ->select(['properties.*', 'users.name as user', 'users.cell as cell']);
+        }else{
+            $properties=$this->condominium->properties()
+                ->leftjoin('users', 'properties.user_id', '=', 'users.id')
+                ->select(['properties.*', 'users.name as user', 'users.cell as cell']);    
+        }
         
         return Datatables::of($properties)
             ->addColumn('action', function ($property) {
-                $property_id = Crypt::encrypt($property->id);
-                $url_edit = route('properties.edit', $property_id);
+                    if(session('role')=='OWN'){
+                        return "";
+                    }else{
                         return '<div class="input-group-btn text-center">
                             <button data-toggle="dropdown" class="btn btn-xs btn-default dropdown-toggle" type="button" title="Acciones"><i class="fa fa-chevron-circle-down" aria-hidden="true"></i></button>
                             <ul class="dropdown-menu">
@@ -66,7 +73,7 @@ class PropertyController extends Controller
                                     <a href="#" name="href_cancel" class="modal-class" onclick="showModalProperty('.$property->id.')"><i class="fa fa-pencil-square-o"></i> Editar</a>
                                 </li>
                                 <li>
-                                    <a href="'.url('properties.statement', Crypt::encrypt($property->id)).'" class="modal-class"><i class="fa fa-file-text-o"></i> Estado de Cuenta</a>
+                                    <a href="'.url('statement', Crypt::encrypt($property->id)).'" class="modal-class"><i class="fa fa-file-text-o"></i> Estado de Cuenta</a>
                                 </li>
 
                                 <li class="divider"></li>
@@ -75,9 +82,10 @@ class PropertyController extends Controller
                                 </li>
                             </ul>
                         </div>';
+                    }
                 })           
             ->editColumn('number', function ($property) {                    
-                    return '<a href="'.url('properties.statement', Crypt::encrypt($property->id)).'" class="modal-class" style="color:inherit"  title="Click para editar"><b>'.$property->number.'</b></a>';
+                    return '<a href="'.url('statement', Crypt::encrypt($property->id)).'" class="modal-class" style="color:inherit"  title="Click para estado de cuenta"><b>'.$property->number.'</b></a>';
                 })
             ->editColumn('due_debt', function ($property) {                    
                     return money_fmt($property->due_debt);
