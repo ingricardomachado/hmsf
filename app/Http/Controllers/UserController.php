@@ -29,7 +29,11 @@ class UserController extends Controller
     public function __construct()
     {
         $this->middleware('auth', ['only' => ['index', 'create', 'edit']]);
-    }
+        $this->middleware(function ($request, $next) {
+            $this->condominium=session()->get('condominium');
+            return $next($request);
+        });
+    }    
     
     /**
      * Display a listing of the resource.
@@ -41,55 +45,36 @@ class UserController extends Controller
         return view('users.index');
     }
 
-    public function datatable(Request $request)
+    public function datatable()
     {        
-            $users = User::all();
 
+        $users = $this->condominium->users()->whereIn('role', ['ADM', 'WAM']);        
+        
         return Datatables::of($users)
             ->addColumn('action', function ($user) {
-                $user_id = Crypt::encrypt($user->id);
-                $url_edit = route('users.edit', $user_id);
-                    if($user->active){
                         return '<div class="input-group-btn text-center">
                             <button data-toggle="dropdown" class="btn btn-xs btn-default dropdown-toggle" type="button" title="Acciones"><i class="fa fa-chevron-circle-down" aria-hidden="true"></i></button>
                             <ul class="dropdown-menu">
                                 <li>
                                     <a href="#" name="href_cancel" class="modal-class" onclick="showModalUser('.$user->id.')"><i class="fa fa-pencil-square-o"></i> Editar</a>
                                 </li>
-                                <li>
-                                    <a href="#" name="href_status" class="modal-class" onclick="change_status('.$user->id.')"><i class="fa fa-ban"></i> Deshabilitar</a>
-                                </li>
-                                
                                 <li class="divider"></li>
                                 <li>
-                                    <a href="#" onclick="showModalDelete(`'.$user_id.'`, `'.$user->full_name.'`)"><i class="fa fa-trash-o"></i> Eliminiar</a>                                
+                                    <a href="#" onclick="showModalDelete(`'.$user->id.'`, `'.$user->name.'`)"><i class="fa fa-trash-o"></i> Eliminiar</a>                                
                                 </li>
                             </ul>
                         </div>';
-                    }else{
-                        return '<div class="input-group-btn text-center">
-                            <button data-toggle="dropdown" class="btn btn-xs btn-default dropdown-toggle" type="button" title="Acciones"><i class="fa fa-chevron-circle-down" aria-hidden="true"></i></button>
-                            <ul class="dropdown-menu">
-                                <li>
-                                    <a href="#" name="href_status" class="modal-class" onclick="change_status('.$user->id.')"><i class="fa fa-check"></i> Activar</a>
-                                </li>
-                            </ul>
-                        </div>';
-                    }
                 })           
             ->editColumn('name', function ($user) {                    
-                    return $user->name.'<br><small><i>'.$user->email.'</i></small>';
+                    return '<a href="#"  onclick="showModalUser('.$user->id.')" class="modal-class" style="color:inherit"  title="Click para editar"><b>'.$user->name.'</b><br><small><i>'.$user->email.'</small></i></a>';
                 })
             ->editColumn('role', function ($user) {                    
                     return $user->role_description;
                 })
-            ->editColumn('created_at', function ($user) {                    
-                    return $user->created_at->format('d/m/Y H:i');
-                })
             ->editColumn('status', function ($user) {                    
                     return $user->status_label;
                 })
-            ->rawColumns(['action','name','role','status'])
+            ->rawColumns(['action', 'name', 'role', 'status'])
             ->make(true);
     }
     
@@ -99,15 +84,15 @@ class UserController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function load_user($user_id)
+    public function load($id)
     {
-        if($user_id==0){
+        if($id==0){
             $user = new User();
         }else{
-            $user = User::find($user_id);
+            $user = User::find($id);
         }
         
-        return view('users.save')->with('user', $user);;
+        return view('users.save')->with('user', $user);
     }
 
     /**
@@ -118,27 +103,35 @@ class UserController extends Controller
      */
     public function store(UserRequest $request)
     {
-        $user = new User();        
-        // Codigo para el avatar
-        $file = Input::file('avatar');        
-        if (File::exists($file))
-        {        
-            $user->avatar_name = $file->getClientOriginalName();
-            $user->avatar_type = $file->getClientOriginalExtension();
-            $user->avatar_size = $file->getSize();
-            $user->avatar=$this->upload_file('/users/', $file);
-        }        
-        $user->name= $request->input('name');
-        $user->email= $request->input('email');
-        $user->role= $request->input('role');
-        $user->password= password_hash($request->input('password'), PASSWORD_DEFAULT);
-        $user->email_notification=($request->input('email_notification'))?1:0;
-        $user->save();
-        
-        return redirect()->route('users.index')->with('notify', 'create');
+        try {
+            $user = new User();
+            $user->condominium_id=$this->condominium->id;
+            $user->name=$request->name;
+            $user->email=$request->email;
+            $user->cell=$request->cell;
+            $user->phone=$request->phone;
+            $user->role=$request->role;
+            $user->password=bcrypt($request->password);
+            $user->save();
+            if($request->notification){
+                Mail::to($user->email)->send(new SignedupOwner($user, $request->password));
+            }
+            
+            return response()->json([
+                    'success' => true,
+                    'message' => 'Usuario registrado exitosamente',
+                    'user' => $user->toArray()
+                ], 200);
+            
+        } catch (Exception $e) {
+            return response()->json([
+                    'success' => false,
+                    'message' => $e->getMessage()
+                ], 500);
+        }
     }
-
-    /**
+    
+   /**
      * Update the specified user in storage.
      *
      * @param  \Illuminate\Http\Request  $request
@@ -147,78 +140,97 @@ class UserController extends Controller
      */
     public function update(UserRequest $request, $id)
     {
-        $user = User::find($id);        
-        // Codigo para el logo
-        $file = Input::file('avatar');
-        if(File::exists($file))
-        {        
-            ($user->file)?Storage::delete('/users/'.$user->file):'';
-            $user->avatar_name = $file->getClientOriginalName();
-            $user->avatar_type = $file->getClientOriginalExtension();
-            $user->avatar_size = $file->getSize();
-            $user->avatar=$this->upload_file('/users/', $file);
-        }
-        $user->name= $request->input('name');
-        $user->email= $request->input('email');
-        $user->role= $request->input('role');
-        if($request->input('change_password')){
-            $user->password= password_hash($request->input('password'), PASSWORD_DEFAULT);
-        }        
-        $user->email_notification=($request->input('email_notification'))?1:0;
-        $user->save();
+        try {
+            $user = User::find($id);
+            $user->name=$request->name;
+            $user->email=$request->email;
+            $user->cell=$request->cell;
+            $user->phone=$request->phone;
+            $user->role=$request->role;
+            if($request->change_password){
+                $user->password=bcrypt($request->password);
+                if($request->notification){
+                    Mail::to($user->email)->send(new ChangePassword($user, $request->password));
+                }
+            }
+            $user->save();
 
-        return redirect()->route('users.index')->with('notify', 'update');
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function delete($id)
-    {        
-        $user = User::find(Crypt::decrypt($id));
-        if ($user->sales->count()==0 & $user->purchases->count()==0 & $user->open_closures->count()==0 & $user->close_closures->count()==0){            
-            ($user->avatar)?Storage::delete('/users/'.$user->avatar):'';
-            $user->delete();
-            return redirect()->route('users.index')->with('notify', 'delete');        
-        }else{            
-            return redirect()->route('users.index')->withErrors('No se puede eliminar el usuario porque tiene información asociada en el sistema. Si quiere, puede deshabilitarlo.');            
+            return response()->json([
+                    'success' => true,
+                    'message' => 'Usuario actualizado exitosamente',
+                    'user' => $user
+                ], 200);
+            
+        } catch (Exception $e) {
+            
+            return response()->json([
+                    'success' => false,
+                    'message' => $e->getMessage()
+                ], 500);
         }
     }
 
     /**
-     * Update the status to specified resource in storage.
+     * Remove the specified user from storage.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function status(Request $request)
+    public function destroy($id)
     {
-        $user = User::find($request->user_id);
-        ($user->active)?$user->active=false:$user->status=true;
-        $user->save();
+        try {
+            $user = User::find($id);
+            $user->delete();
+            
+            return response()->json([
+                'success' => true,
+                'message' => 'Usuario eliminado exitosamente'
+            ], 200);
+
+        } catch (Exception $e) {
+            
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage()
+            ], 500);
+        }
     }
 
+    public function status($id)
+    {
+        try {
+            $user = User::find($id);
+            ($user->active)?$user->active=false:$user->active=true;
+            $user->save();
+
+            return response()->json([
+                    'success' => true,
+                    'message' => 'Estado cambiado exitosamente',
+                ], 200);                        
+
+        } catch (Exception $e) {
+            
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage()
+            ], 500);            
+        }
+    }
+    
     public function rpt_users()
     {        
-        $setting = Setting::first();
-        $users=User::orderBy('name')->get();
-        $logo='data:image/png;base64, '.$setting->logo;
-        $company=$setting->company;
+        $logo=($this->condominium->logo)?realpath(storage_path()).'/app/'.$this->condominium->id.'/'.$this->condominium->logo:public_path().'/img/company_logo.png';
+        $company=$this->condominium->name;
         
         $data=[
-            'company' => $company,
-            'users' => $users,
+            'company' => $this->condominium->name,
+            'users' => $this->condominium->users()->whereIn('role', ['ADM', 'WAM'])->get(),
             'logo' => $logo
         ];
-                
+
         $pdf = PDF::loadView('reports/rpt_users', $data);
         
         return $pdf->stream('Usuarios.pdf');
 
     }
-
 }

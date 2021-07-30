@@ -75,7 +75,6 @@ Route::get('contacts.rpt_contacts', 'ContactController@rpt_contacts')->name('con
 //Countries
 Route::resource("countries","CountryController");
 
-
 //DocumentTypes
 Route::resource("document_types","DocumentTypeController");
 Route::get('document_types.datatable', 'DocumentTypeController@datatable')->name('document_types.datatable');
@@ -149,6 +148,7 @@ Route::get('expense_image/{id}', 'ImgController@showExpenseImage')->name('expens
 Route::get('payment_image/{id}', 'ImgController@showPaymentImage')->name('payment_image');
 Route::get('transfer_image/{id}', 'ImgController@showTransferImage')->name('transfer_image');
 Route::get('facility_photo/{id}', 'ImgController@showFacilityPhoto');
+Route::get('newsletter_image/{id}', 'ImgController@showNewsletterImage')->name('newsletter_image');
 
 //Income
 Route::resource("incomes","IncomeController");
@@ -156,13 +156,20 @@ Route::get('incomes.datatable', 'IncomeController@datatable')->name('incomes.dat
 Route::get('incomes.load/{id}', 'IncomeController@load')->name('incomes.load');
 Route::get('incomes.download/{id}', ['as' => 'incomes.download', 'uses' => 'IncomeController@download_file']);
 
-
 //IncomeTypes
 Route::resource("income_types","IncomeTypeController");
 Route::get('income_types.datatable', 'IncomeTypeController@datatable')->name('income_types.datatable');
 Route::get('income_types.load/{id}', 'IncomeTypeController@load')->name('income_types.load');
 Route::get('income_types.status/{id}', 'IncomeTypeController@status')->name('income_types.status');
 Route::get('income_types.rpt_income_types', 'IncomeTypeController@rpt_income_types')->name('income_types.rpt_income_types');
+
+//Newsletters
+Route::resource("newsletters","NewsletterController");
+Route::post('newsletters.datatable', 'NewsletterController@datatable')->name('newsletters.datatable');
+Route::get('newsletters.load/{id}', 'NewsletterController@load')->name('newsletters.load');
+Route::get('newsletters.status/{id}', 'NewsletterController@status')->name('newsletters.status');
+Route::get('newsletters.rpt_newsletters', 'NewsletterController@rpt_newsletters')->name('newsletters.rpt_newsletters');
+Route::get('newsletters.download/{id}', ['as' => 'newsletters.download', 'uses' => 'NewsletterController@download_file']);
 
 //Notifications
 Route::get('emails', 'NotificationController@email')->name('emails');
@@ -188,10 +195,13 @@ Route::get('payments.load_confirm/{id}', 'PaymentController@load_confirm')->name
 Route::post('payments.confirm/{id}', 'PaymentController@confirm')->name('payments.confirm');
 Route::get('payments.rpt_payment/{id}', 'PaymentController@rpt_payment')->name('payments.rpt_payment');
 
+//Posts
+Route::resource("posts","PostController");
+Route::get('posts.index/{id}', ['as' => 'posts.index', 'uses' => 'PostController@index']);
+
 //Profile
 Route::get('profile', ['as' => 'profile', 'uses' => 'ProfileController@edit']);
 Route::post('profile.update', ['as' => 'profile.update', 'uses' => 'ProfileController@update']);
-
 
 //Projects
 Route::resource("projects","ProjectController");
@@ -233,6 +243,9 @@ Route::get('statement/{id}', 'PropertyController@statement')->name('statement');
 Route::get('properties.rpt_statement/{id}', 'PropertyController@rpt_statement')->name('properties.rpt_statement');
 Route::get('properties.xls_statement/{id}', 'PropertyController@xls_statement')->name('properties.xls_statement');
 
+//Replies
+Route::resource("replies","ReplyController");
+
 //Reservations
 Route::resource("reservations","ReservationController");
 Route::post('reservations.datatable', 'ReservationController@datatable')->name('reservations.datatable');
@@ -271,6 +284,31 @@ Route::get('transfers.download/{id}', ['as' => 'transfers.download', 'uses' => '
 
 //Tools
 Route::get('get_states/{id}', 'ToolController@get_states');
+
+//Users
+Route::resource("users","UserController");
+Route::get('users.datatable', 'UserController@datatable')->name('users.datatable');
+Route::get('users.load/{id}', 'UserController@load')->name('users.load');
+Route::get('users.status/{id}', 'UserController@status')->name('users.status');
+Route::get('users.rpt_users', 'UserController@rpt_users')->name('users.rpt_users');
+
+//VisitTypes
+Route::resource("visit_types","VisitTypeController");
+Route::get('visit_types.datatable', 'VisitTypeController@datatable')->name('visit_types.datatable');
+Route::get('visit_types.load/{id}', 'VisitTypeController@load')->name('visit_types.load');
+Route::get('visit_types.status/{id}', 'VisitTypeController@status')->name('visit_types.status');
+Route::get('visit_types.rpt_visit_types', 'VisitTypeController@rpt_visit_types')->name('visit_types.rpt_visit_types');
+
+//Visitors
+Route::resource("visitors","VisitorController");
+Route::get('visitor_by_nit/{id}', 'VisitorController@visitor_by_nit')->name('visitor_by_nit');
+
+
+//Visits
+Route::resource("visits","VisitController");
+Route::get('visits.datatable', 'VisitController@datatable')->name('visits.datatable');
+Route::get('visits.load/{id}', 'VisitController@load')->name('visits.load');
+Route::get('visits.download/{id}', ['as' => 'visits.download', 'uses' => 'VisitController@download_file']);
 
 //Fix
 Route::get('update_balance_accounts', 'FixController@update_balance_accounts');

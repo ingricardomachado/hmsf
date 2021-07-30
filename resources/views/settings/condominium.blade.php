@@ -22,7 +22,7 @@
                         
             <!-- ibox-title -->
             <div class="ibox-title">
-                <h5><i class="fa fa-cogs" aria-hidden="true"></i> Configuraciones del Condominio<small> Complete el formulario <b>(*) Campos obligatorios.</b></small></h5>
+                <h5><i class="fa fa-cogs" aria-hidden="true"></i> Datos generales del condominio<small> Complete el formulario <b>(*) Campos obligatorios.</b></small></h5>
                 <div class="ibox-tools">
                     <a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
                     <a class="dropdown-toggle" data-toggle="dropdown" href="#"><i class="fa fa-wrench"></i></a>

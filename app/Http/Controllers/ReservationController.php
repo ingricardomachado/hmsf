@@ -124,7 +124,7 @@ class ReservationController extends Controller
                         $label='<b>'.$reservation->facility->name.'</b><br><small>'.day_letter($reservation->start->dayOfWeek, 'lg').' '.$reservation->start->format('d.m.Y').'<br>De '.$reservation->start->format('g:i a').' a '.$reservation->end->format('g:i a').'</small>';
                     }
                     if($reservation->status=='P'){
-                        return '<a href="#" onclick="showModalConfirmReservation('.$reservation->id.')" class="modal-class" style="color:inherit"  title="Click para editar">'.$label.'</a>';                        
+                        return '<a href="#" onclick="showModalConfirmReservation('.$reservation->id.')" class="modal-class" style="color:inherit"  title="Click para confirmar">'.$label.'</a>';                        
                     }else{
                         return $label;
                     }

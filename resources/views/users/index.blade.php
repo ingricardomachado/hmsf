@@ -51,10 +51,11 @@
                 <thead>
                   <tr>
                     <th text-align="center" width="5%"></th>
-                    <th>Nombre</th>
-                    <th>Rol</th>
-                    <th>Creado</th>
-                    <th>Estado</th>
+                    <th width="10%">Nombre</th>
+                    <th width="25%">Rol</th>
+                    <th width="10%">Celular</th>
+                    <th width="10%">Teléfono</th>
+                    <th width="10%">Estado</th>
                   </tr>
                 </thead>
                 <tfoot>
@@ -62,7 +63,8 @@
                     <th></th>
                     <th>Nombre</th>
                     <th>Rol</th>
-                    <th>Creado</th>
+                    <th>Celular</th>
+                    <th>Teléfono</th>
                     <th>Estado</th>
                   </tr>
                 </tfoot>
@@ -78,40 +80,36 @@
   </div>
 </div>
   
-<!-- Modal para Datos Personales -->
-<div class="modal inmodal" id="modalUser" role="dialog"  aria-hidden="true">
+<!-- Modal para Datos -->
+<div class="modal inmodal" id="modalUser" tabindex="-1" role="dialog"  aria-hidden="true">
   <div class="modal-dialog">
     <div class="modal-content animated fadeIn">
       <div id="user"></div>
     </div>
   </div>
 </div>
-<!-- /Modal para Datos Personales -->
+<!-- /Modal para Datos -->
 
-<!-- Modal para eliminar -->
-<div class="modal inmodal" id="modalDelete" tabindex="-1" role="dialog"  aria-hidden="true">
+<!-- Modal para eliminar-->
+<div class="modal inmodal" id="modalDeleteUser" tabindex="-1" role="dialog"  aria-hidden="true">
   <div class="modal-dialog">
-    {{ Form::open(array('url' => '', 'id' => 'form_delete', 'method' => 'GET'), ['' ])}}
     <div class="modal-content animated fadeIn">
       <div class="modal-header">
-        <h5 class="modal-title"><i class="fa fa-exclamation-triangle"></i> <strong>Eliminar Usuario</strong></h5>
+        <h5 class="modal-title"><i class="fa fa-trash" aria-hidden="true"></i> <strong>Eliminar Tipo de Egreso</strong></h5>
         <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
       </div>      
       <div class="modal-body">
-        <input type="hidden" id="hdd_user_id" value=""/>
-          <p>Está seguro que desea eliminar el usuario <b><span id="span_name"></span></b> ?</p>
+          <input type="hidden" id="hdd_user_id" value=""/>
+          <p>Esta seguro que desea eliminar el tipo de egreso <b><span id="user_name"></span></b> ?</p>
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>        
-        <button type="button" id="btn_delete" class="btn btn-danger" data-dismiss="modal">Eliminar</button>
+        <button type="button" id="btn_close" class="btn btn-default" data-dismiss="modal">Cerrar</button>        
+        <button type="button" id="btn_delete_user" class="btn btn-danger">Eliminar</button>
       </div>
     </div>
-    {{ Form::close() }}
   </div>
 </div>
 <!-- /Modal para eliminar-->
-
-
 @endsection
 
 @push('scripts')
@@ -122,51 +120,102 @@
 <script src="{{ asset('js/plugins/dataTables/datatables.min.js') }}"></script>
 <script>
 
-function showModalUser(user_id){
-  url = '{{URL::to("users.load_user")}}/'+user_id;
+function showModalUser(id){
+  url = '{{URL::to("users.load")}}/'+id;
   $('#user').load(url);  
   $("#modalUser").modal("show");
 }
-
-function showModalDelete(user_id, name){
-  $('#hdd_user_id').val(user_id);
-  $('#span_name').html(name);
-  $("#modalDelete").modal("show");    
-};
-
-$('#btn_delete').on("click", function (e) { 
-  var user_id = $('#hdd_user_id').val();
-  url = `{{URL::to('users.delete/')}}/${user_id}`;
-  $('#form_delete').attr('method', 'GET');
-  $('#form_delete').attr('action', url);
-  $('#form_delete').submit();
-});
-  
-function change_status(user_id){
+ 
+function change_status(id){
   $.ajax({
-      url: `{{URL::to("users.status")}}`,
-      type: 'POST',
+      url: `{{URL::to("users.status")}}/${id}`,
+      type: 'GET',
       data: {
         _token: "{{ csrf_token() }}", 
-        user_id:user_id,
       },
   })
   .done(function(response) {
-      $('#users-table').DataTable().draw(); 
-      setTimeout(function() {
-      toastr.options = {
-        closeButton: true,
-        progressBar: true,
-        showMethod: 'slideDown',
-        timeOut: 2000
-      };
-      toastr.success('Estado cambiado exitosamente', '{{ Session::get('app_name') }}');
-      }, 1000);
+      $('#users-table').DataTable().draw(false);
+      toastr_msg('success', '{{ config('app.name') }}', response.message, 2000);
   })
   .fail(function() {
-      console.log("error cambiando estado");
+    if(response.status == 422){
+      var errorsHtml='';
+      $.each(response.responseJSON.errors, function (key, value) {
+        errorsHtml += '<li>' + value[0] + '</li>'; 
+      });          
+      toastr_msg('error', '{{ config('app.name') }}', errorsHtml, 3000);
+    }else{
+      toastr_msg('error', '{{ config('app.name') }}', response.responseJSON.message, 2000);
+    }  
   });
 }  
+
+function showModalDelete(id, name){
+  $('#hdd_user_id').val(id);
+  $('#user_name').html(name);
+  $("#modalDeleteUser").modal("show");    
+};
+    
+$("#btn_delete_user").on('click', function(event) {    
+    user_delete($('#hdd_user_id').val());
+});
+
+function user_delete(id){  
+  $.ajax({
+      url: `{{URL::to("users")}}/${id}`,
+      type: 'DELETE',
+      data: {
+        _token: "{{ csrf_token() }}", 
+      },
+  })
+  .done(function(response) {
+      $('#modalDeleteUser').modal('toggle');
+      $('#users-table').DataTable().draw(false);
+      toastr_msg('success', '{{ config('app.name') }}', response.message, 2000);
+
+  })
+  .fail(function(response) {
+      $('#modalDeleteUser').modal('toggle');
+      toastr_msg('error', '{{ config('app.name') }}', response.responseJSON.message, 4000);
+  });
+}  
+
+function user_CRUD(id){
+        
+    var validator = $("#form_user").validate();
+    formulario_validado = validator.form();
+    if(formulario_validado){
+        $('#btn_submit').attr('disabled', true);
+        var form_data = new FormData($("#form_user")[0]);
+        $.ajax({
+          url:(id==0)?'{{URL::to("users")}}':'{{URL::to("users")}}/'+id,
+          type:'POST',
+          cache:true,
+          processData: false,
+          contentType: false,      
+          data: form_data
+        })
+        .done(function(response) {
+          $('#btn_submit').attr('disabled', false);
+          $('#modalUser').modal('toggle');
+          $('#users-table').DataTable().draw(false); 
+          toastr_msg('success', '{{ config('app.name') }}', response.message, 2000);
+        })
+        .fail(function(response) {
+          if(response.status == 422){
+            $('#btn_submit').attr('disabled', false);
+            var errorsHtml='';
+            $.each(response.responseJSON.errors, function (key, value) {
+              errorsHtml += '<li>' + value[0] + '</li>'; 
+            });          
+            toastr_msg('error', '{{ config('app.name') }}', errorsHtml, 3000);
+          }else{
+            toastr_msg('error', '{{ config('app.name') }}', response.responseJSON.message, 2000);
+          }
+        });
+    }
+}
 
 $(document).ready(function(){
     
@@ -176,42 +225,17 @@ $(document).ready(function(){
         "aaSorting": [[1, "asc"]],
         processing: true,
         serverSide: true,
-        ajax: {
-            url: '{!! route('users.datatable') !!}',
-            type: "POST",
-            data: function(d) {
-                d._token= "{{ csrf_token() }}";
-            }
-        },        
+        ajax: '{!! route('users.datatable') !!}',
         columns: [
             { data: 'action', name: 'action', orderable: false, searchable: false},
-            { data: 'name',   name: 'name'},
-            { data: 'role', name: 'role', orderable: false, searchable: false },
-            { data: 'created_at', name: 'created_at', orderable: false, searchable: false },
+            { data: 'name',   name: 'users.name', orderable: true, searchable: true},
+            { data: 'role',   name: 'role', orderable: false, searchable: true},
+            { data: 'cell',   name: 'cell', orderable: true, searchable: false},
+            { data: 'phone',   name: 'phone', orderable: true, searchable: false},
             { data: 'status', name: 'status', orderable: false, searchable: false }
         ]
     });
-                
-
-     //Notifications
-    setTimeout(function() {
-        toastr.options = {
-            closeButton: true,
-            progressBar: true,
-            showMethod: 'slideDown',
-            timeOut: 2000
-        };
-        if('{{ Session::get('notify') }}'=='create' &&  '{{ Session::get('create_notification') }}'=='1'){
-          toastr.success('Usuario añadido exitosamente', '{{ Session::get('app_name') }}');
-        }
-        if('{{ Session::get('notify') }}'=='update' &&  '{{ Session::get('update_notification') }}'=='1'){
-          toastr.success('Usuario actualizado exitosamente', '{{ Session::get('app_name') }}');
-        }
-        if('{{ Session::get('notify') }}'=='delete' &&  '{{ Session::get('delete_notification') }}'=='1'){
-          toastr.success('Usuario eliminado exitosamente', '{{ Session::get('app_name') }}');
-        }
-    }, 1300);  
  
-  });
-  </script>
+});
+</script>
 @endpush

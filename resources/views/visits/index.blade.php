@@ -1,6 +1,11 @@
 @extends('layouts.app')
 
 @push('stylesheets')
+<!-- Magnific Popup -->
+<link rel="stylesheet" href="{{ URL::asset('js/plugins/magnific-popup/magnific-popup.css') }}">
+<!-- Select2 -->
+<link href="{{ URL::asset('js/plugins/select2/dist/css/select2.min.css') }}" rel="stylesheet">
+<link href="{{ URL::asset('css/style.css') }}" rel="stylesheet">
 <!-- CSS Datatables -->
 <link href="{{ URL::asset('css/plugins/dataTables/datatables.min.css') }}" rel="stylesheet">
 @endpush
@@ -17,7 +22,7 @@
         
         <!-- ibox-title -->
         <div class="ibox-title">
-          <h5><i class="fa fa-folder-o" aria-hidden="true"></i> Tipos de Egresos</h5>
+          <h5><i class="fa fa-folder-o" aria-hidden="true"></i> Visitas</h5>
             <div class="ibox-tools">
               <a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
               <a class="dropdown-toggle" data-toggle="dropdown" href="#"><i class="fa fa-wrench"></i></a>
@@ -33,31 +38,38 @@
         <!-- ibox-content- -->
         <div class="ibox-content">
           <div class="row">
+            {{ Form::open(array('url' => '', 'id' => 'form_rpt', 'method' => 'get'), ['' ])}}
+            {{ Form::close() }}
             <div class="col-sm-3 col-xs-12">
             </div>
             <div class="col-sm-9 col-xs-12 text-right">
-                <a href="#" class="btn btn-sm btn-primary" onclick="showModalExpenseType(0);"><i class="fa fa-plus-circle"></i> Nuevo Tipo de Egreso</a>
-                <a href="{{ url('expense_types.rpt_expense_types') }}" class="btn btn-sm btn-default" target="_blank" title="Imprimir PDF"><i class="fa fa-print"></i></a>
-                <br><br>
+                <a href="#" class="btn btn-sm btn-primary" onclick="showModalVisit(0);"><i class="fa fa-plus-circle"></i> Nuevo Visita</a>
+                <br>
             </div>
             <div class="col-sm-12">
               @include('partials.errors')
             </div>
                                                 
             <div class="table-responsive col-sm-12">
-              <table class="table table-striped table-hover" id="expense_types-table">
+              <table class="table table-striped table-hover" id="visits-table">
                 <thead>
                   <tr>
                     <th text-align="center" width="5%"></th>
-                    <th width="80%">Nombre</th>
-                    <th width="20%">Estado</th>
+                    <th width="15%">Visita</th>
+                    <th width="15%">Visitante</th>
+                    <th width="15%">Propiedad</th>
+                    <th width="25%">Registrada por</th>
+                    <th width="10%">Soporte</th>
                   </tr>
                 </thead>
                 <tfoot>
                   <tr>
                     <th></th>
-                    <th>Nombre</th>
-                    <th>Estado</th>
+                    <th>Visita</th>
+                    <th>Visitante</th>
+                    <th>Propiedad</th>
+                    <th>Registrada por</th>
+                    <th>Soporte</th>
                   </tr>
                 </tfoot>
               </table>
@@ -73,30 +85,30 @@
 </div>
   
 <!-- Modal para Datos -->
-<div class="modal inmodal" id="modalExpenseType" tabindex="-1" role="dialog"  aria-hidden="true">
+<div class="modal inmodal" id="modalVisit" tabindex="-1" role="dialog"  aria-hidden="true">
   <div class="modal-dialog">
     <div class="modal-content animated fadeIn">
-      <div id="expense_type"></div>
+      <div id="visit"></div>
     </div>
   </div>
 </div>
 <!-- /Modal para Datos -->
 
 <!-- Modal para eliminar-->
-<div class="modal inmodal" id="modalDeleteExpenseType" tabindex="-1" role="dialog"  aria-hidden="true">
+<div class="modal inmodal" id="modalDeleteVisit" tabindex="-1" role="dialog"  aria-hidden="true">
   <div class="modal-dialog">
     <div class="modal-content animated fadeIn">
       <div class="modal-header">
-        <h5 class="modal-title"><i class="fa fa-trash" aria-hidden="true"></i> <strong>Eliminar Tipo de Egreso</strong></h5>
+        <h5 class="modal-title"><i class="fa fa-trash" aria-hidden="true"></i> <strong>Eliminar Ingreso</strong></h5>
         <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
       </div>      
       <div class="modal-body">
-          <input type="hidden" id="hdd_expense_type_id" value=""/>
-          <p>Esta seguro que desea eliminar el tipo de egreso <b><span id="expense_type_name"></span></b> ?</p>
+          <input type="hidden" id="hdd_visit_id" value=""/>
+          <p>Esta seguro que desea eliminar la visita <b><span id="visit_name"></span></b> ?</p>
       </div>
       <div class="modal-footer">
         <button type="button" id="btn_close" class="btn btn-default" data-dismiss="modal">Cerrar</button>        
-        <button type="button" id="btn_delete_expense_type" class="btn btn-danger">Eliminar</button>
+        <button type="button" id="btn_delete_visit" class="btn btn-danger">Eliminar</button>
       </div>
     </div>
   </div>
@@ -105,80 +117,60 @@
 @endsection
 
 @push('scripts')
+<!-- Magnific Popup -->
+<script src="{{ URL::asset('js/plugins/magnific-popup/jquery.magnific-popup.min.js') }}"></script>
+<!-- Select2 -->
+<script src="{{ URL::asset('js/plugins/select2/dist/js/select2.full.min.js') }}"></script>
+<script src="{{ URL::asset('js/plugins/select2/dist/js/i18n/es.js') }}"></script>
 <!-- Datatables -->
 <script src="{{ asset('js/plugins/dataTables/datatables.min.js') }}"></script>
 <script>
   
-function showModalExpenseType(id){
-  url = '{{URL::to("expense_types.load")}}/'+id;
-  $('#expense_type').load(url);  
-  $("#modalExpenseType").modal("show");
+function showModalVisit(id){
+  url = '{{URL::to("visits.load")}}/'+id;
+  $('#visit').load(url);  
+  $("#modalVisit").modal("show");
 }
  
-function change_status(id){
-  $.ajax({
-      url: `{{URL::to("expense_types.status")}}/${id}`,
-      type: 'GET',
-      data: {
-        _token: "{{ csrf_token() }}", 
-      },
-  })
-  .done(function(response) {
-      $('#expense_types-table').DataTable().draw(false);
-      toastr_msg('success', '{{ config('app.name') }}', response.message, 2000);
-  })
-  .fail(function() {
-    if(response.status == 422){
-      var errorsHtml='';
-      $.each(response.responseJSON.errors, function (key, value) {
-        errorsHtml += '<li>' + value[0] + '</li>'; 
-      });          
-      toastr_msg('error', '{{ config('app.name') }}', errorsHtml, 3000);
-    }else{
-      toastr_msg('error', '{{ config('app.name') }}', response.responseJSON.message, 2000);
-    }  
-  });
-}  
-
 function showModalDelete(id, name){
-  $('#hdd_expense_type_id').val(id);
-  $('#expense_type_name').html(name);
-  $("#modalDeleteExpenseType").modal("show");    
+  $('#hdd_visit_id').val(id);
+  $('#visit_name').html(name);
+  $("#modalDeleteVisit").modal("show");    
 };
     
-$("#btn_delete_expense_type").on('click', function(event) {    
-    expense_type_delete($('#hdd_expense_type_id').val());
+$("#btn_delete_visit").on('click', function(event) {    
+    visit_delete($('#hdd_visit_id').val());
 });
 
-function expense_type_delete(id){  
+function visit_delete(id){  
   $.ajax({
-      url: `{{URL::to("expense_types")}}/${id}`,
+      url: `{{URL::to("visits")}}/${id}`,
       type: 'DELETE',
       data: {
         _token: "{{ csrf_token() }}", 
       },
   })
   .done(function(response) {
-      $('#modalDeleteExpenseType').modal('toggle');
-      $('#expense_types-table').DataTable().draw(false);
+      $('#modalDeleteVisit').modal('toggle');
+      $('#visits-table').DataTable().draw(false);
       toastr_msg('success', '{{ config('app.name') }}', response.message, 2000);
 
   })
   .fail(function(response) {
-      $('#modalDeleteExpenseType').modal('toggle');
+      $('#modalDeleteVisit').modal('toggle');
       toastr_msg('error', '{{ config('app.name') }}', response.responseJSON.message, 4000);
   });
 }  
 
-function expense_type_CRUD(id){
+function visit_CRUD(id){
         
-    var validator = $("#form_expense_type").validate();
+    var validator = $("#form_visit").validate();
     formulario_validado = validator.form();
     if(formulario_validado){
         $('#btn_submit').attr('disabled', true);
-        var form_data = new FormData($("#form_expense_type")[0]);
+        var form_data = new FormData($("#form_visit")[0]);
         $.ajax({
-          url:(id==0)?'{{URL::to("expense_types")}}':'{{URL::to("expense_types")}}/'+id,
+          url:(id==0)?'{{URL::to("visits")}}':'{{URL::to("visits")}}/'+id,
           type:'POST',
           cache:true,
           processData: false,
@@ -187,8 +179,8 @@ function expense_type_CRUD(id){
         })
         .done(function(response) {
           $('#btn_submit').attr('disabled', false);
-          $('#modalExpenseType').modal('toggle');
-          $('#expense_types-table').DataTable().draw(false); 
+          $('#modalVisit').modal('toggle');
+          $('#visits-table').DataTable().draw(false); 
           toastr_msg('success', '{{ config('app.name') }}', response.message, 2000);
         })
         .fail(function(response) {
@@ -209,17 +201,29 @@ function expense_type_CRUD(id){
 $(document).ready(function(){
                       
     path_str_language = "{{URL::asset('js/plugins/dataTables/es_ES.txt')}}";          
-    var table=$('#expense_types-table').DataTable({
+    var table=$('#visits-table').DataTable({
         "oLanguage":{"sUrl":path_str_language},
         "aaSorting": [[1, "asc"]],
         processing: true,
         serverSide: true,
-        ajax: '{!! route('expense_types.datatable') !!}',
+        ajax: '{!! route('visits.datatable') !!}',
         columns: [
             { data: 'action', name: 'action', orderable: false, searchable: false},
-            { data: 'name',   name: 'name', orderable: true, searchable: true},
-            { data: 'status', name: 'status', orderable: false, searchable: false }
-        ]
+            { data: 'date',   name: 'date', orderable: true, searchable: true},
+            { data: 'visit',   name: 'visit', orderable: false, searchable: true},
+            { data: 'account',   name: 'account', orderable: false, searchable: true},
+            { data: 'amount', name: 'amount', orderable: false, searchable: false },
+            { data: 'file', name: 'file', orderable: false, searchable: false }
+        ],
+        "fnDrawCallback": function () {
+            $('.popup-link').magnificPopup({
+              type: 'image',
+              closeOnContentClick: true,
+              closeBtnInside: false,
+              fixedContentPos: true,
+              mainClass: 'my-custom-class'
+            });
+        }
     });
 
 });

@@ -269,6 +269,7 @@ class DocumentController extends Controller
     public function download_file($id)
     {
         $document = Document::find($id);
-        return response()->download(storage_path('app/'.$document->condominium_id.'/documents/'.$document->file), $document->file_name);
+        
+        return Storage::download($document->condominium_id.'/documents/'.$document->file, $document->file_name);
     }
 }

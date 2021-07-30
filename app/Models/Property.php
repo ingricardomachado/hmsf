@@ -43,7 +43,6 @@ class Property extends Model
     //*** Accesors ***   
     public function getDebtAttribute(){
         $today=Carbon::now();
-
         return $this->fees()
                         ->where('balance','>',0)
                         ->whereDate('due_date','>=',$today)
@@ -52,7 +51,6 @@ class Property extends Model
 
     public function getDueDebtAttribute(){
         $today=Carbon::now();
-
         return $this->fees()
                         ->where('balance','>',0)
                         ->whereDate('due_date','<',$today)
@@ -63,16 +61,29 @@ class Property extends Model
         return $this->debt+$this->due_debt;
     }    
 
-    public function getStatusLabelAttribute(){
+    public function getStatusAttribute(){
         
         if($this->total_debt==0){
-            return "<span class='label label-primary' style='font-weight:normal'>Solvente</span>";
+            return 0;
         }else{
             if($this->due_debt>0){
-                return "<span class='label label-danger' style='font-weight:normal'>Moroso</span>";
+                return 2;
             }else{
-                return "<span class='label label-warning' style='font-weight:normal'>Pendiente</span>";
+                return 1;
             }
+        }
+    }    
+
+    public function getStatusLabelAttribute(){
+        
+        if($this->status==0){
+            return "<span class='label label-primary' style='font-weight:normal'>Solvente</span>";
+        }elseif($this->status==1){
+            return "<span class='label label-warning' style='font-weight:normal'>Pendiente</span>";
+
+        }elseif($this->status==2){
+            return "<span class='label label-danger' style='font-weight:normal'>Moroso</span>";
+
         }
     }    
 

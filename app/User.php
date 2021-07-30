@@ -59,6 +59,8 @@ class User extends Authenticatable
             return "Administrador";
         }else if($this->role == 'OWN'){
             return "Propietario";
+        }else if($this->role == 'WAM'){
+            return "Vigilante";
         }else{
             return $this->role;
         }

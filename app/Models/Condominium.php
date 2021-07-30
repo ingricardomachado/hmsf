@@ -74,6 +74,11 @@ class Condominium extends Model
         return $this->hasMany('App\Models\Income');
     }
 
+    public function newsletters(){
+   
+        return $this->hasMany('App\Models\Newsletter');
+    }
+    
     public function payments(){
    
         return $this->hasMany('App\Models\Payment');
@@ -94,6 +99,11 @@ class Condominium extends Model
         return $this->belongsTo('App\Models\PropertyType');
     }
 
+    public function posts(){
+   
+        return $this->hasMany('App\Models\Post');
+    }
+    
     public function reservations(){
    
         return $this->hasMany('App\Models\Reservation');
@@ -122,6 +132,16 @@ class Condominium extends Model
     public function users(){
    
         return $this->hasMany('App\User');
+    }
+
+    public function visit_types(){
+   
+        return $this->hasMany('App\Models\VisitType');
+    }
+
+    public function visits(){
+   
+        return $this->hasMany('App\Models\Visit');
     }
 
     //*** Accesors ***   

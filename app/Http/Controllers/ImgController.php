@@ -16,6 +16,7 @@ use App\Models\Income;
 use App\Models\Expense;
 use App\Models\Payment;
 use App\Models\Transfer;
+use App\Models\Newsletter;
 use File;
 use Image;
 use Illuminate\Support\Facades\Redirect;
@@ -182,6 +183,16 @@ class ImgController extends Controller
 
         return $response;
     }
-}
 
+    public function showNewsletterImage($id)
+    {
+        $newsletter = Newsletter::findOrFail($id);
+        $picture = Image::make(Storage::get($newsletter->condominium_id.'/newsletters/'.$newsletter->file));
+        $response = Response::make($picture->encode('jpg'));
+        $response->header('Content-Type', 'image/jpeg');
+
+        return $response;
+    }
+
+}
 ?>

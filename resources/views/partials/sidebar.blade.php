@@ -170,8 +170,16 @@
             <li class="{{ set_active(['events']) }}">
                 <a href="{{url('events')}}"><i class="fa fa-calendar-o"></i> <span class="nav-label">Calendario</span></a>
             </li>
-            <li class="{{ set_active(['settings']) }}">
-                <a href="{{url('settings')}}"><i class="fa fa-cogs"></i> <span class="nav-label">Configuración</span></a>
+            <li class="{{ set_active(['users', 'settings']) }}">
+                <a href="#"><i class="fa fa-cogs"></i><span class="nav-label">Configuración</span> <span class="fa arrow"></span></a>
+                <ul class="nav nav-second-level collapse">
+                    <li class="{{ set_active(['users']) }}">
+                        <a href="{{url('users')}}">Usuarios</a>
+                    </li>
+                    <li class="{{ set_active(['settings']) }}">
+                        <a href="{{url('settings')}}">Datos generales</a>
+                    </li>
+                </ul>
             </li>
         @endif
         <!-- /Menu ADM Administrador -->        
@@ -208,6 +216,25 @@
         @endif
         <!-- /Menu OWN Propietario -->
         
+        <!-- Menu WAM Vigilante -->
+        @if(session('role')=='WAM')
+            <li class="{{ set_active(['newsletters']) }}">
+                <a href="{{url('newsletters')}}"><i class="fa fa-newspaper-o"></i> <span class="nav-label">Novedades</span></a>
+            </li>
+            <li class="{{ set_active(['visit_types', 'visits']) }}">
+                <a href="#"><i class="fa fa-male"></i><span class="nav-label">Visitas</span> <span class="fa arrow"></span></a>
+                <ul class="nav nav-second-level collapse">
+                    <li class="{{ set_active(['visit_types']) }}">
+                        <a href="{{url('visit_types')}}">Tipos de visita</a>
+                    </li>
+                    <li class="{{ set_active(['visits']) }}">
+                        <a href="{{url('visits')}}">Visitas</a>
+                    </li>
+                </ul>
+            </li>
+        @endif
+        <!-- /Menu WAM Vigilante -->
+
         </ul>
     </div>
 </nav>

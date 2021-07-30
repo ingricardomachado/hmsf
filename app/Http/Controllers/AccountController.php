@@ -64,7 +64,7 @@ class AccountController extends Controller
                                     <a href="#" name="href_cancel" class="modal-class" onclick="showModalAccount('.$account->id.')"><i class="fa fa-pencil-square-o"></i> Editar</a>
                                 </li>
                                 <li>
-                                    <a href="'.url('accounts.statement',$account->id).'" name="href_cancel" class="modal-class"><i class="fa fa-file-text-o"></i> Estado de Cuenta</a>
+                                    <a href="'.url('accounts.statement', Crypt::encrypt($account->id)).'" name="href_cancel" class="modal-class"><i class="fa fa-file-text-o"></i> Estado de Cuenta</a>
                                 </li>
 
                                 <li>
@@ -91,7 +91,7 @@ class AccountController extends Controller
             ->editColumn('aliase', function ($account) {                    
                     $info=($account->type=='C')?'Caja':$account->bank.'<br><small>'.$account->number.'<br>'.$account->holder.'</small>';
 
-                    return '<a href="'.url('accounts.statement', $account->id).'" class="modal-class" style="color:inherit"  title="Click para estado de cuenta"><b>'.$account->aliase.'</b><br>'.$info.'</a>';
+                    return '<a href="'.url('accounts.statement', Crypt::encrypt($account->id)).'" class="modal-class" style="color:inherit"  title="Click para estado de cuenta"><b>'.$account->aliase.'</b><br>'.$info.'</a>';
                 })
             ->editColumn('status', function ($account) {                    
                     return $account->status_label;
@@ -296,7 +296,7 @@ class AccountController extends Controller
      */
     public function statement($id)
     {
-        $account=Account::findOrFail($id);
+        $account=Account::findOrFail(Crypt::decrypt($id));
         $start = new Carbon('first day of this month');
         $end = new Carbon('last day of this month');
         
