@@ -18,7 +18,7 @@ class CreateVisitingCarsTable extends Migration
             $table->bigInteger('condominium_id')->unsigned()->nullable();
             $table->foreign('condominium_id')->references('id')->on('condominiums')->onDelete('cascade');
             $table->string('plate', 10)->nullable();
-            $table->string('brand',50)->nullable();
+            $table->string('make',50)->nullable();
             $table->string('model',50)->nullable();
             $table->string('color',50)->nullable();
             $table->timestamps();

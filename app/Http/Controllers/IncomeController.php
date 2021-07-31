@@ -50,13 +50,17 @@ class IncomeController extends Controller
      */
     public function index()
     {                
-        return view('incomes.index');
+        $start = new Carbon('first day of this month');
+        $end = new Carbon('last day of this month');                
+        
+        return view('incomes.index')
+                        ->with('start', $start->format('d/m/Y'))
+                        ->with('end', $end->format('d/m/Y'));
     }
 
-    public function datatable()
+    public function datatable(Request $request)
     {        
-        /*Se construye asi para que funcione el search de Yajra*/
-        $incomes = $this->condominium->incomes();
+        $incomes = $this->get_incomes_collection($request);
         
         return Datatables::of($incomes)
             ->addColumn('action', function ($income) {
@@ -267,13 +271,46 @@ class IncomeController extends Controller
         }
     }
 
+    public function get_incomes_collection(Request $request){
+        
+        $start_filter=Carbon::createFromFormat('d/m/Y', $request->start_filter);
+        $end_filter=Carbon::createFromFormat('d/m/Y', $request->end_filter);;
+
+        $incomes = $this->condominium->incomes()
+                            ->whereDate('date','>=', $start_filter)
+                            ->whereDate('date','<=', $end_filter);
+
+        return $incomes;
+    }
+
+
+    public function rpt_incomes(Request $request){
+        
+        $logo=($this->condominium->logo)?'data:image/png;base64, '.base64_encode(Storage::get($this->condominium->id.'/'.$this->condominium->logo)):'';
+        $company=$this->condominium->name;
+        
+        $incomes=$this->get_incomes_collection($request)->get();
+
+        $data=[
+            'company' => $this->condominium->name,
+            'logo' => $logo,            
+            'start' => $request->start_filter,
+            'end' => $request->end_filter,
+            'incomes' => $incomes            
+        ];
+
+        $pdf = PDF::loadView('reports/rpt_incomes', $data);
+        
+        return $pdf->stream('Ingresos extraordinarios.pdf');        
+    }    
+
     /*
      * Download file from DB  
     */ 
     public function download_file($id)
     {
-        $income = Document::find($id);
-        return response()->download(storage_path('app/'.$income->condominium_id.'/incomes/'.$income->file), $income->file_name);
+        $income = Income::find($id);
+        
+        return Storage::download($income->condominium_id.'/incomes/'.$income->file, $income->file_name);
     }
-    
 }

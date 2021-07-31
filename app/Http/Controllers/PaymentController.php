@@ -93,7 +93,7 @@ class PaymentController extends Controller
             ->addColumn('action', function ($payment) {
                 $opt_rpt=($payment->status=='A')?
                     '<li>
-                        <a href="'.route('payments.rpt_payment', $payment->id).'" target="_blank" name="href_rpt_invoice" class="modal-class"><i class="fa fa-print"></i> Imprimir recibo</a>
+                        <a href="'.route('payments.rpt_payment', Crypt::encrypt($payment->id)).'" target="_blank" name="href_rpt_invoice" class="modal-class"><i class="fa fa-print"></i> Imprimir recibo</a>
                     </li>':'';
                 if($payment->status=='P'){
                     return '<div class="input-group-btn text-center">
@@ -425,13 +425,31 @@ class PaymentController extends Controller
         }
     }
 
+    public function rpt_payment($id){
+        
+        $logo=($this->condominium->logo)?'data:image/png;base64, '.base64_encode(Storage::get($this->condominium->id.'/'.$this->condominium->logo)):'';
+        $company=$this->condominium->name;
+        
+        $payment=Payment::findOrFail(Crypt::decrypt($id));
+
+        $data=[
+            'company' => $this->condominium->name,
+            'logo' => $logo,            
+            'payment' => $payment            
+        ];
+
+        $pdf = PDF::loadView('reports/rpt_payment', $data);
+        
+        return $pdf->stream('Recibo de Pago.pdf');        
+    }    
+    
     /*
      * Download file from DB  
     */ 
     public function download_file($id)
     {
-        $payment = Document::find($id);
-        return response()->download(storage_path('app/'.$payment->condominium_id.'/payments/'.$payment->file), $payment->file_name);
+        $payment = Payment::find($id);
+        
+        return Storage::download($payment->condominium_id.'/payments/'.$payment->file, $payment->file_name);
     }
-    
 }

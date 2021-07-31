@@ -47,33 +47,17 @@ class NewsletterController extends Controller
      */
     public function index()
     {                
+        $start = new Carbon('first day of this month');
+        $end = new Carbon('last day of this month');                
         $users=$this->condominium->users()->where('role', 'WAM')->orderBy('name')->pluck('name','id');
-        return view('newsletters.index')->with('users', $users);
+        return view('newsletters.index')->with('start', $start->format('d/m/Y'))
+                        ->with('end', $end->format('d/m/Y'))
+                        ->with('users', $users);
     }
 
     public function datatable(Request $request)
     {        
-
-        $user_filter=$request->user_filter;
-        $level_filter=$request->level_filter;
-
-        if($user_filter!=''){
-            if($level_filter!=''){
-                $newsletters = $this->condominium->newsletters()
-                                        ->where('user_id', $user_filter)
-                                        ->where('level', $level_filter);
-            }else{
-                $newsletters = $this->condominium->newsletters()
-                                        ->where('user_id', $user_filter);
-            }
-        }else{
-            if($level_filter!=''){
-                $newsletters = $this->condominium->newsletters()
-                                        ->where('level', $level_filter);
-            }else{
-                $newsletters = $this->condominium->newsletters();
-            }
-        }
+        $newsletters=$this->get_newsletters_collection($request);        
         
         return Datatables::of($newsletters)
             ->addColumn('action', function ($newsletter) {
@@ -250,23 +234,6 @@ class NewsletterController extends Controller
         }
     }
     
-    public function rpt_newsletters()
-    {        
-        $logo=($this->condominium->logo)?realpath(storage_path()).'/app/'.$this->condominium->id.'/'.$this->condominium->logo:public_path().'/img/company_logo.png';
-        $company=$this->condominium->name;
-        
-        $data=[
-            'company' => $this->condominium->name,
-            'newsletters' => $this->condominium->newsletters()->get(),
-            'logo' => $logo
-        ];
-
-        $pdf = PDF::loadView('reports/rpt_newsletters', $data);
-        
-        return $pdf->stream('Novedads.pdf');
-
-    }
-
     /*
      * Download file from DB  
     */ 
@@ -277,4 +244,84 @@ class NewsletterController extends Controller
         return Storage::download($newsletter->condominium_id.'/newsletters/'.$newsletter->file, $newsletter->file_name);
     }
 
+
+    public function get_newsletters_collection(Request $request){
+        
+        $start_filter=(new Carbon((new ToolController)->format_ymd($request->start_filter)))->format('Y-m-d');
+        $end_filter=(new Carbon((new ToolController)->format_ymd($request->end_filter)))->format('Y-m-d');
+        $user_filter=$request->user_filter;
+        $level_filter=$request->level_filter;
+
+        if($user_filter!=''){
+            if($level_filter!=''){
+                $newsletters = $this->condominium->newsletters()
+                            ->whereDate('date','>=', $start_filter)
+                            ->whereDate('date','<=', $end_filter)
+                            ->where('user_id', $user_filter)
+                            ->where('level', $level_filter);
+            }else{
+                $newsletters = $this->condominium->newsletters()
+                            ->whereDate('date','>=', $start_filter)
+                            ->whereDate('date','<=', $end_filter)
+                            ->where('user_id', $user_filter);
+            }
+        }else{
+            if($level_filter!=''){
+                $newsletters = $this->condominium->newsletters()
+                            ->whereDate('date','>=', $start_filter)
+                            ->whereDate('date','<=', $end_filter)
+                            ->where('level', $level_filter);
+            }else{
+                $newsletters = $this->condominium->newsletters()
+                            ->whereDate('date','>=', $start_filter)
+                            ->whereDate('date','<=', $end_filter);
+            }
+        }
+        return $newsletters;
+    }
+
+    public function rpt_newsletters(Request $request){
+        
+        $logo=($this->condominium->logo)?'data:image/png;base64, '.base64_encode(Storage::get($this->condominium->id.'/'.$this->condominium->logo)):'';
+        $company=$this->condominium->name;
+        
+        $newsletters=$this->get_newsletters_collection($request)->get();
+
+        if($request->level_filter!=''){
+            switch ($request->level_filter) {
+                case '1':
+                    $level_name='Alto';
+                    break;
+                case '2':
+                    $level_name='Medio';
+                    break;
+                case '3':
+                    $level_name='Bajo';
+                    break;
+            }
+        }else{
+            $level_name='Todos';
+        }
+
+        if($request->user_filter!=''){
+            $user=User::find($request->user_filter);
+            $user_name=$user->name;
+        }else{
+            $user_name='Todos';
+        }
+
+        $data=[
+            'company' => $this->condominium->name,
+            'logo' => $logo,            
+            'start' => $request->start_filter,
+            'end' => $request->end_filter,
+            'user_name' => $user_name,
+            'level_name' => $level_name,
+            'newsletters' => $newsletters            
+        ];
+
+        $pdf = PDF::loadView('reports/rpt_newsletters', $data);
+        
+        return $pdf->stream('Visitas.pdf');        
+    }
 }

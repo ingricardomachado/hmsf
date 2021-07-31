@@ -10,8 +10,9 @@ use App\Models\Account;
 use App\Models\Visit;
 use App\Models\VisitType;
 use App\Models\Property;
-use App\Models\Setting;
-use App\Models\Movement;
+use App\Models\Visitor;
+use App\Models\VisitingCar;
+use App\User;
 use Illuminate\Support\Facades\Crypt;
 use Yajra\Datatables\Datatables;
 use Maatwebsite\Excel\Facades\Excel;
@@ -50,12 +51,20 @@ class VisitController extends Controller
      */
     public function index()
     {                
-        return view('visits.index');
+        $start = new Carbon('first day of this month');
+        $end = new Carbon('last day of this month');        
+        $properties=$this->condominium->properties()->orderBy('number')->pluck('number','id');
+        $users=$this->condominium->users()->where('role', 'WAM')->orderBy('name')->pluck('name','id');
+
+        return view('visits.index')->with('start', $start->format('d/m/Y'))
+                        ->with('end', $end->format('d/m/Y'))
+                        ->with('users', $users)
+                        ->with('properties', $properties);
     }
 
-    public function datatable()
+    public function datatable(Request $request)
     {        
-        $visits = $this->condominium->visits();
+        $visits = $this->get_visits_collection($request);
         
         return Datatables::of($visits)
             ->addColumn('action', function ($visit) {
@@ -72,13 +81,30 @@ class VisitController extends Controller
                         </ul>
                     </div>';
                 })           
+            ->editColumn('visitor', function ($visit) {                    
+                    if($visit->visiting_car_id){
+                        return '<b>'.$visit->visitor->name.'</b><br>'.$visit->visitor->NIT.'<br>'.$visit->visiting_car->plate.' '.$visit->visiting_car->make.' '.$visit->visiting_car->model.'<br><span class="text-muted"><small>'.Carbon::parse($visit->checkin)->isoFormat('LLLL').'</small></span>';
+                    }else{
+                        return '<b>'.$visit->visitor->name.'</b><br>'.$visit->visitor->NIT;
+                    }
+                })
             ->editColumn('visit', function ($visit) {                    
-                    return '<a href="#"  onclick="showModalVisit('.$visit->id.')" class="modal-class" style="color:inherit"  title="Click para editar">'.$visit->notes.'<br><small><i>'.$visit->visit_type->name.'</i></small></a>';
+                    return '<a href="#"  onclick="showModalVisit('.$visit->id.')" class="modal-class" style="color:inherit"  title="Click para editar">'.$visit->notes.'<br><small>'.$visit->visit_type->name.'</small></a>';
+                })
+            ->editColumn('property', function ($visit) {                    
+                    if($visit->property->user_id){
+                        return '<b>'.$visit->property->number.'</b> '.(($visit->property->user_id)?$visit->property->user->name:'').'<br>'.$visit->property->user->cell;
+                    }else{
+                        return '<b>'.$visit->property->number.'</b>';
+                    }
+                })
+            ->editColumn('user', function ($visit) {                    
+                    return $visit->user->name;
                 })
             ->addColumn('file', function ($visit) {
                     return $visit->download_file;
                 })
-            ->rawColumns(['action', 'visit', 'file'])
+            ->rawColumns(['action', 'visit', 'visitor', 'property', 'file'])
             ->make(true);
     }
     
@@ -90,7 +116,7 @@ class VisitController extends Controller
      */
     public function load($id)
     {
-        
+        $properties=$this->condominium->properties()->orderBy('number')->pluck('number','id');
         $visit_types=$this->condominium->visit_types()->orderBy('name')->pluck('name','id');
         $today=Carbon::now();
 
@@ -101,8 +127,9 @@ class VisitController extends Controller
         }
         
         return view('visits.save')->with('visit', $visit)
-                                ->with('today', $today)
-                                ->with('visit_types', $visit_types);
+                            ->with('today', $today)
+                            ->with('properties', $properties)
+                            ->with('visit_types', $visit_types);
     }
 
     /**
@@ -117,8 +144,14 @@ class VisitController extends Controller
             $visit = new Visit();
             $visit->condominium_id=$request->condominium_id;
             $visit->visit_type_id=$request->visit_type;
-            $visit->property_id=$request->property_id;
-            $visit->user_id=$request->user_id;
+            $visit->property_id=$request->property;
+            $visit->user_id=Auth::user()->id;
+            //se obtiene el visitante
+            $visitor=$this->get_visitor($request);
+            $visit->visitor_id=$visitor->id;
+            //se obtiene el carro visitante
+            $visiting_car=$this->get_visiting_car($request);
+            $visit->visiting_car_id=$visiting_car->id;
             $visit->checkin=Carbon::createFromFormat('d/m/Y H:i', $request->checkin);
             $visit->notes=$request->notes;
             $file = $request->file;
@@ -156,7 +189,7 @@ class VisitController extends Controller
         try {
             $visit = Visit::find($id);
             $visit->visit_type_id=$request->visit_type;
-            $visit->property_id=$request->property_id;
+            $visit->property_id=$request->property;
             $visit->checkin=Carbon::createFromFormat('d/m/Y H:i', $request->checkin);
             $visit->notes=$request->notes;
             $file = $request->file;
@@ -222,9 +255,110 @@ class VisitController extends Controller
     */ 
     public function download_file($id)
     {
-        $visit = Document::find($id);
+        $visit = Visit::find($id);
         
         return Storage::download($visit->condominium_id.'/visits/'.$visit->file, $visit->file_name);
     }
     
+    function get_visitor($request){
+        $condominium_id=$request->condominium_id;
+        $nit=$request->NIT;
+        if(Visitor::where('condominium_id', $condominium_id)->where('NIT', $nit)->exists()){
+            $visitor=Visitor::where('condominium_id', $condominium_id)->where('NIT', $nit)->first();
+        }else{
+            $visitor=new Visitor();
+            $visitor->condominium_id=$condominium_id;
+            $visitor->NIT=$nit;
+            $visitor->name=trim(strtoupper($request->name));
+            $visitor->save();
+        }
+        return $visitor;
+    }
+
+    function get_visiting_car($request){
+        $condominium_id=$request->condominium_id;
+        $plate=trim(strtoupper($request->plate));
+        if(VisitingCar::where('condominium_id', $condominium_id)->where('plate', $plate)->exists()){
+            $visiting_car=VisitingCar::where('condominium_id', $condominium_id)->where('plate', $plate)->first();
+        }else{
+            $visiting_car=new VisitingCar();
+            $visiting_car->condominium_id=$condominium_id;
+            $visiting_car->plate=$plate;
+            $visiting_car->make=trim(strtoupper($request->make));
+            $visiting_car->model=trim(strtoupper($request->model));
+            $visiting_car->save();
+        }
+        return $visiting_car;
+    }
+
+    public function get_visits_collection(Request $request){
+        
+        $start_filter=(new Carbon((new ToolController)->format_ymd($request->start_filter)))->format('Y-m-d');
+        $end_filter=(new Carbon((new ToolController)->format_ymd($request->end_filter)))->format('Y-m-d');
+        $user_filter=$request->user_filter;
+        $property_filter=$request->property_filter;
+
+        if($user_filter!=''){
+            if($property_filter!=''){
+                $visits = $this->condominium->visits()
+                            ->whereDate('checkin','>=', $start_filter)
+                            ->whereDate('checkin','<=', $end_filter)
+                            ->where('user_id', $user_filter)
+                            ->where('property_id', $property_filter);
+            }else{
+                $visits = $this->condominium->visits()
+                            ->whereDate('checkin','>=', $start_filter)
+                            ->whereDate('checkin','<=', $end_filter)
+                            ->where('user_id', $user_filter);
+            }
+        }else{
+            if($property_filter!=''){
+                $visits = $this->condominium->visits()
+                            ->whereDate('checkin','>=', $start_filter)
+                            ->whereDate('checkin','<=', $end_filter)
+                            ->where('property_id', $property_filter);
+            }else{
+                $visits = $this->condominium->visits()
+                            ->whereDate('checkin','>=', $start_filter)
+                            ->whereDate('checkin','<=', $end_filter);
+            }
+        }
+        return $visits;
+    }
+
+    public function rpt_visits(Request $request){
+        
+        $logo=($this->condominium->logo)?'data:image/png;base64, '.base64_encode(Storage::get($this->condominium->id.'/'.$this->condominium->logo)):'';
+        $company=$this->condominium->name;
+        
+        $visits=$this->get_visits_collection($request)->get();
+
+        if($request->property_filter!=''){
+            $property=Property::find($request->property_filter);
+            $property_number=$property->number;
+        }else{
+            $property_number='Todas';
+        }
+
+        if($request->user_filter!=''){
+            $user=User::find($request->user_filter);
+            $user_name=$user->name;
+        }else{
+            $user_name='Todos';
+        }
+
+        $data=[
+            'company' => $this->condominium->name,
+            'logo' => $logo,            
+            'start' => $request->start_filter,
+            'end' => $request->end_filter,
+            'user_name' => $user_name,
+            'property_number' => $property_number,
+            'visits' => $visits            
+        ];
+
+        $pdf = PDF::loadView('reports/rpt_visits', $data);
+        
+        return $pdf->stream('Visitas.pdf');        
+    }
 }

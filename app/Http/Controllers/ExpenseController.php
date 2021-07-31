@@ -12,6 +12,7 @@ use App\Models\ExpenseType;
 use App\Models\Property;
 use App\Models\Setting;
 use App\Models\Movement;
+use App\Models\Supplier;
 use Illuminate\Support\Facades\Crypt;
 use Yajra\Datatables\Datatables;
 use Maatwebsite\Excel\Facades\Excel;
@@ -52,6 +53,9 @@ class ExpenseController extends Controller
      */
     public function index()
     {                
+        $start = new Carbon('first day of this month');
+        $end = new Carbon('last day of this month');                
+        
         $expense_types = ExpenseType::where(function($query) {
                         $query->where('condominium_id', $this->condominium->id);
                         $query->orWhere(function($query_two) {
@@ -61,33 +65,17 @@ class ExpenseController extends Controller
         
         $suppliers=$this->condominium->suppliers()->orderBy('name')->pluck('name','id');
         
-        return view('expenses.index')->with('expense_types', $expense_types)
-                                ->with('suppliers', $suppliers);
+        return view('expenses.index')
+                        ->with('start', $start->format('d/m/Y'))
+                        ->with('end', $end->format('d/m/Y'))
+                        ->with('expense_types', $expense_types)
+                        ->with('suppliers', $suppliers);
     }
 
     public function datatable(Request $request)
     {        
-        $expense_type_filter=$request->expense_type_filter;
-        $supplier_filter=$request->supplier_filter;
-
-        if($expense_type_filter!=''){
-            if($supplier_filter!=''){
-                $expenses = $this->condominium->expenses()
-                                    ->where('expense_type_id', $expense_type_filter)
-                                    ->where('supplier_id', $supplier_filter);
-            }else{
-                $expenses = $this->condominium->expenses()
-                                    ->where('expense_type_id', $expense_type_filter);
-            }
-        }else{
-            if($supplier_filter!=''){
-                $expenses = $this->condominium->expenses()
-                                    ->where('supplier_id', $supplier_filter);
-            }else{
-                $expenses = $this->condominium->expenses();                
-            }
-        }
- 
+        $expenses=$this->get_expenses_collection($request);
+        
         return Datatables::of($expenses)
             ->addColumn('action', function ($expense) {
                     return '<div class="input-group-btn text-center">
@@ -314,13 +302,87 @@ class ExpenseController extends Controller
         }
     }
 
+    public function get_expenses_collection(Request $request){
+        
+        $start_filter=Carbon::createFromFormat('d/m/Y', $request->start_filter);
+        $end_filter=Carbon::createFromFormat('d/m/Y', $request->end_filter);;
+
+        $expense_type_filter=$request->expense_type_filter;
+        $supplier_filter=$request->supplier_filter;
+
+        if($expense_type_filter!=''){
+            if($supplier_filter!=''){
+                $expenses = $this->condominium->expenses()
+                                ->whereDate('date','>=', $start_filter)
+                                ->whereDate('date','<=', $end_filter)
+                                ->where('expense_type_id', $expense_type_filter)
+                                ->where('supplier_id', $supplier_filter);
+            }else{
+                $expenses = $this->condominium->expenses()
+                                ->whereDate('date','>=', $start_filter)
+                                ->whereDate('date','<=', $end_filter)
+                                ->where('expense_type_id', $expense_type_filter);
+            }
+        }else{
+            if($supplier_filter!=''){
+                $expenses = $this->condominium->expenses()
+                                ->whereDate('date','>=', $start_filter)
+                                ->whereDate('date','<=', $end_filter)
+                                ->where('supplier_id', $supplier_filter);
+            }else{
+                $expenses = $this->condominium->expenses()
+                                ->whereDate('date','>=', $start_filter)
+                                ->whereDate('date','<=', $end_filter);
+            }
+        }
+
+        return $expenses;
+    }
+
+
+    public function rpt_expenses(Request $request){
+                
+        $logo=($this->condominium->logo)?'data:image/png;base64, '.base64_encode(Storage::get($this->condominium->id.'/'.$this->condominium->logo)):'';
+        $company=$this->condominium->name;
+        
+        $expenses=$this->get_expenses_collection($request)->get();
+
+        if($request->supplier_filter!=''){
+            $supplier=Supplier::find($request->supplier_filter);
+            $supplier_name=$supplier->name;
+        }else{
+            $supplier_name='Todos';
+        }
+
+        if($request->expense_type_filter!=''){
+            $expense_type=ExpenseType::find($request->expense_type_filter);
+            $expense_type_name=$expense_type->name;
+        }else{
+            $expense_type_name='Todos';
+        }
+        
+        $data=[
+            'company' => $this->condominium->name,
+            'logo' => $logo,            
+            'start' => $request->start_filter,
+            'end' => $request->end_filter,
+            'supplier_name' => $supplier_name,
+            'expense_type_name' => $expense_type_name,
+            'expenses' => $expenses            
+        ];
+
+        $pdf = PDF::loadView('reports/rpt_expenses', $data);
+        
+        return $pdf->stream('Egresos extraordinarios.pdf');        
+    }    
+    
     /*
      * Download file from DB  
     */ 
     public function download_file($id)
     {
-        $expense = Document::find($id);
-        return response()->download(storage_path('app/'.$expense->condominium_id.'/expenses/'.$expense->file), $expense->file_name);
+        $expense = Expense::find($id);
+        
+        return Storage::download($expense->condominium_id.'/expenses/'.$expense->file, $expense->file_name);
     }
-    
 }

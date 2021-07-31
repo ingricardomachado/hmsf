@@ -248,7 +248,7 @@ class TransferController extends Controller
     public function download_file($id)
     {
         $transfer = Document::find($id);
-        return response()->download(storage_path('app/'.$transfer->condominium_id.'/transfers/'.$transfer->file), $transfer->file_name);
+
+        return Storage::download($transfer->condominium_id.'/transfers/'.$transfer->file, $transfer->file_name);
     }
-    
 }

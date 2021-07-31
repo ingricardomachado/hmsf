@@ -302,8 +302,8 @@ class CondominiumController extends Controller
     {        
         $setting=Setting::first();
         $condominiums=Condominium::where('demo', false)->get();
-        $logo=($setting->logo)?realpath(storage_path()).'/app/global/'.$setting->logo:public_path().'/img/company_logo.png';
-        
+        $logo=($setting->logo)?'data:image/png;base64, '.base64_encode(Storage::get('global/'.$setting->logo)):'';
+                
         $data=[
             'company' => $setting->company,
             'condominiums' => $condominiums,
@@ -321,11 +321,12 @@ class CondominiumController extends Controller
     {        
         $setting=Setting::first();
         $condominiums=Condominium::where('demo', true)->get();
+        $logo=($setting->logo)?'data:image/png;base64, '.base64_encode(Storage::get('global/'.$setting->logo)):'';
         
         $data=[
             'company' => $setting->company,
             'condominiums' => $condominiums,
-            'logo' => ''
+            'logo' => $logo
         ];
 
 

@@ -6,19 +6,41 @@
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <meta name="viewport" content="width=device-width, initial-scale=1">        
         <style type="text/css">  
-            body {
-                font-family: "Helvetica Neue", Roboto, Arial, "Droid Sans", sans-serif;
-                font-size: 10px;}
-            @page {
-                margin-top: 3.0em;
-                margin-right: 5.0em;
-                margin-left: 5.0em;
+            header {
+                position: fixed;
+                top: -20px;
+                left: 0px;
+                right: 0px;
+                height: 0px;
+                text-align: left;
+                line-height: 35px;
+                /*border: solid red;
+                border-width: thin;*/
             }
-            /* Thumnail con CSS porque si se coloca como clase el DomPDF solo muestra la imagen en la pagina 1 */
-            img {
-                border-radius: 4px;  /* Rounded border */
-                width: 110px; /* Set a small width */
+            footer {
+                margin: 0;                
+                position: fixed; 
+                bottom: -40px; 
+                left: 0px; 
+                right: 0px;
+                height: 30px;
+                text-align:center;
+                /*border: solid red;
+                border-width: thin;*/
             }            
+            body {
+                margin-top: 0px;
+                margin-bottom: 0px;
+                font-family: "Helvetica Neue", Roboto, Arial, "Droid Sans", sans-serif, "DejaVu Sans Condensed";
+                font-size: 10px;
+                /*border: solid blue;
+                border-width: thin;*/                
+            }
+            @page {
+                margin-top: 2.0em;
+                margin-right: 4.0em;
+                margin-left: 4.0em;
+            }
             small {
                 font-size: smaller;
             }    
@@ -45,24 +67,13 @@
             }
             .symbols{
                 font-family:"DeJaVu Sans Mono",monospace;
-            }            
+            }
         </style>
     </head><body>                        
         @stack('stylesheets')                
+        <footer>
+            Copyright &copy; {{ date("Y") }} {{ config('app.name') }}. Todos los derechos reservados.
+        </footer>        
             @yield('content')
-                <footer>    
-                    <script type="text/php">
-                        $now = new DateTime();
-                        $y = $pdf->get_height() - 24;
-                        $x = $pdf->get_width() - 100;
-                        $font_size = 8;         
-                        $text_right = '';    
-                        $text_center = 'Copyright '.date("Y").' {{ Session::get('app_name') }}. Todos los derechos reservados.';
-                        $text_left = '';
-                        $pdf->page_text($x, $y, $text_left, null, $font_size);
-                        $pdf->page_text(200, $y, $text_center, null, $font_size);
-                        $pdf->page_text(50, $y, $text_right, null, $font_size);
-                    </script>
-                </footer>            
         @stack('scripts')
     </body></html>

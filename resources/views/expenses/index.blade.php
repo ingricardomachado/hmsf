@@ -1,6 +1,8 @@
 @extends('layouts.app')
 
 @push('stylesheets')
+<!-- DatePicker -->
+<link href="{{ URL::asset('css/plugins/datapicker/datepicker3.css') }}" rel="stylesheet">
 <!-- Magnific Popup -->
 <link rel="stylesheet" href="{{ URL::asset('js/plugins/magnific-popup/magnific-popup.css') }}">
 <!-- Select2 -->
@@ -38,18 +40,35 @@
         <!-- ibox-content- -->
         <div class="ibox-content">
           <div class="row">
-            {{ Form::open(array('url' => '', 'id' => 'form_rpt', 'method' => 'get'), ['' ])}}
-            {{ Form::close() }}
-            <div class="col-sm-3 col-xs-12">
-                {{ Form::select('expense_type_filter', $expense_types, null, ['id'=>'expense_type_filter', 'class'=>'select2 form-control-sm', 'tabindex'=>'-1', 'placeholder'=>''])}}
+            {{ Form::open(array('url' => '', 'id' => 'form_rpt', 'method' => 'post'), ['' ])}}
+            <div class="form-group col-sm-2">
+                <label>Desde *</label>
+                <div class="input-group date">
+                  <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                  {{ Form::text ('start_filter', $start, ['id'=>'start_filter', 'class'=>'form-control', 'placeholder'=>'', 'style'=>'font-size:13px', 'required']) }}
+                </div>
+            </div>
+            <div class="form-group col-sm-2">
+                <label>Hasta *</label>
+                <div class="input-group date">
+                  <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                  {{ Form::text ('end_filter', $end, ['id'=>'end_filter', 'class'=>'form-control', 'placeholder'=>'', 'style'=>'font-size:13px', 'required']) }}
+                </div>
             </div>
             <div class="col-sm-3 col-xs-12">
+                <label>Proveedor</label>
                 {{ Form::select('supplier_filter', $suppliers, null, ['id'=>'supplier_filter', 'class'=>'select2 form-control-sm', 'tabindex'=>'-1', 'placeholder'=>''])}}
             </div>
-            <div class="col-sm-6 col-xs-12 text-right">
-                <a href="#" class="btn btn-sm btn-primary" onclick="showModalExpense(0);"><i class="fa fa-plus-circle"></i> Nuevo Egreso</a>
-                <br><br>
+            <div class="col-sm-3 col-xs-12">
+                <label>Tipo de egreso</label>
+                {{ Form::select('expense_type_filter', $expense_types, null, ['id'=>'expense_type_filter', 'class'=>'select2 form-control-sm', 'tabindex'=>'-1', 'placeholder'=>''])}}
             </div>
+            <div class="col-sm-2 col-xs-12 text-right">
+                <a href="#" class="btn btn-sm btn-primary" onclick="showModalExpense(0);"><i class="fa fa-plus-circle"></i> Nuevo Egreso</a>
+                <button type="button" name="btn_print" id="btn_print" class="btn btn-default" title="Imprimir"><i class="fa fa-print" aria-hidden="true"></i></button>
+                <br>
+            </div>
+            {{ Form::close() }}
             <div class="col-sm-12">
               @include('partials.errors')
             </div>
@@ -121,6 +140,9 @@
 @endsection
 
 @push('scripts')
+<!-- DatePicker --> 
+<script src="{{ URL::asset('js/plugins/datapicker/bootstrap-datepicker.js') }}"></script>
+<script src="{{ URL::asset('js/plugins/datapicker/bootstrap-datepicker.es.min.js') }}"></script>
 <!-- Magnific Popup -->
 <script src="{{ URL::asset('js/plugins/magnific-popup/jquery.magnific-popup.min.js') }}"></script>
 <!-- Select2 -->
@@ -210,6 +232,17 @@ $("#supplier_filter").change( event => {
   $('#expenses-table').DataTable().draw(false);
 });
 
+$('#btn_print').click(function(event) {
+  var validator = $("#form_rpt" ).validate();
+  formulario_validado = validator.form();
+  if(formulario_validado){
+    url = '{{URL::to("expenses.rpt_expenses")}}';
+    $('#form_rpt').attr('action', url);
+    $('#form_rpt').attr('target', '_blank');
+    $('#form_rpt').submit();
+  }
+});
+
 $(document).ready(function(){
                       
     path_str_language = "{{URL::asset('js/plugins/dataTables/es_ES.txt')}}";          
@@ -223,15 +256,17 @@ $(document).ready(function(){
             type: "POST",
             data: function(d) {
                 d._token= "{{ csrf_token() }}";
+                d.start_filter = $('#start_filter').val();
+                d.end_filter = $('#end_filter').val();
                 d.expense_type_filter = $('#expense_type_filter').val();
                 d.supplier_filter = $('#supplier_filter').val();
             }
         },        
         columns: [
             { data: 'action', name: 'action', orderable: false, searchable: false},
-            { data: 'date',   name: 'date', orderable: true, searchable: true},
-            { data: 'expense',   name: 'expense', orderable: false, searchable: true},
-            { data: 'account',   name: 'account', orderable: false, searchable: true},
+            { data: 'date',   name: 'date', orderable: true, searchable: false},
+            { data: 'expense',   name: 'expenses.concept', orderable: false, searchable: true},
+            { data: 'account',   name: 'account', orderable: false, searchable: false},
             { data: 'amount', name: 'amount', orderable: false, searchable: false },
             { data: 'file', name: 'file', orderable: false, searchable: false }
         ],
@@ -260,6 +295,24 @@ $(document).ready(function(){
       minimumResultsForSearch: 10,
       allowClear: true,
       width: '100%'
+    });
+
+    $('#start_filter').datepicker({
+        format: 'dd/mm/yyyy',
+        todayHighlight: true,
+        autoclose: true,
+        language: 'es',
+    }).on("changeDate", function (e) {
+        $('#expenses-table').DataTable().draw();
+    });
+
+    $('#end_filter').datepicker({
+        format: 'dd/mm/yyyy',
+        todayHighlight: true,
+        autoclose: true,
+        language: 'es',
+    }).on("changeDate", function (e) {
+        $('#expenses-table').DataTable().draw();
     });
 
 });

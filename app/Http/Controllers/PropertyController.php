@@ -209,7 +209,7 @@ class PropertyController extends Controller
 
     public function rpt_properties()
     {        
-        $logo=($this->condominium->logo)?realpath(storage_path()).'/app/'.$this->condominium->id.'/'.$this->condominium->logo:public_path().'/img/company_logo.png';
+        $logo=($this->condominium->logo)?'data:image/png;base64, '.base64_encode(Storage::get($this->condominium->id.'/'.$this->condominium->logo)):'';
         $company=$this->condominium->name;
         
         $data=[
@@ -282,7 +282,7 @@ class PropertyController extends Controller
 
     public function rpt_statement($id)
     {        
-        $logo=($this->condominium->logo)?realpath(storage_path()).'/app/'.$this->condominium->id.'/'.$this->condominium->logo:public_path().'/img/company_logo.png';
+        $logo=($this->condominium->logo)?'data:image/png;base64, '.base64_encode(Storage::get($this->condominium->id.'/'.$this->condominium->logo)):'';
         $company=$this->condominium->name;
         
         $property=Property::find(Crypt::decrypt($id));

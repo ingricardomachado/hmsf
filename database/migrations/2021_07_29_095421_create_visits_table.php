@@ -30,6 +30,10 @@ class CreateVisitsTable extends Migration
             $table->bigInteger('visiting_car_id')->unsigned()->nullable();
             $table->foreign('visiting_car_id')->references('id')->on('visiting_cars')->onDelete('cascade');
             $table->string('notes',1000)->nullable();
+            $table->string('file_name',255)->nullable();
+            $table->string('file_type',10)->nullable();
+            $table->Integer('file_size')->unsigned()->nullable();
+            $table->string('file',255)->nullable();
             $table->timestamps();
         });
     }

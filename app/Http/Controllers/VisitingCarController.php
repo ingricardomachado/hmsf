@@ -5,13 +5,8 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 
 use App\Http\Requests;
-use App\Http\Requests\VisitorRequest;
-use App\Models\Account;
-use App\Models\Visitor;
-use App\Models\VisitorType;
-use App\Models\Property;
-use App\Models\Setting;
-use App\Models\Movement;
+use App\Http\Requests\VisitingCarRequest;
+use App\Models\VisitingCar;
 use Illuminate\Support\Facades\Crypt;
 use Yajra\Datatables\Datatables;
 use Maatwebsite\Excel\Facades\Excel;
@@ -30,11 +25,11 @@ use PDF;
 use Auth;
 use Carbon\Carbon;
 
-class VisitorController extends Controller
+class VisitingCarController extends Controller
 {
            
     /**
-     * Display a listing of the visitor.
+     * Display a listing of the visiting_car.
      *
      * @return \Illuminate\Http\Response
      */
@@ -46,10 +41,10 @@ class VisitorController extends Controller
     public function show($id)
     {                
         try {
-            $visitor = Visitor::findOrFail($id);
+            $visiting_car = VisitingCar::findOrFail($id);
             
             return response()->json([
-                $visitor->toArray()
+                $visiting_car->toArray()
                 ], 200);
             
         } catch (Exception $e) {
@@ -63,7 +58,7 @@ class VisitorController extends Controller
 
 
     /**
-     * Store a newly created visitor in storage.
+     * Store a newly created visiting_car in storage.
      *
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
@@ -71,16 +66,17 @@ class VisitorController extends Controller
     public function store(Request $request)
     {
         try {
-            $visitor=new Visitor();
-            $visitor->condominium_id=$request->condominium_id;
-            $visitor->NIT=$request->condominium_id;
-            $visitor->name=$request->name;
-            $visitor->save();
+            $visiting_car=new VisitingCar();
+            $visiting_car->condominium_id=$request->condominium_id;
+            $visiting_car->plate=$request->plate;
+            $visiting_car->make=$request->make;
+            $visiting_car->model=$request->model;
+            $visiting_car->save();
             
             return response()->json([
                     'success' => true,
-                    'message' => 'Visitante registrado exitosamente',
-                    'visitor' => $visitor->toArray()
+                    'message' => 'Vehiculo visitante registrado exitosamente',
+                    'visiting_car' => $visiting_car->toArray()
                 ], 200);
             
         } catch (Exception $e) {
@@ -92,24 +88,25 @@ class VisitorController extends Controller
     }
     
    /**
-     * Update the specified visitor in storage.
+     * Update the specified visiting_car in storage.
      *
      * @param  \Illuminate\Http\Request  $request
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(VisitorRequest $request, $id)
+    public function update(VisitingCarRequest $request, $id)
     {
         try {
-            $visitor = Visitor::find($id);
-            $visitor->NIT=$request->condominium_id;
-            $visitor->name=$request->name;
-            $visitor->save();
+            $visiting_car = VisitingCar::find($id);
+            $visiting_car->plate=$request->plate;
+            $visiting_car->make=$request->make;
+            $visiting_car->model=$request->model;
+            $visiting_car->save();
             
             return response()->json([
                     'success' => true,
-                    'message' => 'Visitante actualizado exitosamente',
-                    'visitor' => $visitor->toArray()
+                    'message' => 'Vehículo visitante actualizado exitosamente',
+                    'visiting_car' => $visiting_car->toArray()
                 ], 200);
             
         } catch (Exception $e) {
@@ -122,7 +119,7 @@ class VisitorController extends Controller
     }
 
     /**
-     * Remove the specified visitor from storage.
+     * Remove the specified visiting_car from storage.
      *
      * @param  int  $id
      * @return \Illuminate\Http\Response
@@ -130,12 +127,12 @@ class VisitorController extends Controller
     public function destroy($id)
     {
         try {
-            $visitor = Visitor::find($id);
-            $visitor->delete();
+            $visiting_car = VisitingCar::find($id);
+            $visiting_car->delete();
                         
             return response()->json([
                 'success' => true,
-                'message' => 'Visitante eliminado exitosamente'
+                'message' => 'Vehiculo visitante eliminado exitosamente'
             ], 200);
 
         } catch (Exception $e) {
@@ -147,15 +144,15 @@ class VisitorController extends Controller
         }
     }    
 
-    public function visitor_by_nit($condominium_id, $nit)
+    public function visiting_car_by_plate($condominium_id, $plate)
     {                
         try {
-            if(Visitor::where('condominium_id', $condominium_id)->where('NIT', $nit)->exists()){
-                $visitor=Visitor::where('condominium_id', $condominium_id)->where('NIT', $nit)->first();
+            if(VisitingCar::where('condominium_id', $condominium_id)->where('plate', $plate)->exists()){
+                $visiting_car=VisitingCar::where('condominium_id', $condominium_id)->where('plate', $plate)->first();
                 
                 return response()->json([
                         'success' => true,
-                        'visitor' => $visitor->toArray()
+                        'visiting_car' => $visiting_car->toArray()
                     ], 200);
             }else{
                 return response()->json([

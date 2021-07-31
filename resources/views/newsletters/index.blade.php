@@ -1,6 +1,8 @@
 @extends('layouts.app')
 
 @push('stylesheets')
+<!-- DatePicker -->
+<link href="{{ URL::asset('css/plugins/datapicker/datepicker3.css') }}" rel="stylesheet">
 <!-- Magnific Popup -->
 <link rel="stylesheet" href="{{ URL::asset('js/plugins/magnific-popup/magnific-popup.css') }}">
 <!-- Select2 -->
@@ -38,17 +40,35 @@
         <!-- ibox-content- -->
         <div class="ibox-content">
           <div class="row">
+            {{ Form::open(array('url' => '', 'id' => 'form_rpt', 'method' => 'post'), ['' ])}}
+            <div class="form-group col-sm-2">
+                <label>Desde *</label>
+                <div class="input-group date">
+                  <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                  {{ Form::text ('start_filter', $start, ['id'=>'start_filter', 'class'=>'form-control', 'placeholder'=>'', 'style'=>'font-size:13px', 'required']) }}
+                </div>
+            </div>
+            <div class="form-group col-sm-2">
+                <label>Hasta *</label>
+                <div class="input-group date">
+                  <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                  {{ Form::text ('end_filter', $end, ['id'=>'end_filter', 'class'=>'form-control', 'placeholder'=>'', 'style'=>'font-size:13px', 'required']) }}
+                </div>
+            </div>
             <div class="col-sm-3 col-xs-12">
+                <label>Vigilante</label>
                 {{ Form::select('user_filter', $users, null, ['id'=>'user_filter', 'class'=>'select2 form-control-sm', 'tabindex'=>'-1', 'placeholder'=>''])}}
             </div>
             <div class="col-sm-3 col-xs-12">
+                <label>Importancia</label>
                 {{ Form::select('level_filter', ['1'=>'Alta', '2'=>'Media', '3'=>'Baja'], null, ['id'=>'level_filter', 'class'=>'select2 form-control-sm', 'tabindex'=>'-1', 'placeholder'=>''])}}
             </div>
-            <div class="col-sm-6 col-xs-12 text-right">
+            <div class="col-sm-2 col-xs-12 text-right">
                 <a href="#" class="btn btn-sm btn-primary" onclick="showModalNewsletter(0);"><i class="fa fa-plus-circle"></i> Nueva Novedad</a>
-                <a href="{{ url('newsletters.rpt_newsletters') }}" class="btn btn-sm btn-default" target="_blank" title="Imprimir PDF"><i class="fa fa-print"></i></a>
+                <button type="button" name="btn_print" id="btn_print" class="btn btn-default" title="Imprimir"><i class="fa fa-print" aria-hidden="true"></i></button>
                 <br><br>
             </div>
+            {{ Form::close() }}
             <div class="col-sm-12">
               @include('partials.errors')
             </div>
@@ -58,8 +78,8 @@
                 <thead>
                   <tr>
                     <th text-align="center" width="5%"></th>
-                    <th width="20%">Registrada por</th>
                     <th width="60%">Novedad</th>
+                    <th width="20%">Vigilante</th>
                     <th width="10%">Soporte</th>
                     <th width="10%">Importancia</th>
                   </tr>
@@ -67,8 +87,8 @@
                 <tfoot>
                   <tr>
                     <th></th>
-                    <th>Registrar por</th>
                     <th>Novedad</th>
+                    <th>Vigilante</th>
                     <th>Soporte</th>
                     <th>Importancia</th>
                   </tr>
@@ -118,6 +138,9 @@
 @endsection
 
 @push('scripts')
+<!-- DatePicker --> 
+<script src="{{ URL::asset('js/plugins/datapicker/bootstrap-datepicker.js') }}"></script>
+<script src="{{ URL::asset('js/plugins/datapicker/bootstrap-datepicker.es.min.js') }}"></script>
 <!-- Magnific Popup -->
 <script src="{{ URL::asset('js/plugins/magnific-popup/jquery.magnific-popup.min.js') }}"></script>
 <!-- Select2 -->
@@ -207,6 +230,17 @@ $("#user_filter").change( event => {
   $('#newsletters-table').DataTable().draw(false);
 });
 
+$('#btn_print').click(function(event) {
+  var validator = $("#form_rpt" ).validate();
+  formulario_validado = validator.form();
+  if(formulario_validado){
+    url = '{{URL::to("newsletters.rpt_newsletters")}}';
+    $('#form_rpt').attr('action', url);
+    $('#form_rpt').attr('target', '_blank');
+    $('#form_rpt').submit();
+  }
+});
+
 $(document).ready(function(){
                       
     path_str_language = "{{URL::asset('js/plugins/dataTables/es_ES.txt')}}";          
@@ -220,14 +254,16 @@ $(document).ready(function(){
             type: "POST",
             data: function(d) {
                 d._token= "{{ csrf_token() }}";
+                d.start_filter = $('#start_filter').val();
+                d.end_filter = $('#end_filter').val();
                 d.user_filter = $('#user_filter').val();
                 d.level_filter = $('#level_filter').val();
             }
         },        
         columns: [
             { data: 'action', name: 'action', orderable: false, searchable: false},
-            { data: 'user',   name: 'users.name', orderable: false, searchable: false},
             { data: 'title',   name: 'title', orderable: false, searchable: true},
+            { data: 'user',   name: 'users.name', orderable: false, searchable: false},
             { data: 'file',   name: 'file', orderable: false, searchable: false},
             { data: 'level',   name: 'level', orderable: false, searchable: false}
         ],
@@ -242,9 +278,27 @@ $(document).ready(function(){
         }
     });
 
+    $('#start_filter').datepicker({
+        format: 'dd/mm/yyyy',
+        todayHighlight: true,
+        autoclose: true,
+        language: 'es',
+    }).on("changeDate", function (e) {
+        $('#newsletters-table').DataTable().draw();
+    });
+
+    $('#end_filter').datepicker({
+        format: 'dd/mm/yyyy',
+        todayHighlight: true,
+        autoclose: true,
+        language: 'es',
+    }).on("changeDate", function (e) {
+        $('#newsletters-table').DataTable().draw();
+    });
+    
     $("#user_filter").select2({
       language: "es",
-      placeholder: "Vigilante - Todas",
+      placeholder: "Todos",
       minimumResultsForSearch: 10,
       allowClear: true,
       width: '100%'
@@ -252,7 +306,7 @@ $(document).ready(function(){
 
     $("#level_filter").select2({
       language: "es",
-      placeholder: "Importancia - Todas",
+      placeholder: "Todas",
       minimumResultsForSearch: 10,
       allowClear: true,
       width: '100%'

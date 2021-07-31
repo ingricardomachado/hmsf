@@ -17,6 +17,7 @@ use App\Models\Expense;
 use App\Models\Payment;
 use App\Models\Transfer;
 use App\Models\Newsletter;
+use App\Models\Visit;
 use File;
 use Image;
 use Illuminate\Support\Facades\Redirect;
@@ -188,6 +189,16 @@ class ImgController extends Controller
     {
         $newsletter = Newsletter::findOrFail($id);
         $picture = Image::make(Storage::get($newsletter->condominium_id.'/newsletters/'.$newsletter->file));
+        $response = Response::make($picture->encode('jpg'));
+        $response->header('Content-Type', 'image/jpeg');
+
+        return $response;
+    }
+
+    public function showVisitImage($id)
+    {
+        $visit = Visit::findOrFail($id);
+        $picture = Image::make(Storage::get($visit->condominium_id.'/visits/'.$visit->file));
         $response = Response::make($picture->encode('jpg'));
         $response->header('Content-Type', 'image/jpeg');
 

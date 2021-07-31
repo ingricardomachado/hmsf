@@ -15,7 +15,7 @@ class Visit extends Model
         return $this->belongsTo('App\Models\Condominium');
     }
 
-    public function visting_car(){
+    public function visiting_car(){
    
         return $this->belongsTo('App\Models\VisitingCar');
     }

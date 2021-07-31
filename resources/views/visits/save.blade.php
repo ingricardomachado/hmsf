@@ -27,6 +27,10 @@
                     </div>
                 </div>
                 <div class="form-group col-sm-6">  
+                  <label>Propiedad *</label>
+                  {{ Form::select('property', $properties, $visit->property_id, ['id'=>'property', 'class'=>'select2 form-control', 'tabindex'=>'-1', 'placeholder'=>'', 'required'])}}
+                </div>
+                <div class="form-group col-sm-6">  
                   <label>Tipo de visita *</label>
                   {{ Form::select('visit_type', $visit_types, $visit->visit_type_id, ['id'=>'visit_type', 'class'=>'select2 form-control', 'tabindex'=>'-1', 'placeholder'=>'', 'required'])}}
                 </div>
@@ -39,7 +43,7 @@
                     {!! Form::text('name', ($visit->visitor_id)?$visit->visitor->name:'', ['id'=>'name', 'class'=>'form-control', 'type'=>'text', 'placeholder'=>'', 'maxlength'=>'20', 'required']) !!}
                 </div>
                 
-                <div class="form-group col-sm-12">
+                <div class="form-group col-sm-6">
                     <div class="i-checks">
                         {!! Form::checkbox('car', null, false, ['id'=>'car', 'class'=>'i-checks']) !!} <label>Viene en vehículo</label>
                     </div>
@@ -47,11 +51,11 @@
             <div id="div_car" style="display: none">
                 <div class="form-group col-sm-6">
                     <label>Placa *</label>
-                    {!! Form::text('plate', ($visit->visiting_car_id)?$visit->visting_car->plate:'', ['id'=>'plate', 'class'=>'form-control', 'type'=>'text', 'placeholder'=>'', 'maxlength'=>'20', 'required']) !!}
+                    {!! Form::text('plate', ($visit->visiting_car_id)?$visit->visiting_car->plate:'', ['id'=>'plate', 'class'=>'form-control', 'type'=>'text', 'placeholder'=>'', 'maxlength'=>'20', 'required']) !!}
                 </div>
                 <div class="form-group col-sm-6">
                     <label>Marca *</label>
-                    {!! Form::text('brand', ($visit->visiting_car_id)?$visit->visiting_car->brand:'', ['id'=>'brand', 'class'=>'form-control', 'type'=>'text', 'placeholder'=>'', 'maxlength'=>'20', 'required']) !!}
+                    {!! Form::text('make', ($visit->visiting_car_id)?$visit->visiting_car->make:'', ['id'=>'make', 'class'=>'form-control', 'type'=>'text', 'placeholder'=>'', 'maxlength'=>'20', 'required']) !!}
                 </div>
                 <div class="form-group col-sm-6">
                     <label>Modelo *</label>
@@ -62,10 +66,12 @@
                     <label>Notas</label><small> Máx. 150 caracteres</small>
                     {!! Form::textarea('notes', $visit->notes, ['id'=>'notes', 'class'=>'form-control', 'type'=>'text', 'rows'=>'2', 'style'=>'font-size:12px', 'placeholder'=>'Escribe aqui alguna nota de interés ...', 'maxlength'=>'150']) !!}
                 </div>
-                <div class="form-group col-sm-12">
-                  <label>Soporte</label><small> (Sólo formatos jpg, jpeg, png, pdf. Máx. 2Mb.)</small>
-                  <input id="file" name="file" type="file">
-                </div>
+                @if(!$visit->file)
+                    <div class="form-group col-sm-12">
+                      <label>Soporte</label><small> (Sólo formatos jpg, jpeg, png, pdf. Máx. 2Mb.)</small>
+                      <input id="file" name="file" type="file">
+                    </div>
+                @endif
             </div>
         </div>
         <div class="modal-footer">
@@ -84,6 +90,8 @@
 <script src="{{ URL::asset('js/plugins/iCheck/icheck.min.js') }}"></script>
 <script>
 
+var condominium_id={{ session('condominium')->id }};
+
 $('#car').on('ifChanged', function(event){
   (event.target.checked)?$('#div_car').show():$('#div_car').hide();
 });
@@ -95,14 +103,38 @@ if (e.which == '13') {
 
 function search_visitor(nit){  
     $.ajax({
-      url: `{{URL::to("visitor_by_nit")}}/${nit}`,
+      url: `{{URL::to("visitor_by_nit")}}/${condominium_id}/${nit}`,
       type: 'GET',
     })
     .done(function(response) {
         $('#name').val(response.visitor.name);
     })
     .fail(function(response) {
-        //
+        $('#name').val('');
+        $('#name').focus();
+    });
+}  
+
+$('#plate').keypress(function (e) {
+if (e.which == '13') {
+    search_visiting_car($(this).val());
+}});
+
+function search_visiting_car(plate){  
+    $.ajax({
+      url: `{{URL::to("visiting_car_by_plate")}}/${condominium_id}/${plate}`,
+      type: 'GET',
+    })
+    .done(function(response) {
+        $('#make').val(response.visiting_car.make);
+        $('#model').val(response.visiting_car.model);
+        $('#color').val(response.visiting_car.color);
+    })
+    .fail(function(response) {
+        $('#make').val('');
+        $('#model').val('');
+        $('#color').val('');
+        $('#make').focus();
     });
 }  
 
@@ -115,6 +147,15 @@ $(document).ready(function() {
     });
             
     $("#visit_type").select2({
+        language: "es",
+        placeholder: "Seleccione",
+        minimumResultsForSearch: 10,
+        allowClear: false,
+        dropdownParent: $('#modalVisit .modal-content'),
+        width: '100%'
+    });
+
+    $("#property").select2({
         language: "es",
         placeholder: "Seleccione",
         minimumResultsForSearch: 10,
