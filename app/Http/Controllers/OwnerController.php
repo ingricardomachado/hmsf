@@ -24,6 +24,7 @@ use Auth;
 use Mail;
 use App\Mail\SignedupOwner;
 use App\Mail\ChangePassword;
+use Storage;
 
 class OwnerController extends Controller
 {

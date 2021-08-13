@@ -24,6 +24,7 @@ use File;
 use DB;
 use PDF;
 use Auth;
+use Storage;
 
 class ExpenseTypeController extends Controller
 {

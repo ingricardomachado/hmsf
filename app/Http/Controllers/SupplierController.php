@@ -24,6 +24,7 @@ use File;
 use DB;
 use PDF;
 use Auth;
+use Storage;
 
 class SupplierController extends Controller
 {

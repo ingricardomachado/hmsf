@@ -25,6 +25,7 @@ use File;
 use DB;
 use PDF;
 use Auth;
+use Storage;
 
 class AccountController extends Controller
 {

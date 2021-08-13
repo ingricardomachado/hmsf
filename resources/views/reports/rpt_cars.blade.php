@@ -6,6 +6,7 @@
     <table class="table" width="100%">
         <thead>
             <tr>
+                <th class="text-left">Propietario</th>
                 <th class="text-left">Placa</th>
                 <th class="text-left">Marca</th>
                 <th class="text-left">Modelo</th>
@@ -18,9 +19,9 @@
         @foreach($cars as $car)                    
             <tr>
                 <td class="text-left">
-                    <b>{{ $car->plate }}</b><br>
-                    <small><i>{{ $car->property->number }}</i></small>
+                    {!! ($car->property->user_id)?'<b>'.$car->property->number.'</b> - '.$car->property->user->name:'<b>'.$car->property->number.'</b>' !!}
                 </td>
+                <td class="text-left"><b>{{ $car->plate }}</b></td>
                 <td class="text-left">{{ $car->make }}</td>
                 <td class="text-left">{{ $car->model }}</td>
                 <td class="text-left">{{ $car->year }}</td>

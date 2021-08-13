@@ -23,6 +23,7 @@ use File;
 use DB;
 use PDF;
 use Auth;
+use Storage;
 
 class CarController extends Controller
 {
@@ -242,7 +243,10 @@ class CarController extends Controller
         
         $data=[
             'company' => $this->condominium->name,
-            'cars' => $this->condominium->cars()->get(),
+            'cars' => $this->condominium->cars()
+                        ->join('properties', 'cars.property_id', '=', 'properties.id')
+                        ->orderBy('properties.number')->get(),
+                        
             'logo' => $logo
         ];
 

@@ -11,7 +11,7 @@
                 top: -20px;
                 left: 0px;
                 right: 0px;
-                height: 100px;
+                height: 80px;
                 text-align: left;
                 line-height: 35px;
                 /*border: solid red;
@@ -25,14 +25,15 @@
                 right: 0px;
                 height: 30px;
                 text-align:center;
+                font-size: 10px;
                 /*border: solid red;
                 border-width: thin;*/
             }            
             body {
-                margin-top: 80px;
+                margin-top: 60px;
                 margin-bottom: 0px;
-                font-family: "Helvetica Neue", Roboto, Arial, "Droid Sans", sans-serif, "DejaVu Sans Condensed";
-                font-size: 10px;
+                font-family: "Helvetica Neue", Helvetica, Arial, Roboto, Arial, "Droid Sans", sans-serif;
+                font-size: 11px;
                 /*border: solid blue;
                 border-width: thin;*/                
             }

@@ -40,7 +40,6 @@
             <div class="col-sm-9 col-xs-12 text-right">
               @if(session('role')=='ADM')
                 <a href="#" class="btn btn-sm btn-primary" onclick="showModalFacility(0);"><i class="fa fa-plus-circle"></i> Nueva Instalación</a>
-                <a href="{{ url('facilities.rpt_facilities') }}" class="btn btn-sm btn-default" target="_blank" title="Imprimir PDF"><i class="fa fa-print"></i></a>
                 <br><br>
               @endif
             </div>

@@ -24,6 +24,7 @@ use DB;
 use PDF;
 use Auth;
 use Carbon\Carbon;
+use Storage;
 
 class PropertyController extends Controller
 {
