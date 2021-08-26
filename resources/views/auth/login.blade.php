@@ -26,7 +26,7 @@
         <div>
             <div>
                 <h1>
-                   <span><img src="{{ asset("img/company_logo.png") }}" style="max-height:auto; max-width:280px;"/></span>
+                   <span><img src="{{ asset("img/company_logo.png") }}" class="img-thumbnail" style="max-height:auto; max-width:280px;"/></span>
                 </h1>            
                     <!-- show erros -->
                     @if (count($errors) > 0)

@@ -444,19 +444,19 @@
                             <p>Llene el formulario. <b/>(*) Campos Obligatorios</b></p>
                         </div>                                    
                         <div class="col-sm-12">
-                            {{ Form::select('country', $countries, null, ['id' => 'country', 'class'=>'form-control', 'tabindex'=>'-1', 'placeholder'=>'', 'required'])}}
+                            {{ Form::select('country', $countries, null, ['id' => 'country', 'class'=>'select2 form-control', 'tabindex'=>'-1', 'placeholder'=>'', 'required'])}}
                         </div>
                         <div class="col-sm-12" style="padding-top: 1mm">
-                            {{ Form::select('state', [], null, ['id' => 'state', 'class'=>'form-control', 'tabindex'=>'-1', 'placeholder'=>'', 'required'])}}
+                            {{ Form::select('state', [], null, ['id' => 'state', 'class'=>'select2 form-control', 'tabindex'=>'-1', 'placeholder'=>'', 'required'])}}
                         </div>
                         <div class="col-sm-12" style="padding-top: 1mm">
                           <input id="condominium" class="form-control" name="condominium" placeholder="Nombre del Condominio *" required="required" type="text">
                         </div>
                         <div class="col-sm-12" style="padding-top: 1mm">
-                            {{ Form::select('type', ['C' =>'Comercial', 'R' => 'Residencial'], 'R', ['id' => 'type', 'class'=>'form-control', 'tabindex'=>'-1', 'placeholder'=>'', 'required'])}}
+                            {{ Form::select('type', ['C' =>'Comercial', 'R' => 'Residencial'], 'R', ['id' => 'type', 'class'=>'select2 form-control', 'tabindex'=>'-1', 'placeholder'=>'', 'required'])}}
                         </div>
                         <div class="col-sm-12" style="padding-top: 1mm">
-                            {{ Form::select('property_type', $property_types, 1, ['id' => 'property_type', 'class'=>'form-control', 'tabindex'=>'-1', 'placeholder'=>'', 'required'])}}
+                            {{ Form::select('property_type', $property_types, 1, ['id' => 'property_type', 'class'=>'select2 form-control', 'tabindex'=>'-1', 'placeholder'=>'', 'required'])}}
                         </div>
                         <div class="col-sm-12" style="padding-top: 1mm">
                           <input id="properties" class="form-control" name="properties" placeholder="Cantidad de propiedades *" min="1" max="500" required="required" type="number">

@@ -38,29 +38,20 @@ class User extends Authenticatable
     ];
 
     //*** Relations ***    
-    public function condominium(){
-   
-        return $this->belongsTo('App\Models\Condominium');
-    }
-
-    public function properties(){
-   
-        return $this->hasMany('App\Models\Property');
-    }
 
     //*** Method ***    
     
     //*** Accesors ***
     public function getRoleDescriptionAttribute(){
         
-        if($this->role == 'SAM'){
-            return "Super Administrador";
-        }else if($this->role == 'ADM'){
+        if($this->role == 'ADM'){
             return "Administrador";
-        }else if($this->role == 'OWN'){
-            return "Propietario";
-        }else if($this->role == 'WAM'){
-            return "Vigilante";
+        }else if($this->role == 'SOC'){
+            return "Socio de negocio";
+        }else if($this->role == 'SUP'){
+            return "Supervisor";
+        }else if($this->role == 'MEN'){
+            return "Mensajero";
         }else{
             return $this->role;
         }

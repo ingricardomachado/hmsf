@@ -5,7 +5,6 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use App\Providers\RouteServiceProvider;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
-use App\Models\Condominium;
 use App\Models\Setting;
 use App\User;
 use Session;
@@ -76,15 +75,8 @@ class LoginController extends Controller
                 $setting = Setting::first();
                 Session::put('role', $user->role);
                 Session::put('company_name', $setting->company);
-                if($user->role=='SAM'){
-                    Session::put('coin', $setting->coin);
-                    Session::put('money_format', $setting->money_format);
-                }else{
-                    $condominium=Condominium::find($user->condominium_id);
-                    Session::put('condominium', $condominium);
-                    Session::put('coin', $condominium->coin);
-                    Session::put('money_format', $condominium->money_format);
-                }
+                Session::put('coin', $setting->coin);
+                Session::put('money_format', $setting->money_format);
 
                 return $this->sendLoginResponse($request);
             } else {

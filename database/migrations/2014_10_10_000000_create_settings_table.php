@@ -22,6 +22,7 @@ class CreateSettingsTable extends Migration
             $table->string('app_name');
             $table->string('coin',10);
             $table->char('money_format',3);
+            $table->float('tax', 8,2);
             $table->string('logo',100)->nullable();
             $table->string('logo_name',100)->nullable();
             $table->string('logo_type',10)->nullable();

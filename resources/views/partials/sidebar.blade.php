@@ -31,75 +31,22 @@
             </li>
             <!-- /Profile -->
         
-        <!-- Menu SAM Super Administrador -->
-        @if(session('role')=='SAM')
-            <li class="{{ set_active(['condominiums', 'demos']) }}">
-                <a href="#"><i class="fa fa-building-o"></i><span class="nav-label">Condominios</span> <span class="fa arrow"></span></a>
-                <ul class="nav nav-second-level collapse">
-                    <li class="{{ set_active(['condominiums']) }}">
-                        <a href="{{url('condominiums')}}">Permanentes</a>
-                    </li>
-                    <li class="{{ set_active(['demos']) }}">
-                        <a href="{{url('demos')}}">Demos</a>
-                    </li>
-                </ul>
-            </li>
-            <li class="{{ set_active(['global']) }}">
-                <a href="{{url('global')}}"><span class="nav-label"><i class="fa fa-cogs"></i> Configuraciones</span></a>
-            </li>
-        @endif
-        <!-- /Menu SAM Super Administrador -->
-
         <!-- Menu ADM Administrador  -->
         @if(session('role')=='ADM')
             <li class="{{ set_active(['home']) }}">
                 <a href="{{url('home')}}"><i class="fa fa-laptop"></i> <span class="nav-label">Dashboard</span></a>
             </li>
-            <li class="{{ set_active(['properties', 'owners', 'taxes', 'facilities', 'reservations', 'cars', 'assets']) }}">
-                <a href="#"><i class="fa fa-building-o"></i><span class="nav-label">Condominio</span> <span class="fa arrow"></span></a>
-                <ul class="nav nav-second-level collapse">
-                    <li class="{{ set_active(['properties']) }}">
-                        <a href="{{url('properties')}}">Propiedades</a>
-                    </li>
-                    <li class="{{ set_active(['owners']) }}">
-                        <a href="{{url('owners')}}">Propietarios</a>
-                    </li>
-                    <li class="{{ set_active(['taxes']) }}">
-                        <a href="{{url('taxes')}}">Alicuotas</a>
-                    </li>
-                    <li class="{{ set_active(['facilities']) }}">
-                        <a href="{{url('facilities')}}">Instalaciones</a>
-                    </li>
-                    <li class="{{ set_active(['reservations']) }}">
-                        <a href="{{url('reservations')}}">Reservaciones</a>
-                    </li>
-                    <li class="{{ set_active(['cars']) }}">
-                        <a href="{{url('cars')}}">Vehículos</a>
-                    </li>
-                    <li class="{{ set_active(['assets']) }}">
-                        <a href="{{url('assets')}}">Activos</a>
-                    </li>
-                </ul>
+            <li class="{{ set_active(['partners']) }}">
+                <a href="{{url('partners')}}"><i class="fa fa-users"></i> <span class="nav-label">Socios de Negocio</span></a>
+            </li>
+            <li class="{{ set_active(['customers']) }}">
+                <a href="{{url('customers')}}"><i class="fa fa-users"></i> <span class="nav-label">Clientes</span></a>
             </li>
             <li class="{{ set_active(['accounts', 'income_types', 'payments', 'incomes', 'expense_types', 'expenses', 'transfers']) }}">
                 <a href="#"><i class="fa fa-line-chart"></i><span class="nav-label">Finanzas</span> <span class="fa arrow"></span></a>
                 <ul class="nav nav-second-level collapse">
                     <li class="{{ set_active(['accounts']) }}">
-                        <a href="{{url('accounts')}}">Caja y Banco</a>
-                    </li>
-                    <li class="{{ set_active(['income_types', 'payments', 'incomes']) }}">
-                        <a href="#">Ingresos <span class="fa arrow"></span></a>
-                        <ul class="nav nav-third-level">
-                            <li class="{{ set_active(['income_types']) }}">
-                                <a href="{{url('income_types')}}">Tipos de Ingresos</a>
-                            </li>
-                            <li class="{{ set_active(['payments']) }}">
-                                <a href="{{url('payments')}}">Pagos de Cuotas</a>
-                            </li>
-                            <li class="{{ set_active(['incomes']) }}">
-                                <a href="{{url('incomes')}}">Extraordinarios</a>
-                            </li>
-                        </ul>
+                        <a href="{{url('accounts')}}">Operaciones</a>
                     </li>
                     <li class="{{ set_active(['expense_types', 'expenses']) }}">
                         <a href="#">Egresos <span class="fa arrow"></span></a>
@@ -111,34 +58,6 @@
                                 <a href="{{url('expenses')}}">Egresos</a>
                             </li>
                         </ul>
-                    </li>
-                    <li class="{{ set_active(['transfers']) }}">
-                        <a href="{{url('transfers')}}">Transferencias</a>
-                    </li>
-                    <li class="{{ set_active(['fees']) }}">
-                        <a href="{{url('fees')}}">Cuotas</a>
-                    </li>
-                </ul>
-            </li>
-            <li class="{{ set_active(['supplier_categories', 'suppliers', 'services', 'contacts', 'employees']) }}">
-                <a href="#"><i class="fa fa-address-book-o"></i><span class="nav-label">Directorios</span> <span class="fa arrow"></span></a>
-                <ul class="nav nav-second-level collapse">
-                    <li class="{{ set_active(['supplier_categories', 'suppliers']) }}">
-                        <a href="#">Proveedores <span class="fa arrow"></span></a>
-                        <ul class="nav nav-third-level">
-                            <li class="{{ set_active(['supplier_categories']) }}">
-                                <a href="{{url('supplier_categories')}}">Categorías</a>
-                            </li>
-                            <li class="{{ set_active(['suppliers']) }}">
-                                <a href="{{url('suppliers')}}">Proveedores</a>
-                            </li>
-                        </ul>
-                    </li>
-                    <li class="{{ set_active(['employees']) }}">
-                        <a href="{{url('employees')}}">Empleados</a>
-                    </li>
-                    <li class="{{ set_active(['contacts']) }}">
-                        <a href="{{url('contacts')}}">Contactos</a>
                     </li>
                 </ul>
             </li>
@@ -156,20 +75,6 @@
                     </li>
                 </ul>
             </li>
-            <li class="{{ set_active(['emails']) }}">
-                <a href="#"><i class="fa fa-envelope-o"></i><span class="nav-label">Correos</span> <span class="fa arrow"></span></a>
-                <ul class="nav nav-second-level collapse">
-                    <li class="{{ set_active(['emails']) }}">
-                        <a href="{{url('emails')}}">Correo Libre</a>
-                    </li>
-                    <li class="{{ set_active(['emails']) }}">
-                        <a href="{{url('emails')}}">Avisos de Cobro</a>
-                    </li>
-                </ul>
-            </li>
-            <li class="{{ set_active(['events']) }}">
-                <a href="{{url('events')}}"><i class="fa fa-calendar-o"></i> <span class="nav-label">Calendario</span></a>
-            </li>
             <li class="{{ set_active(['users', 'settings']) }}">
                 <a href="#"><i class="fa fa-cogs"></i><span class="nav-label">Configuración</span> <span class="fa arrow"></span></a>
                 <ul class="nav nav-second-level collapse">
@@ -186,9 +91,6 @@
         
         <!-- Menu OWN Propietario -->
         @if(session('role')=='OWN')
-            <li class="{{ set_active(['home']) }}">
-                <a href="{{url('home')}}"><i class="fa fa-laptop"></i> <span class="nav-label">Dashboard</span></a>
-            </li>
             @if(Auth::user()->properties()->count()>1)
                 <li class="{{ set_active(['properties']) }}">
                     <a href="{{url('properties')}}"><i class="fa fa-home"></i> <span class="nav-label">Propiedades</span></a>

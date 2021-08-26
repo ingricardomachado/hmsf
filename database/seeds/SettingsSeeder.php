@@ -12,14 +12,15 @@ class SettingsSeeder extends Seeder
     public function run()
     {
         DB::table('settings')->insert(array(        
-            'company'      => 'Guayoyo Software, C.A',
+            'company'      => 'HM Soluciones Financieras',
             'NIT'      => 'J-9999999',
             'address'      => 'Sector Tipuro. Monagas, VEN',
             'phone'      => ' +58 5439974',
-            'email'      => 'cliente@guayoyosoftware.com',
-            'app_name'  	=> 'SmartCond v2.0',
+            'email'      => 'hmsoluciones@prueba.com',
+            'app_name'  	=> 'HM Soluciones v1.0',
         	'coin' => '$',
         	'money_format' => 'PC2',
+            'tax' => 10,
         	'created_at' => '2019-01-01',
         	'updated_at' => '2019-01-01',            
  		));    

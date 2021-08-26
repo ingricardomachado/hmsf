@@ -15,18 +15,14 @@ class CreateUsersTable extends Migration
     {
         Schema::create('users', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->bigInteger('condominium_id')->unsigned()->nullable();
-            $table->foreign('condominium_id')->references('id')->on('condominiums')->onDelete('cascade');
-            $table->string('name');
+            $table->string('first_name', 50);
+            $table->string('last_name',50);
+            $table->string('full_name', 100);
             $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
             $table->rememberToken();
-            $table->char('role',3); //SAM - ADM - US1 - US2
-            $table->string('cell',15)->nullable();
-            $table->string('phone',15)->nullable();
-            $table->boolean('committee')->default(false);
-            $table->boolean('email_notification')->default(false);
+            $table->char('role',3); //ADM - SOC - SUP - MEN
             $table->string('avatar',100)->nullable();
             $table->string('avatar_name',100)->nullable();
             $table->string('avatar_type',10)->nullable();

@@ -20,7 +20,6 @@
     <link href="{{ URL::asset('css/plugins/toastr/toastr.min.css') }}" rel="stylesheet">
     <!-- Custom Style -->
     <link href="{{ asset("css/style.css") }}" rel="stylesheet">
-    <script src="{{ asset("js/plugins/toastr/toastr.min.js") }}"></script>
     
     @stack('stylesheets')
 
