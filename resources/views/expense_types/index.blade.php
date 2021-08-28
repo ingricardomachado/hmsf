@@ -17,7 +17,7 @@
         
         <!-- ibox-title -->
         <div class="ibox-title">
-          <h5><i class="fa fa-folder-o" aria-hidden="true"></i> Tipos de Egresos</h5>
+          <h5><i class="fa fa-folder-o" aria-hidden="true"></i> Tipos de Gastos</h5>
             <div class="ibox-tools">
               <a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
               <a class="dropdown-toggle" data-toggle="dropdown" href="#"><i class="fa fa-wrench"></i></a>
@@ -36,7 +36,7 @@
             <div class="col-sm-3 col-xs-12">
             </div>
             <div class="col-sm-9 col-xs-12 text-right">
-                <a href="#" class="btn btn-sm btn-primary" onclick="showModalExpenseType(0);"><i class="fa fa-plus-circle"></i> Nuevo Tipo de Egreso</a>
+                <a href="#" class="btn btn-sm btn-primary" onclick="showModalExpenseType(0);"><i class="fa fa-plus-circle"></i> Nuevo Tipo de Gasto</a>
                 <a href="{{ url('expense_types.rpt_expense_types') }}" class="btn btn-sm btn-default" target="_blank" title="Imprimir PDF"><i class="fa fa-print"></i></a>
                 <br><br>
             </div>
@@ -87,12 +87,12 @@
   <div class="modal-dialog">
     <div class="modal-content animated fadeIn">
       <div class="modal-header">
-        <h5 class="modal-title"><i class="fa fa-trash" aria-hidden="true"></i> <strong>Eliminar Tipo de Egreso</strong></h5>
+        <h5 class="modal-title"><i class="fa fa-trash" aria-hidden="true"></i> <strong>Eliminar Tipo de Gasto</strong></h5>
         <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
       </div>      
       <div class="modal-body">
           <input type="hidden" id="hdd_expense_type_id" value=""/>
-          <p>Esta seguro que desea eliminar el tipo de egreso <b><span id="expense_type_name"></span></b> ?</p>
+          <p>Esta seguro que desea eliminar el tipo de gasto <b><span id="expense_type_name"></span></b> ?</p>
       </div>
       <div class="modal-footer">
         <button type="button" id="btn_close" class="btn btn-default" data-dismiss="modal">Cerrar</button>        

@@ -4,14 +4,14 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class ExpenseType extends Model
+class Customer extends Model
 {
-    protected $table = 'expense_types';
+    protected $table = 'customers';
     
     //*** Relations ***
-    public function expenses(){
+    public function partner(){
    
-        return $this->hasMany('App\Models\Expense');
+        return $this->belongsTo('App\Models\Partner');
     }
 
     //*** Accesors ***   
@@ -26,5 +26,4 @@ class ExpenseType extends Model
 
         return "<span class='label label-".$label."' style='font-weight:normal'>$this->status_description</span>";       
     }
-
 }

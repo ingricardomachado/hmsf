@@ -2,7 +2,7 @@
 @push('stylesheets')
 @endpush
 @section('content')
-    <h2 class="text-center">Tipos de Egresos</h2>
+    <h2 class="text-center">Tipos de Gastos</h2>
     <table class="table" width="100%">
         <thead>
             <tr>

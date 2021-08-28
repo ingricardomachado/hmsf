@@ -6,7 +6,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>SmartCond | Recuperar contraseña</title>
+    <title>HM Soluciones Financieras | Recuperar contraseña</title>
     <link rel="shortcut icon" href="{{ asset("img/app_ico.ico") }}" />
 
     <!-- Bootstrap -->

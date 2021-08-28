@@ -19,26 +19,39 @@
 <div class="wrapper wrapper-content">
 	<div class="row">
         <div class="col-lg-3">
-            <div class="widget style1 navy-bg">
+            <div class="widget style1 style1 lazur-bg">
                 <div class="row">
                     <div class="col-xs-4">
                         <i class="fa fa-users fa-4x"></i>
                     </div>
                     <div class="col-xs-8 text-right">
-                        <span> Solventes <b>000</b></span>
-                        <h3 class="font-bold"></h3>
+                        <span> Clientes </span>
+                        <h3 class="font-bold">0000</h3>
+                    </div>
+                </div>
+            </div>
+        </div>        
+        <div class="col-lg-3">
+            <div class="widget style1 yellow-bg">
+                <div class="row">
+                    <div class="col-xs-4">
+                        <i class="fa fa-truck fa-4x"></i>
+                    </div>
+                    <div class="col-xs-8 text-right">
+                        <span> Operaciones <b>000</b></span>
+                        <h3 class="font-bold">{{ session('coin') }}{{ money_fmt(0) }}</h3>
                     </div>
                 </div>
             </div>
         </div>
         <div class="col-lg-3">
-            <div class="widget style1 yellow-bg">
+            <div class="widget style1 navy-bg">
                 <div class="row">
                     <div class="col-xs-4">
-                        <i class="fa fa-users fa-4x"></i>
+                        <i class="fa fa-money fa-4x"></i>
                     </div>
                     <div class="col-xs-8 text-right">
-                        <span> Pendientes <b>000</b></span>
+                        <span> Tot Ingresos Mes</span>
                         <h3 class="font-bold">{{ session('coin') }}{{ money_fmt(0) }}</h3>
                     </div>
                 </div>
@@ -48,23 +61,10 @@
             <div class="widget style1 red-bg">
                 <div class="row">
                     <div class="col-xs-4">
-                        <i class="fa fa-users fa-4x"></i>
-                    </div>
-                    <div class="col-xs-8 text-right">
-                        <span> Morosos <b>000</b></span>
-                        <h3 class="font-bold">{{ session('coin') }}{{ money_fmt(0) }}</h3>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="col-lg-3">
-            <div class="widget style1 style1 lazur-bg">
-                <div class="row">
-                    <div class="col-xs-4">
                         <i class="fa fa-money fa-4x"></i>
                     </div>
                     <div class="col-xs-8 text-right">
-                        <span> Total Cta x Cobrar </span>
+                        <span> Tot Egresos Mes</span>
                         <h3 class="font-bold">{{ session('coin') }}{{ money_fmt(0) }}</h3>
                     </div>
                 </div>

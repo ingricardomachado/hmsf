@@ -18,7 +18,8 @@ class CreateCentersTable extends Migration
             $table->string('name',100)->nullable();
             $table->bigInteger('state_id')->unsigned()->nullable();
             $table->foreign('state_id')->references('id')->on('states')->onDelete('cascade');
-            $table->string('adresss',100)->nullable();
+            $table->string('city',50)->nullable();
+            $table->string('address',100)->nullable();
             $table->boolean('active')->default(true);
             $table->timestamps();
         });

@@ -48,28 +48,46 @@ class UserController extends Controller
     public function datatable()
     {        
 
-        $users = $this->condominium->users()->whereIn('role', ['ADM', 'WAM']);        
+        $users = User::whereIn('role', ['ADM', 'SUP', 'MEN']);        
         
         return Datatables::of($users)
             ->addColumn('action', function ($user) {
+                    if($user->active){
                         return '<div class="input-group-btn text-center">
                             <button data-toggle="dropdown" class="btn btn-xs btn-default dropdown-toggle" type="button" title="Acciones"><i class="fa fa-chevron-circle-down" aria-hidden="true"></i></button>
                             <ul class="dropdown-menu">
                                 <li>
-                                    <a href="#" name="href_cancel" class="modal-class" onclick="showModalUser('.$user->id.')"><i class="fa fa-pencil-square-o"></i> Editar</a>
+                                    <a href="#" name="" class="modal-class" onclick="showModalUser('.$user->id.')"><i class="fa fa-pencil-square-o"></i> Editar</a>
                                 </li>
+                                <li>
+                                    <a href="#" name="href_status" class="modal-class" onclick="change_status('.$user->id.')"><i class="fa fa-ban"></i> Deshabilitar</a>
+                                </li>
+                                
                                 <li class="divider"></li>
                                 <li>
-                                    <a href="#" onclick="showModalDelete(`'.$user->id.'`, `'.$user->name.'`)"><i class="fa fa-trash-o"></i> Eliminiar</a>                                
+                                    <a href="#" onclick="showModalDelete(`'.$user->id.'`, `'.$user->full_name.'`)"><i class="fa fa-trash-o"></i> Eliminiar</a>                                
                                 </li>
                             </ul>
                         </div>';
+                    }else{
+                        return '<div class="input-group-btn text-center">
+                            <button data-toggle="dropdown" class="btn btn-xs btn-default dropdown-toggle" type="button" title="Acciones"><i class="fa fa-chevron-circle-down" aria-hidden="true"></i></button>
+                            <ul class="dropdown-menu">
+                                <li>
+                                    <a href="#" name="href_status" class="modal-class" onclick="change_status('.$user->id.')"><i class="fa fa-check"></i> Activar</a>
+                                </li>
+                            </ul>
+                        </div>';
+                    }
                 })           
             ->editColumn('name', function ($user) {                    
-                    return '<a href="#"  onclick="showModalUser('.$user->id.')" class="modal-class" style="color:inherit"  title="Click para editar"><b>'.$user->name.'</b><br><small><i>'.$user->email.'</small></i></a>';
+                    return '<a href="#"  onclick="showModalUser('.$user->id.')" class="modal-class" style="color:inherit"  title="Click para editar"><b>'.$user->full_name.'</b><br><small><i>'.$user->email.'</small></i></a>';
                 })
             ->editColumn('role', function ($user) {                    
                     return $user->role_description;
+                })
+            ->editColumn('created_at', function ($user) {                    
+                    return $user->created_at->format('d/m/Y H:i');
                 })
             ->editColumn('status', function ($user) {                    
                     return $user->status_label;
@@ -105,11 +123,10 @@ class UserController extends Controller
     {
         try {
             $user = new User();
-            $user->condominium_id=$this->condominium->id;
-            $user->name=$request->name;
+            $user->first_name=$request->first_name;
+            $user->last_name=$request->last_name;
+            $user->full_name=$user->first_name.' '.$user->last_name;
             $user->email=$request->email;
-            $user->cell=$request->cell;
-            $user->phone=$request->phone;
             $user->role=$request->role;
             $user->password=bcrypt($request->password);
             $user->save();
@@ -142,10 +159,10 @@ class UserController extends Controller
     {
         try {
             $user = User::find($id);
-            $user->name=$request->name;
+            $user->first_name=$request->first_name;
+            $user->last_name=$request->last_name;
+            $user->full_name=$user->first_name.' '.$user->last_name;
             $user->email=$request->email;
-            $user->cell=$request->cell;
-            $user->phone=$request->phone;
             $user->role=$request->role;
             if($request->change_password){
                 $user->password=bcrypt($request->password);
@@ -219,12 +236,13 @@ class UserController extends Controller
     
     public function rpt_users()
     {        
-        $logo=($this->condominium->logo)?'data:image/png;base64, '.base64_encode(Storage::get($this->condominium->id.'/'.$this->condominium->logo)):'';
-        $company=$this->condominium->name;
+        $setting=Setting::first();
+        $logo=($setting->logo)?'data:image/png;base64, '.base64_encode(Storage::get('settings/'.$setting->logo)):'';
+        $users=User::whereIn('role', ['ADM', 'SUP', 'MEN'])->orderBy('last_name')->get();
         
         $data=[
-            'company' => $this->condominium->name,
-            'users' => $this->condominium->users()->whereIn('role', ['ADM', 'WAM'])->get(),
+            'company' => $setting->company,
+            'users' => $users,
             'logo' => $logo
         ];
 

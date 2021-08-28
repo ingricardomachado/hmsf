@@ -5,9 +5,10 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 
 use App\Http\Requests;
-use App\Http\Requests\ExpenseTypeRequest;
-use App\Models\ExpenseType;
-use App\Models\Property;
+use App\Http\Requests\CenterRequest;
+use App\User;
+use App\Models\Center;
+use App\Models\State;
 use App\Models\Setting;
 use Illuminate\Support\Facades\Crypt;
 use Yajra\Datatables\Datatables;
@@ -16,9 +17,8 @@ use Illuminate\Support\Facades\Input;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Response;
 use App\Http\Controllers\ImgController;
-use Illuminate\Support\Facades\Validator;
 //Export
-use App\Exports\PropertiesExport;
+use Carbon\Carbon;
 use Image;
 use File;
 use DB;
@@ -26,7 +26,7 @@ use PDF;
 use Auth;
 use Storage;
 
-class ExpenseTypeController extends Controller
+class CenterController extends Controller
 {
        
     public function __construct()
@@ -35,35 +35,44 @@ class ExpenseTypeController extends Controller
     }    
     
     /**
-     * Display a listing of the expense_type.
+     * Display a listing of the center.
      *
      * @return \Illuminate\Http\Response
      */
     public function index()
     {                
-        return view('expense_types.index');
+        return view('centers.index');
     }
 
-    public function datatable()
+    /**
+     * Display a listing of the center.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function demos()
+    {                
+        return view('centers.index');
+    }
+
+    public function datatable(Request $request)
     {        
-        /*Se construye asi para que funcione el search de Yajra*/
-        $expense_types = ExpenseType::orderBy('name');
+        $centers = Center::orderBy('name');        
         
-        return Datatables::of($expense_types)
-            ->addColumn('action', function ($expense_type) {
-                    if($expense_type->active){
+        return Datatables::of($centers)
+            ->addColumn('action', function ($center){
+                    if($center->active){
                         return '<div class="input-group-btn text-center">
                             <button data-toggle="dropdown" class="btn btn-xs btn-default dropdown-toggle" type="button" title="Acciones"><i class="fa fa-chevron-circle-down" aria-hidden="true"></i></button>
                             <ul class="dropdown-menu">
                                 <li>
-                                    <a href="#" name="href_cancel" class="modal-class" onclick="showModalExpenseType('.$expense_type->id.')"><i class="fa fa-pencil-square-o"></i> Editar</a>
+                                    <a href="#" name="href_cancel" class="modal-class" onclick="showModalCenter('.$center->id.')"><i class="fa fa-pencil-square-o"></i> Editar</a>
                                 </li>
                                 <li>
-                                    <a href="#" name="href_status" class="modal-class" onclick="change_status('.$expense_type->id.')"><i class="fa fa-ban"></i> Deshabilitar</a>
+                                    <a href="#" name="href_status" class="modal-class" onclick="change_status('.$center->id.')"><i class="fa fa-ban"></i> Deshabilitar</a>
                                 </li>
                                 <li class="divider"></li>
                                 <li>
-                                    <a href="#" onclick="showModalDelete(`'.$expense_type->id.'`, `'.$expense_type->name.'`)"><i class="fa fa-trash-o"></i> Eliminiar</a>                                
+                                    <a href="#" onclick="showModalDelete(`'.$center->id.'`, `'.$center->name.'`)"><i class="fa fa-trash-o"></i> Eliminiar</a>                                
                                 </li>
                             </ul>
                         </div>';
@@ -72,56 +81,63 @@ class ExpenseTypeController extends Controller
                             <button data-toggle="dropdown" class="btn btn-xs btn-default dropdown-toggle" type="button" title="Acciones"><i class="fa fa-chevron-circle-down" aria-hidden="true"></i></button>
                             <ul class="dropdown-menu">
                                 <li>
-                                    <a href="#" name="href_status" class="modal-class" onclick="change_status('.$expense_type->id.')"><i class="fa fa-check"></i> Activar</a>
+                                    <a href="#" name="href_status" class="modal-class" onclick="change_status('.$center->id.')"><i class="fa fa-check"></i> Activar</a>
                                 </li>
                             </ul>
                         </div>';
-                    }
+
+                    }    
                 })           
-            ->editColumn('name', function ($expense_type) {                    
-                    return '<a href="#"  onclick="showModalExpenseType('.$expense_type->id.')" class="modal-class" style="color:inherit"  title="Click para editar">'.$expense_type->name.'</a>';
+            ->editColumn('name', function ($center) {                    
+                    return '<a href="#"  onclick="showModalCenter('.$center->id.')" class="modal-class" style="color:inherit"  title="Click para editar"><b>'.$center->name.'</b><br><small><i>'.$center->state->name.'</small></i></a>';
                 })
-            ->editColumn('status', function ($expense_type) {                    
-                    return $expense_type->status_label;
+            ->editColumn('status', function ($center) {                    
+                    return $center->status_label;
                 })
             ->rawColumns(['action', 'name', 'status'])
             ->make(true);
     }
     
     /**
-     * Display the specified expense_type.
+     * Display the specified center.
      *
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
     public function load($id)
     {
+        $states=State::orderBy('name')->pluck('name','id');
+
         if($id==0){
-            $expense_type = new ExpenseType();
+            $center = new Center();
         }else{
-            $expense_type = ExpenseType::find($id);
+            $center = Center::find($id);
         }
         
-        return view('expense_types.save')->with('expense_type', $expense_type);
+        return view('centers.save')->with('center', $center)
+                                ->with('states', $states);
     }
 
     /**
-     * Store a newly created expense_type in storage.
+     * Store a newly created center in storage.
      *
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(ExpenseTypeRequest $request)
+    public function store(CenterRequest $request)
     {
         try {
-            $expense_type = new ExpenseType();
-            $expense_type->name=$request->name;
-            $expense_type->save();
+            $center = new Center();
+            $center->name=$request->name;
+            $center->state_id=$request->state;
+            $center->city=$request->city;
+            $center->address=$request->address;
+            $center->save();
             
             return response()->json([
                     'success' => true,
-                    'message' => 'Tipo de gasto registrado exitosamente',
-                    'expense_type' => $expense_type->toArray()
+                    'message' => 'Oficina registrada exitosamente',
+                    'center' => $center->toArray()
                 ], 200);
             
         } catch (Exception $e) {
@@ -133,23 +149,26 @@ class ExpenseTypeController extends Controller
     }
     
    /**
-     * Update the specified expense_type in storage.
+     * Update the specified center in storage.
      *
      * @param  \Illuminate\Http\Request  $request
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(ExpenseTypeRequest $request, $id)
-    {        
+    public function update(CenterRequest $request, $id)
+    {
         try {
-            $expense_type = ExpenseType::find($id);
-            $expense_type->name=$request->name;
-            $expense_type->save();
+            $center = Center::find($id);
+            $center->name=$request->name;
+            $center->state_id=$request->state;
+            $center->city=$request->city;
+            $center->address=$request->address;
+            $center->save();
 
             return response()->json([
                     'success' => true,
-                    'message' => 'Tipo de gasto actualizado exitosamente',
-                    'expense_type' => $expense_type
+                    'message' => 'Oficina actualizada exitosamente',
+                    'center' => $center
                 ], 200);
             
         } catch (Exception $e) {
@@ -162,7 +181,7 @@ class ExpenseTypeController extends Controller
     }
 
     /**
-     * Remove the specified expense_type from storage.
+     * Remove the specified center from storage.
      *
      * @param  int  $id
      * @return \Illuminate\Http\Response
@@ -170,12 +189,13 @@ class ExpenseTypeController extends Controller
     public function destroy($id)
     {
         try {
-            $expense_type = ExpenseType::find($id);
-            $expense_type->delete();
+            $center = Center::find($id);
+            Storage::deleteDirectory($center->id);
+            $center->delete();
             
             return response()->json([
                 'success' => true,
-                'message' => 'Tipo de gasto eliminado exitosamente'
+                'message' => 'Oficina eliminada exitosamente'
             ], 200);
 
         } catch (Exception $e) {
@@ -190,9 +210,9 @@ class ExpenseTypeController extends Controller
     public function status($id)
     {
         try {
-            $expense_type = ExpenseType::find($id);
-            ($expense_type->active)?$expense_type->active=false:$expense_type->active=true;
-            $expense_type->save();
+            $center = Center::find($id);
+            ($center->active)?$center->active=false:$center->active=true;
+            $center->save();
 
             return response()->json([
                     'success' => true,
@@ -208,22 +228,21 @@ class ExpenseTypeController extends Controller
         }
     }
     
-    public function rpt_expense_types()
+    public function rpt_centers()
     {        
         $setting=Setting::first();
         $logo=($setting->logo)?'data:image/png;base64, '.base64_encode(Storage::get('settings/'.$setting->logo)):'';
 
-        $expense_types=ExpenseType::orderBy('name')->get();
-        
+        $centers=Center::orderBy('name')->get();
+                
         $data=[
             'company' => $setting->company,
-            'expense_types' => $expense_types,
+            'centers' => $centers,
             'logo' => $logo
         ];
 
-        $pdf = PDF::loadView('reports/rpt_expense_types', $data);
+        $pdf = PDF::loadView('reports/rpt_centers', $data);
         
-        return $pdf->stream('Tipos de Gastos.pdf');
-
+        return $pdf->stream('Oficinas.pdf');
     }
 }

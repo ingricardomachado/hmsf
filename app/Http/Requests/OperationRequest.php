@@ -5,7 +5,7 @@ namespace App\Http\Requests;
 use Illuminate\Foundation\Http\FormRequest;
 use App\Models\Property;
 
-class ExpenseTypeRequest extends FormRequest
+class ExpenseRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -25,14 +25,6 @@ class ExpenseTypeRequest extends FormRequest
     public function rules()
     {
         $rules = [];
-
-        $expense_type_id=$this->request->get('expense_type_id');
-
-        if($expense_type_id>0){
-            $rules['name'] = 'required|unique:expense_types,name,'.$expense_type_id;
-        }else{
-            $rules['name'] = 'required|unique:expense_types,name,NULL,id';
-        }
         
         return $rules;
     }
@@ -40,7 +32,7 @@ class ExpenseTypeRequest extends FormRequest
     public function messages()
     {
         return [
-          'name.unique' => 'El tipo de egreso ya existe.',
+            //
         ];
     }
 }

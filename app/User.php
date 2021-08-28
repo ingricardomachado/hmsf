@@ -67,29 +67,13 @@ class User extends Authenticatable
     }
 
     public function getStatusLabelAttribute(){
-                
-        $status_lbl = '';
-        
+                        
         if($this->active){
-            $status_lbl = "<span class='label label-primary' style='font-weight:normal'>Activo</span>";
+            return "<span class='label label-primary' style='font-weight:normal'>Activo</span>";
         }else{
-            $status_lbl = "<span class='label label-danger' style='font-weight:normal'>Inactivo</span>";
+            return "<span class='label label-danger' style='font-weight:normal'>Inactivo</span>";
         }
-
-        return $status_lbl;
     }
 
-    public function getPropertiesLabelAttribute(){
-        
-        $lbl_start="<span class='form-group label label-default' style='padding-top:1mm;padding-bottom:1mm;font-weight:normal'>";
-        $lbl_end="</span>";
-        $properties_lbl = '';
-        $properties = $this->properties()->orderBy('number')->get();
-
-        foreach ($properties as $property) {
-            ($properties_lbl=='')?$properties_lbl=$lbl_start.$property->number.$lbl_end:$properties_lbl=$properties_lbl.' '.$lbl_start.$property->number.$lbl_end;
-        }
-        return $properties_lbl;
-    }    
-
+    //*** Mutators****
 }

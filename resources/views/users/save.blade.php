@@ -3,12 +3,6 @@
 <!-- Select2 -->
 <link href="{{ URL::asset('js/plugins/select2/dist/css/select2.min.css') }}" rel="stylesheet">
 <link href="{{ URL::asset('css/style.css') }}" rel="stylesheet">
-<!-- International Phones -->
-<link href="{{ URL::asset('js/plugins/intl-tel-input-master/build/css/intlTelInput.css') }}" rel="stylesheet">
-<!-- Esta instruccion es para que input del cell sea 100% width-->
-<style type="text/css">
-    .iti { width: 100%; }
-</style>
     
     <form action="{{url('users/'.$user->id)}}" id="form_user" method="POST">
         <input type="hidden" name="_token" value="{{{ csrf_token() }}}" />
@@ -26,25 +20,21 @@
             <div class="row">            
                 <div class="form-group col-sm-6">
                     <label>Nombre *</label>
-                    {!! Form::text('name', $user->name, ['id'=>'name', 'class'=>'form-control', 'type'=>'text', 'placeholder'=>'', 'maxlength'=>'100', 'required']) !!}
+                    {!! Form::text('first_name', $user->first_name, ['id'=>'first_name', 'class'=>'form-control', 'type'=>'text', 'placeholder'=>'', 'maxlength'=>'50', 'required']) !!}
                 </div>
-                <div class="form-group col-sm-6">  
-                  <label>Rol *</label>
-                  {{ Form::select('role', ['ADM'=>'Administrador', 'WAM'=>'Vigilante'], $user->role, ['id'=>'role', 'class'=>'select2 form-control form-control-sm', 'tabindex'=>'-1', 'placeholder'=>'', 'required'])}}
+                <div class="form-group col-sm-6">
+                    <label>Apellido *</label>
+                    {!! Form::text('last_name', $user->last_name, ['id'=>'last_name', 'class'=>'form-control', 'type'=>'text', 'placeholder'=>'', 'maxlength'=>'50', 'required']) !!}
                 </div>
                 <div class="form-group col-sm-6">
                     <label>Correo *</label><small> Será su nombre de usuario</small>
                     {!! Form::email('email', $user->email, ['id'=>'email', 'class'=>'form-control', 'placeholder'=>'', 'maxlength'=>'50', 'required']) !!}
                 </div>
-                <div class="form-group col-sm-6">
-                    <label>Celular</label>
-                    {!! Form::tel('national_cell', $user->cell, ['id'=>'national_cell', 'class'=>'form-control', 'placeholder'=>'']) !!}
-                    <span id="error-msg" style="color:#cc5965;font-weight:bold"></span>
+                <div class="form-group col-sm-6">  
+                  <label>Rol *</label>
+                  {{ Form::select('role', ['ADM'=>'Administrador', 'MEN'=>'Mensajero', 'SUP'=>'Supervisor'], $user->role, ['id'=>'role', 'class'=>'select2 form-control form-control-sm', 'tabindex'=>'-1', 'placeholder'=>'', 'required'])}}
                 </div>
-                <div class="form-group col-sm-6">
-                    <label>Teléfono</label>
-                    {!! Form::text('phone', $user->phone, ['id'=>'phone', 'class'=>'form-control', 'type'=>'text', 'placeholder'=>'', 'maxlength'=>'30']) !!}
-                </div>
+                
                 <div class="form-group col-sm-12" style="display:{{ ($user->id)?'solid':'none' }}">
                     <div class="i-checks">
                         <label>{!! Form::checkbox('change_password', null,  false, ['id'=>'change_password']) !!} Cambiar la contraseña</label>
@@ -76,9 +66,6 @@
 <!-- Select2 -->
 <script src="{{ URL::asset('js/plugins/select2/dist/js/select2.full.min.js') }}"></script>
 <script src="{{ URL::asset('js/plugins/select2/dist/js/i18n/es.js') }}"></script>
-<!-- International Phones --> 
-<script src="{{ URL::asset('js/plugins/intl-tel-input-master/build/js/intlTelInput.js') }}"></script>
-<script src="{{ URL::asset('js/plugins/intl-tel-input-master/build/js/utils.js') }}"></script>
 <script>
 
 $('#change_password').on('ifChanged', function(event){
@@ -94,28 +81,6 @@ $('#change_password').on('ifChanged', function(event){
     $('#div_notification').hide();    
   }  
 });
-
-var input = document.querySelector("#national_cell"),
-output = document.querySelector("#error-msg");
-
-var iti = window.intlTelInput(input, {
-  initialCountry:'{{ session('condominium')->country->iso }}',
-  onlyCountries: ['ar', 'bo', 'br', 'cl', 'co', 'cr', 'cu', 'sv', 'ec', 'es', 'gt', 'hn', 'mx', 'ni', 'pa', 'py', 'pe', 'pr', 'do', 'uy', 've'],
-  nationalMode: true,
-  utilsScript: "../../build/js/utils.js?1590403638580" // just for formatting/placeholders etc
-});
-
-var handleChange = function() {
-    var text="";
-    (iti.isValidNumber()) ? $('#cell').val(iti.getNumber()) : text="Introduzca un número válido";
-    var textNode = document.createTextNode(text);
-    output.innerHTML = "";
-    output.appendChild(textNode);
-};
-
-// listen to "keyup", but also "change" to update when the user selects a country
-input.addEventListener('change', handleChange);
-input.addEventListener('keyup', handleChange);
 
 $(document).ready(function() {
     

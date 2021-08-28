@@ -2,18 +2,19 @@
 @push('stylesheets')
 @endpush
 @section('content')
-    <h2 class="text-center">Egresos extraordinarios</h2>
+    <h2 class="text-center">Gastos</h2>
     <div style="margin-bottom:2mm">
         <b>Desde:</b> {{ $start }} <b>Hasta:</b> {{ $end }}<br>
         <b>Proveedor:</b> {{ $supplier_name }}<br>
-        <b>Tipo de Egreso:</b> {{ $expense_type_name }}
+        <b>Tipo de Gasto:</b> {{ $expense_type_name }}<br>
+        <b>Oficina:</b> {{ $center_name }}
     </div>
     <table class="table" width="100%">
         <thead>
             <tr>
                 <th class="text-left">Fecha</th>
                 <th class="text-left">Egreso</th>
-                <th class="text-left">Cuenta</th>
+                <th class="text-left">Oficina</th>
                 <th class="text-right">Monto</th>
             </tr>
         </thead>
@@ -22,17 +23,11 @@
             <tr>
                 <td class="text-left">{{ $expense->date->format('d/m/Y') }}</td>
                 <td class="text-left">
-                    @if($expense->supplier_id)
-                        {{ $expense->supplier->name }}<br>
-                        {{ $expense->concept }}<br>
-                        <small>{{ $expense->expense_type->name }}</small>                    
-                    @else
                         {{ $expense->concept }}<br>
                         <small>{{ $expense->expense_type->name }}</small>
-                    @endif
                 </td>
-                <td class="text-left">{{ $expense->account->aliase }}<br>
-                    <small>{{ $expense->payment_method_description }}</small>
+                <td class="text-left">
+                    {{ ($expense->center_id)?$expense->center->name:'' }}
                 </td>
                 <td class="text-right">{{ session('coin') }} {{ money_fmt($expense->amount) }}</td>
             </tr>

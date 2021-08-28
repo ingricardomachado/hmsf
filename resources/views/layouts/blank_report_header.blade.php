@@ -56,18 +56,21 @@
             .text-right {
                 text-align: right;
             }
-            .well {
-                min-height: 20px;
-                padding: 9px;
-                margin-bottom: 20px;
-                background-color: #f5f5f5;
-                border: 1px solid #e3e3e3;
-                border-radius: 4px;
-                -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, .05);
-                box-shadow: inset 0 1px 1px rgba(0, 0, 0, .05);
+            .img-rounded {
+              border-radius: 6px;
             }
-            .symbols{
-                font-family:"DeJaVu Sans Mono",monospace;
+            .img-thumbnail {
+              display: inline-block;
+              max-width: 100%;
+              height: auto;
+              padding: 4px;
+              line-height: 1.42857143;
+              background-color: #fff;
+              border: 0.5px solid #ddd;
+              border-radius: 4px;
+              -webkit-transition: all .2s ease-in-out;
+                   -o-transition: all .2s ease-in-out;
+                      transition: all .2s ease-in-out;
             }
         </style>
     </head><body>                        
@@ -77,10 +80,10 @@
                 <tbody>
                     <tr>
                         <td width="25%">
-                            <img alt="image" style="max-height:100px; max-width:100px;" src="{{ $logo }}"/>
+                            <img alt="image" style="max-height:130px; max-width:130px;" src="{{ $logo }}" class="img-thumbnail" />
                         </td>
                         <td width="50%" style="text-align:center">
-                            <h2>{{ $company }}</h2>
+                                <h2>{{ $company }}</h2>
                         </td>
                         <td width="25%" style="text-align:left;color:grey"></td>
                     </tr>

@@ -6,7 +6,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>SmartCond | Tu condominio inteligente</title>
+    <title>HM Soluciones Financieras | Tu condominio inteligente</title>
     <link rel="shortcut icon" href="{{ asset("img/app_ico.ico") }}" />
 
     <!-- Bootstrap -->
@@ -55,7 +55,7 @@
                         <a class="reset_pass" href="{{  url('/password/reset') }}">Olvidaste la contraseña?</a>
                     </form>
                     <p class="text-center m-t">
-                        <small><i class="fa fa-building-o" aria-hidden="true"></i> Smart<b>Cond</b>&nbsp;&nbsp;Copyright &copy; 2020</small>
+                        <small><i class="fa fa-truck" aria-hidden="true"></i> <b>HM</b>Soluciones Financieras&nbsp;&nbsp;Copyright &copy; 2020</small>
                     </p>
                 </div>
             </div>

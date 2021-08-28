@@ -1,9 +1,6 @@
 @extends('layouts.app')
 
 @push('stylesheets')
-<!-- Select2 -->
-<link href="{{ URL::asset('js/plugins/select2/dist/css/select2.min.css') }}" rel="stylesheet">
-<link href="{{ URL::asset('css/style.css') }}" rel="stylesheet">
 <!-- CSS Datatables -->
 <link href="{{ URL::asset('css/plugins/dataTables/datatables.min.css') }}" rel="stylesheet">
 @endpush
@@ -20,7 +17,7 @@
         
         <!-- ibox-title -->
         <div class="ibox-title">
-          <h5><i class="fa fa-users" aria-hidden="true"></i> Usuarios</h5>
+          <h5><i class="fa fa-building-o" aria-hidden="true"></i> Oficinas</h5>
             <div class="ibox-tools">
               <a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
               <a class="dropdown-toggle" data-toggle="dropdown" href="#"><i class="fa fa-wrench"></i></a>
@@ -36,33 +33,32 @@
         <!-- ibox-content- -->
         <div class="ibox-content">
           <div class="row">
-            <div class="col-sm-4 col-xs-12">
-            </div>                            
-            <div class="col-sm-8 col-xs-12 text-right">
-                <a href="#" class="btn btn-sm btn-primary" onclick="showModalUser(0);"><i class="fa fa-plus-circle"></i> Nuevo Usuario</a>
-              <a href="{{ url('users.rpt_users') }}" class="btn btn-sm btn-default" target="_blank" title="Imprimir PDF"><i class="fa fa-print"></i></a><br><br>
+            <div class="col-sm-3 col-xs-12">
+            </div>
+            <div class="col-sm-9 col-xs-12 text-right">
+                <a href="#" class="btn btn-sm btn-primary" onclick="showModalCenter(0);"><i class="fa fa-plus-circle"></i> Nueva Oficina</a>
+                <a href="{{ url('centers.rpt_centers') }}" class="btn btn-sm btn-default" target="_blank" title="Imprimir PDF"><i class="fa fa-print"></i></a>
+                <br><br>
             </div>
             <div class="col-sm-12">
               @include('partials.errors')
             </div>
                                                 
             <div class="table-responsive col-sm-12">
-              <table class="table table-striped table-hover" id="users-table">
+              <table class="table table-striped table-hover" id="centers-table">
                 <thead>
                   <tr>
                     <th text-align="center" width="5%"></th>
-                    <th width="10%">Nombre</th>
-                    <th width="25%">Rol</th>
-                    <th width="25%">Creado</th>
+                    <th width="10%">Oficina</th>
+                    <th width="10%">Direccion</th>
                     <th width="10%">Estado</th>
                   </tr>
                 </thead>
                 <tfoot>
                   <tr>
                     <th></th>
-                    <th>Nombre</th>
-                    <th>Rol</th>
-                    <th>Creado</th>
+                    <th>Oficina</th>
+                    <th>Dirección</th>
                     <th>Estado</th>
                   </tr>
                 </tfoot>
@@ -79,30 +75,30 @@
 </div>
   
 <!-- Modal para Datos -->
-<div class="modal inmodal" id="modalUser" tabindex="-1" role="dialog"  aria-hidden="true">
+<div class="modal inmodal" id="modalCenter" tabindex="-1" role="dialog"  aria-hidden="true">
   <div class="modal-dialog">
     <div class="modal-content animated fadeIn">
-      <div id="user"></div>
+      <div id="center"></div>
     </div>
   </div>
 </div>
 <!-- /Modal para Datos -->
 
 <!-- Modal para eliminar-->
-<div class="modal inmodal" id="modalDeleteUser" tabindex="-1" role="dialog"  aria-hidden="true">
+<div class="modal inmodal" id="modalDeleteCenter" tabindex="-1" role="dialog"  aria-hidden="true">
   <div class="modal-dialog">
     <div class="modal-content animated fadeIn">
       <div class="modal-header">
-        <h5 class="modal-title"><i class="fa fa-trash" aria-hidden="true"></i> <strong>Eliminar Usuario</strong></h5>
+        <h5 class="modal-title"><i class="fa fa-trash" aria-hidden="true"></i> <strong>Eliminar Oficina</strong></h5>
         <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
       </div>      
       <div class="modal-body">
-          <input type="hidden" id="hdd_user_id" value=""/>
-          <p>Esta seguro que desea eliminar el usuario <b><span id="user_name"></span></b> ?</p>
+          <input type="hidden" id="hdd_center_id" value=""/>
+          <p>Esta seguro que desea eliminar la oficina <b><span id="center_name"></span></b> ?</p>
       </div>
       <div class="modal-footer">
         <button type="button" id="btn_close" class="btn btn-default" data-dismiss="modal">Cerrar</button>        
-        <button type="button" id="btn_delete_user" class="btn btn-danger">Eliminar</button>
+        <button type="button" id="btn_delete_center" class="btn btn-danger">Eliminar</button>
       </div>
     </div>
   </div>
@@ -111,32 +107,29 @@
 @endsection
 
 @push('scripts')
-<!-- Select2 -->
-<script src="{{ URL::asset('js/plugins/select2/dist/js/select2.full.min.js') }}"></script>
-<script src="{{ URL::asset('js/plugins/select2/dist/js/i18n/es.js') }}"></script>
 <!-- Datatables -->
 <script src="{{ asset('js/plugins/dataTables/datatables.min.js') }}"></script>
 <script>
-
-function showModalUser(id){
-  url = '{{URL::to("users.load")}}/'+id;
-  $('#user').load(url);  
-  $("#modalUser").modal("show");
+  
+function showModalCenter(id){
+  url = '{{URL::to("centers.load")}}/'+id;
+  $('#center').load(url);  
+  $("#modalCenter").modal("show");
 }
  
 function change_status(id){
   $.ajax({
-      url: `{{URL::to("users.status")}}/${id}`,
+      url: `{{URL::to("centers.status")}}/${id}`,
       type: 'GET',
       data: {
         _token: "{{ csrf_token() }}", 
       },
   })
   .done(function(response) {
-      $('#users-table').DataTable().draw(false);
+      $('#centers-table').DataTable().draw(false);
       toastr_msg('success', '{{ config('app.name') }}', response.message, 2000);
   })
-  .fail(function() {
+  .fail(function(response) {
     if(response.status == 422){
       var errorsHtml='';
       $.each(response.responseJSON.errors, function (key, value) {
@@ -150,44 +143,44 @@ function change_status(id){
 }  
 
 function showModalDelete(id, name){
-  $('#hdd_user_id').val(id);
-  $('#user_name').html(name);
-  $("#modalDeleteUser").modal("show");    
+  $('#hdd_center_id').val(id);
+  $('#center_name').html(name);
+  $("#modalDeleteCenter").modal("show");    
 };
     
-$("#btn_delete_user").on('click', function(event) {    
-    user_delete($('#hdd_user_id').val());
+$("#btn_delete_center").on('click', function(event) {    
+    center_delete($('#hdd_center_id').val());
 });
 
-function user_delete(id){  
+function center_delete(id){  
   $.ajax({
-      url: `{{URL::to("users")}}/${id}`,
+      url: `{{URL::to("centers")}}/${id}`,
       type: 'DELETE',
       data: {
         _token: "{{ csrf_token() }}", 
       },
   })
   .done(function(response) {
-      $('#modalDeleteUser').modal('toggle');
-      $('#users-table').DataTable().draw(false);
+      $('#modalDeleteCenter').modal('toggle');
+      $('#centers-table').DataTable().draw(false);
       toastr_msg('success', '{{ config('app.name') }}', response.message, 2000);
 
   })
   .fail(function(response) {
-      $('#modalDeleteUser').modal('toggle');
+      $('#modalDeleteCenter').modal('toggle');
       toastr_msg('error', '{{ config('app.name') }}', response.responseJSON.message, 4000);
   });
 }  
 
-function user_CRUD(id){
+function center_CRUD(id){
         
-    var validator = $("#form_user").validate();
+    var validator = $("#form_center").validate();
     formulario_validado = validator.form();
     if(formulario_validado){
         $('#btn_submit').attr('disabled', true);
-        var form_data = new FormData($("#form_user")[0]);
+        var form_data = new FormData($("#form_center")[0]);
         $.ajax({
-          url:(id==0)?'{{URL::to("users")}}':'{{URL::to("users")}}/'+id,
+          url:(id==0)?'{{URL::to("centers")}}':'{{URL::to("centers")}}/'+id,
           type:'POST',
           cache:true,
           processData: false,
@@ -196,8 +189,8 @@ function user_CRUD(id){
         })
         .done(function(response) {
           $('#btn_submit').attr('disabled', false);
-          $('#modalUser').modal('toggle');
-          $('#users-table').DataTable().draw(false); 
+          $('#modalCenter').modal('toggle');
+          $('#centers-table').DataTable().draw(false); 
           toastr_msg('success', '{{ config('app.name') }}', response.message, 2000);
         })
         .fail(function(response) {
@@ -216,23 +209,30 @@ function user_CRUD(id){
 }
 
 $(document).ready(function(){
-    
+                      
     path_str_language = "{{URL::asset('js/plugins/dataTables/es_ES.txt')}}";          
-    var table=$('#users-table').DataTable({
+    var table=$('#centers-table').DataTable({
         "oLanguage":{"sUrl":path_str_language},
         "aaSorting": [[1, "asc"]],
         processing: true,
         serverSide: true,
-        ajax: '{!! route('users.datatable') !!}',
+        ajax: {
+            url: '{!! route('centers.datatable') !!}',
+            type: "POST",
+            data: function(d) {
+                d._token= "{{ csrf_token() }}";
+                d.demo = 0;
+            }
+        },        
         columns: [
             { data: 'action', name: 'action', orderable: false, searchable: false},
-            { data: 'name',   name: 'users.full_name', orderable: true, searchable: true},
-            { data: 'role',   name: 'role', orderable: false, searchable: false},
-            { data: 'created_at',   name: 'created_at', orderable: false, searchable: false},
+            { data: 'name',   name: 'name', orderable: false, searchable: true},
+            { data: 'address', name: 'address', orderable: false, searchable: false },
             { data: 'status', name: 'status', orderable: false, searchable: false }
         ]
     });
- 
+
 });
+
 </script>
 @endpush

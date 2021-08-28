@@ -1,6 +1,5 @@
     <form action="" id="form_expense_type" method="POST">
         <input type="hidden" name="_token" value="{{{ csrf_token() }}}" />
-        {!! Form::hidden('condominium_id', ($expense_type->id)?$expense_type->condominium_id:session('condominium')->id, ['id'=>'condominium_id']) !!}
         {!! Form::hidden('expense_type_id', ($expense_type->id)?$expense_type->id:0, ['id'=>'expense_type_id']) !!}
         @if($expense_type->id)                
             {{ Form::hidden ('_method', 'PUT') }}
@@ -8,7 +7,7 @@
         <div class="modal-header">
             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
             <span aria-hidden="true">&times;</span></button>
-            <h5 class="modal-title"><i class="fa fa-folder-o" aria-hidden="true"></i> {{ ($expense_type->id) ? "Modificar Tipo de Ingreso": "Registrar Tipo de Ingreso" }}</h5><small>Complete el formulario <b>(*) Campos obligatorios.</b></small>
+            <h5 class="modal-title"><i class="fa fa-folder-o" aria-hidden="true"></i> {{ ($expense_type->id) ? "Modificar Tipo de Gasto": "Registrar Tipo de Gasto" }}</h5><small>Complete el formulario <b>(*) Campos obligatorios.</b></small>
         </div>
         <div class="modal-body">
             <div class="row">            

@@ -22,6 +22,13 @@ class CreateExpensesTable extends Migration
             $table->date('date');
             $table->string('concept',100);
             $table->float('amount',11,2);
+            $table->string('reference',50);
+            $table->string('notes',200);            
+            $table->string('file',100)->nullable();
+            $table->string('file_name',100)->nullable();
+            $table->string('file_type',10)->nullable();
+            $table->integer('file_size')->unsigned()->nullable();
+
             $table->timestamps();
         });
     }

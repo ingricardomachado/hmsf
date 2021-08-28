@@ -1,9 +1,6 @@
 @extends('layouts.app')
 
 @push('stylesheets')
-<!-- Select2 -->
-<link href="{{ URL::asset('js/plugins/select2/dist/css/select2.min.css') }}" rel="stylesheet">
-<link href="{{ URL::asset('css/style.css') }}" rel="stylesheet">
 <!-- CSS Datatables -->
 <link href="{{ URL::asset('css/plugins/dataTables/datatables.min.css') }}" rel="stylesheet">
 @endpush
@@ -20,7 +17,7 @@
         
         <!-- ibox-title -->
         <div class="ibox-title">
-          <h5><i class="fa fa-users" aria-hidden="true"></i> Usuarios</h5>
+          <h5><i class="fa fa-users" aria-hidden="true"></i> Socios Comerciales</h5>
             <div class="ibox-tools">
               <a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
               <a class="dropdown-toggle" data-toggle="dropdown" href="#"><i class="fa fa-wrench"></i></a>
@@ -36,24 +33,26 @@
         <!-- ibox-content- -->
         <div class="ibox-content">
           <div class="row">
-            <div class="col-sm-4 col-xs-12">
-            </div>                            
-            <div class="col-sm-8 col-xs-12 text-right">
-                <a href="#" class="btn btn-sm btn-primary" onclick="showModalUser(0);"><i class="fa fa-plus-circle"></i> Nuevo Usuario</a>
-              <a href="{{ url('users.rpt_users') }}" class="btn btn-sm btn-default" target="_blank" title="Imprimir PDF"><i class="fa fa-print"></i></a><br><br>
+            <div class="col-sm-3 col-xs-12">
+            </div>
+            <div class="col-sm-9 col-xs-12 text-right">
+                <a href="#" class="btn btn-sm btn-primary" onclick="showModalPartner(0);"><i class="fa fa-plus-circle"></i> Nuevo Socio Comercial</a>
+              <a href="{{ url('partners.rpt_partners') }}" class="btn btn-sm btn-default" target="_blank" title="Imprimir PDF"><i class="fa fa-print"></i></a><br><br>
             </div>
             <div class="col-sm-12">
               @include('partials.errors')
             </div>
                                                 
             <div class="table-responsive col-sm-12">
-              <table class="table table-striped table-hover" id="users-table">
+              <table class="table table-striped table-hover" id="partners-table">
                 <thead>
                   <tr>
                     <th text-align="center" width="5%"></th>
-                    <th width="10%">Nombre</th>
-                    <th width="25%">Rol</th>
-                    <th width="25%">Creado</th>
+                    <th width="20%">Nombre</th>
+                    <th width="10%">Celular</th>
+                    <th width="10%">Comisión</th>
+                    <th width="10%">Clientes</th>
+                    <th width="10%">Operaciones</th>
                     <th width="10%">Estado</th>
                   </tr>
                 </thead>
@@ -61,8 +60,10 @@
                   <tr>
                     <th></th>
                     <th>Nombre</th>
-                    <th>Rol</th>
-                    <th>Creado</th>
+                    <th>Celular</th>
+                    <th>Comisión</th>
+                    <th>Clientes</th>
+                    <th>Operaciones</th>                    
                     <th>Estado</th>
                   </tr>
                 </tfoot>
@@ -79,64 +80,61 @@
 </div>
   
 <!-- Modal para Datos -->
-<div class="modal inmodal" id="modalUser" tabindex="-1" role="dialog"  aria-hidden="true">
+<div class="modal inmodal" id="modalPartner" tabindex="-1" role="dialog"  aria-hidden="true">
   <div class="modal-dialog">
     <div class="modal-content animated fadeIn">
-      <div id="user"></div>
+      <div id="partner"></div>
     </div>
   </div>
 </div>
 <!-- /Modal para Datos -->
 
-<!-- Modal para eliminar-->
-<div class="modal inmodal" id="modalDeleteUser" tabindex="-1" role="dialog"  aria-hidden="true">
+<!-- Modal para eliminar usuario -->
+<div class="modal inmodal" id="modalDeletePartner" tabindex="-1" role="dialog"  aria-hidden="true">
   <div class="modal-dialog">
     <div class="modal-content animated fadeIn">
       <div class="modal-header">
-        <h5 class="modal-title"><i class="fa fa-trash" aria-hidden="true"></i> <strong>Eliminar Usuario</strong></h5>
+        <h5 class="modal-title"><i class="fa fa-trash" aria-hidden="true"></i> <strong>Eliminar Socio Comercial</strong></h5>
         <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
       </div>      
       <div class="modal-body">
-          <input type="hidden" id="hdd_user_id" value=""/>
-          <p>Esta seguro que desea eliminar el usuario <b><span id="user_name"></span></b> ?</p>
+          <input type="hidden" id="hdd_partner_id" value=""/>
+          <p>Esta seguro que desea eliminar el socio comercial <b><span id="partner_name"></span></b> ?</p>
       </div>
       <div class="modal-footer">
         <button type="button" id="btn_close" class="btn btn-default" data-dismiss="modal">Cerrar</button>        
-        <button type="button" id="btn_delete_user" class="btn btn-danger">Eliminar</button>
+        <button type="button" id="btn_delete_partner" class="btn btn-danger">Eliminar</button>
       </div>
     </div>
   </div>
 </div>
-<!-- /Modal para eliminar-->
+<!-- /Modal para eliminar usuario-->
 @endsection
 
 @push('scripts')
-<!-- Select2 -->
-<script src="{{ URL::asset('js/plugins/select2/dist/js/select2.full.min.js') }}"></script>
-<script src="{{ URL::asset('js/plugins/select2/dist/js/i18n/es.js') }}"></script>
 <!-- Datatables -->
 <script src="{{ asset('js/plugins/dataTables/datatables.min.js') }}"></script>
 <script>
-
-function showModalUser(id){
-  url = '{{URL::to("users.load")}}/'+id;
-  $('#user').load(url);  
-  $("#modalUser").modal("show");
+  
+function showModalPartner(id){
+  url = '{{URL::to("partners.load")}}/'+id;
+  $('#partner').load(url);  
+  $("#modalPartner").modal("show");
 }
- 
+
 function change_status(id){
   $.ajax({
-      url: `{{URL::to("users.status")}}/${id}`,
+      url: `{{URL::to("partners.status")}}/${id}`,
       type: 'GET',
       data: {
         _token: "{{ csrf_token() }}", 
       },
   })
   .done(function(response) {
-      $('#users-table').DataTable().draw(false);
+      $('#partners-table').DataTable().draw(false);
       toastr_msg('success', '{{ config('app.name') }}', response.message, 2000);
   })
-  .fail(function() {
+  .fail(function(response) {
     if(response.status == 422){
       var errorsHtml='';
       $.each(response.responseJSON.errors, function (key, value) {
@@ -148,46 +146,46 @@ function change_status(id){
     }  
   });
 }  
-
+  
 function showModalDelete(id, name){
-  $('#hdd_user_id').val(id);
-  $('#user_name').html(name);
-  $("#modalDeleteUser").modal("show");    
+  $('#hdd_partner_id').val(id);
+  $('#partner_name').html(name);
+  $("#modalDeletePartner").modal("show");    
 };
     
-$("#btn_delete_user").on('click', function(event) {    
-    user_delete($('#hdd_user_id').val());
+$("#btn_delete_partner").on('click', function(event) {    
+    partner_delete($('#hdd_partner_id').val());
 });
 
-function user_delete(id){  
+function partner_delete(id){  
   $.ajax({
-      url: `{{URL::to("users")}}/${id}`,
+      url: `{{URL::to("partners")}}/${id}`,
       type: 'DELETE',
       data: {
         _token: "{{ csrf_token() }}", 
       },
   })
   .done(function(response) {
-      $('#modalDeleteUser').modal('toggle');
-      $('#users-table').DataTable().draw(false);
+      $('#modalDeletePartner').modal('toggle');
+      $('#partners-table').DataTable().draw(false);
       toastr_msg('success', '{{ config('app.name') }}', response.message, 2000);
 
   })
   .fail(function(response) {
-      $('#modalDeleteUser').modal('toggle');
+      $('#modalDeletePartner').modal('toggle');
       toastr_msg('error', '{{ config('app.name') }}', response.responseJSON.message, 4000);
   });
 }  
 
-function user_CRUD(id){
+function partner_CRUD(id){
         
-    var validator = $("#form_user").validate();
+    var validator = $("#form_partner").validate();
     formulario_validado = validator.form();
     if(formulario_validado){
         $('#btn_submit').attr('disabled', true);
-        var form_data = new FormData($("#form_user")[0]);
+        var form_data = new FormData($("#form_partner")[0]);
         $.ajax({
-          url:(id==0)?'{{URL::to("users")}}':'{{URL::to("users")}}/'+id,
+          url:(id==0)?'{{URL::to("partners")}}':'{{URL::to("partners")}}/'+id,
           type:'POST',
           cache:true,
           processData: false,
@@ -196,8 +194,8 @@ function user_CRUD(id){
         })
         .done(function(response) {
           $('#btn_submit').attr('disabled', false);
-          $('#modalUser').modal('toggle');
-          $('#users-table').DataTable().draw(false); 
+          $('#modalPartner').modal('toggle');
+          $('#partners-table').DataTable().draw(false); 
           toastr_msg('success', '{{ config('app.name') }}', response.message, 2000);
         })
         .fail(function(response) {
@@ -216,23 +214,26 @@ function user_CRUD(id){
 }
 
 $(document).ready(function(){
-    
+                      
     path_str_language = "{{URL::asset('js/plugins/dataTables/es_ES.txt')}}";          
-    var table=$('#users-table').DataTable({
+    var table=$('#partners-table').DataTable({
         "oLanguage":{"sUrl":path_str_language},
         "aaSorting": [[1, "asc"]],
         processing: true,
         serverSide: true,
-        ajax: '{!! route('users.datatable') !!}',
+        ajax: '{!! route('partners.datatable') !!}',
         columns: [
             { data: 'action', name: 'action', orderable: false, searchable: false},
             { data: 'name',   name: 'users.full_name', orderable: true, searchable: true},
-            { data: 'role',   name: 'role', orderable: false, searchable: false},
-            { data: 'created_at',   name: 'created_at', orderable: false, searchable: false},
+            { data: 'cell',   name: 'cell', orderable: true, searchable: false},
+            { data: 'tax',   name: 'tax', orderable: true, searchable: false},
+            { data: 'customers',   name: 'customers', orderable: false, searchable: false},
+            { data: 'operations',   name: 'operations', orderable: false, searchable: false},
             { data: 'status', name: 'status', orderable: false, searchable: false }
         ]
     });
- 
+
 });
+
 </script>
 @endpush

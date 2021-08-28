@@ -18,31 +18,21 @@ use App\Models\PropertyType;
 
 Auth::routes();
 Route::get('/', 'HomeController@index')->name('home');
+Route::get('home', ['as' => 'home', 'uses' => 'HomeController@index']);
 
-//Assets
-Route::resource("assets","AssetController");
-Route::get('assets.datatable', 'AssetController@datatable')->name('assets.datatable');
-Route::get('assets.load/{id}', 'AssetController@load')->name('properties.load');
-Route::get('assets.status/{id}', 'AssetController@status')->name('assets.status');
-Route::get('assets.rpt_assets', 'AssetController@rpt_assets')->name('assets.rpt_assets');
+//Centers
+Route::resource("centers","CenterController");
+Route::post('centers.datatable', 'CenterController@datatable')->name('centers.datatable');
+Route::get('centers.load/{id}', 'CenterController@load')->name('centers.load');
+Route::get('centers.status/{id}', 'CenterController@status')->name('centers.status');
+Route::get('centers.rpt_centers', 'CenterController@rpt_centers')->name('centers.rpt_centers');
 
-//Condominiums
-Route::resource("condominiums","CondominiumController");
-Route::get('demos', 'CondominiumController@demos')->name('demos');
-Route::post('condominiums.datatable', 'CondominiumController@datatable')->name('condominiums.datatable');
-Route::get('condominiums.load/{id}', 'CondominiumController@load')->name('condominiums.load');
-Route::get('condominiums.status/{id}', 'CondominiumController@status')->name('condominiums.status');
-Route::get('condominiums.permanent/{id}', 'CondominiumController@permanent')->name('condominiums.permanent');
-Route::get('condominiums.rpt_condominiums', 'CondominiumController@rpt_condominiums')->name('condominiums.rpt_condominiums');
-Route::get('condominiums.rpt_demos', 'CondominiumController@rpt_demos')->name('condominiums.rpt_demos');
-Route::post('condominiums/{id}/events', 'CondominiumController@events');
-
-//Employees
-Route::resource("employees","EmployeeController");
-Route::post('employees.datatable', 'EmployeeController@datatable')->name('employees.datatable');
-Route::get('employees.load/{id}', 'EmployeeController@load')->name('employees.load');
-Route::get('employees.status/{id}', 'EmployeeController@status')->name('employees.status');
-Route::get('employees.rpt_employees', 'EmployeeController@rpt_employees')->name('employees.rpt_employees');
+//Customers
+Route::resource("customers","CustomerController");
+Route::post('customers.datatable', 'CustomerController@datatable')->name('customers.datatable');
+Route::get('customers.load/{id}', 'CustomerController@load')->name('customers.load');
+Route::get('customers.status/{id}', 'CustomerController@status')->name('customers.status');
+Route::get('customers.rpt_customers', 'CustomerController@rpt_customer')->name('customers.rpt_customers');
 
 //Expenses
 Route::resource("expenses","ExpenseController");
@@ -57,12 +47,6 @@ Route::get('expense_types.datatable', 'ExpenseTypeController@datatable')->name('
 Route::get('expense_types.load/{id}', 'ExpenseTypeController@load')->name('expense_types.load');
 Route::get('expense_types.status/{id}', 'ExpenseTypeController@status')->name('expense_types.status');
 Route::get('expense_types.rpt_expense_types', 'ExpenseTypeController@rpt_expense_types')->name('expense_types.rpt_expense_types');
-
-
-//Home
-//Route::get('/', 'HomeController@index');
-//*** Home ***
-Route::get('home', ['as' => 'home', 'uses' => 'HomeController@index']);
 
 //Img
 Route::get('company_logo/{id}', 'ImgController@showCompanyLogo');
@@ -79,15 +63,27 @@ Route::get('facility_photo/{id}', 'ImgController@showFacilityPhoto');
 Route::get('newsletter_image/{id}', 'ImgController@showNewsletterImage')->name('newsletter_image');
 Route::get('visit_image/{id}', 'ImgController@showVisitImage')->name('visit_image');
 
+//Operations
+Route::resource("operations","OperationController");
+Route::post('operations.datatable', 'OperationController@datatable')->name('operations.datatable');
+Route::get('operations.load/{id}', 'OperationController@load')->name('operations.load');
+Route::get('operations.status/{id}', 'OperationController@status')->name('operations.status');
+Route::get('operations.rpt_operations', 'OperationController@rpt_operations')->name('operations.rpt_operations');
+
+//Partner
+Route::resource("partners","PartnerController");
+Route::get('partners.datatable', 'PartnerController@datatable')->name('partners.datatable');
+Route::get('partners.load/{id}', 'PartnerController@load')->name('partners.load');
+Route::get('partners.status/{id}', 'PartnerController@status')->name('partners.status');
+Route::get('partners.rpt_partners', 'PartnerController@rpt_partners')->name('partners.rpt_partners');
+
 //Profile
 Route::get('profile', ['as' => 'profile', 'uses' => 'ProfileController@edit']);
 Route::post('profile.update', ['as' => 'profile.update', 'uses' => 'ProfileController@update']);
 
 //Setting
-Route::get('global', ['as' => 'global', 'uses' => 'SettingController@global']);
-Route::post('settings.update_global', ['as' => 'settings.update_global', 'uses' => 'SettingController@update_global']);
-Route::get('settings', ['as' => 'settings', 'uses' => 'SettingController@condominium']);
-Route::post('settings.update_condominium', ['as' => 'settings.update_condominium', 'uses' => 'SettingController@update_condominium']);
+Route::get('settings', ['as' => 'settings', 'uses' => 'SettingController@index']);
+Route::post('settings.update', ['as' => 'settings.update', 'uses' => 'SettingController@update']);
 
 //Users
 Route::resource("users","UserController");

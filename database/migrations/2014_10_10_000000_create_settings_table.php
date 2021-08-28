@@ -19,7 +19,6 @@ class CreateSettingsTable extends Migration
             $table->string('address', 200);
             $table->string('phone', 25);
             $table->string('email', 50);
-            $table->string('app_name');
             $table->string('coin',10);
             $table->char('money_format',3);
             $table->float('tax', 8,2);
