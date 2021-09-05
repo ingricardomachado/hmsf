@@ -24,7 +24,7 @@
         
         <!-- ibox-title -->
         <div class="ibox-title">
-          <h5><i class="fa fa-folder-o" aria-hidden="true"></i> Gastos</h5>
+          <h5><i class="fa fa-folder-o" aria-hidden="true"></i> Operaciones</h5>
             <div class="ibox-tools">
               <a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
               <a class="dropdown-toggle" data-toggle="dropdown" href="#"><i class="fa fa-wrench"></i></a>
@@ -41,32 +41,37 @@
         <div class="ibox-content">
           <div class="row">
             {{ Form::open(array('url' => '', 'id' => 'form_rpt', 'method' => 'post'), ['' ])}}
-            <div class="form-group col-sm-2">
-                <label>Desde *</label>
-                <div class="input-group date">
-                  <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
-                  {{ Form::text ('start_filter', $start, ['id'=>'start_filter', 'class'=>'form-control', 'placeholder'=>'', 'style'=>'font-size:13px', 'required']) }}
-                </div>
+            <div class="form-group col-sm-12">
+              <div class="col-sm-2">
+                  <label>Desde *</label>
+                  <div class="input-group date">
+                    <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                    {{ Form::text ('start_filter', $start, ['id'=>'start_filter', 'class'=>'form-control', 'placeholder'=>'', 'style'=>'font-size:12px', 'required']) }}
+                  </div>
+              </div>
+              <div class="col-sm-2">
+                  <label>Hasta *</label>
+                  <div class="input-group date">
+                    <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                    {{ Form::text ('end_filter', $end, ['id'=>'end_filter', 'class'=>'form-control', 'placeholder'=>'', 'style'=>'font-size:12px', 'required']) }}
+                  </div>
+              </div>
+              <div class="col-sm-68col-xs-12 text-right">
+                  <a href="#" class="btn btn-sm btn-primary" onclick="showModalOperation(0);"><i class="fa fa-plus-circle"></i> Nueva Operación</a>
+                  <button type="button" name="btn_print" id="btn_print" class="btn btn-sm btn-default" title="Imprimir"><i class="fa fa-print" aria-hidden="true"></i></button>
+                  <br>
+              </div>
             </div>
-            <div class="form-group col-sm-2">
-                <label>Hasta *</label>
-                <div class="input-group date">
-                  <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
-                  {{ Form::text ('end_filter', $end, ['id'=>'end_filter', 'class'=>'form-control', 'placeholder'=>'', 'style'=>'font-size:13px', 'required']) }}
-                </div>
-            </div>
-            <div class="col-sm-3 col-xs-12">
-                <label>Tipo de gasto</label>
-                {{ Form::select('expense_type_filter', $expense_types, null, ['id'=>'expense_type_filter', 'class'=>'select2 form-control-sm', 'tabindex'=>'-1', 'placeholder'=>''])}}
-            </div>
-            <div class="col-sm-3 col-xs-12">
-                <label>Oficina</label>
-                {{ Form::select('center_filter', $centers, null, ['id'=>'center_filter', 'class'=>'select2 form-control-sm', 'tabindex'=>'-1', 'placeholder'=>''])}}
-            </div>
-            <div class="col-sm-2 col-xs-12 text-right">
-                <a href="#" class="btn btn-sm btn-primary" onclick="showModalExpense(0);"><i class="fa fa-plus-circle"></i> Nuevo Gasto</a>
-                <button type="button" name="btn_print" id="btn_print" class="btn btn-sm btn-default" title="Imprimir"><i class="fa fa-print" aria-hidden="true"></i></button>
-                <br>
+            <div class="form-group col-sm-12">
+              <div class="col-sm-4 col-xs-12">
+                  {{ Form::select('partner_filter', $partners, null, ['id'=>'partner_filter', 'class'=>'select2 form-control-sm', 'tabindex'=>'-1', 'placeholder'=>''])}}
+              </div>
+              <div class="col-sm-4 col-xs-12">
+                  {{ Form::select('customer_filter', $customers, null, ['id'=>'customer_filter', 'class'=>'select2 form-control-sm', 'tabindex'=>'-1', 'placeholder'=>''])}}
+              </div>
+              <div class="col-sm-4 col-xs-12">
+                  {{ Form::select('user_filter', $users, null, ['id'=>'user_filter', 'class'=>'select2 form-control-sm', 'tabindex'=>'-1', 'placeholder'=>''])}}
+              </div>
             </div>
             {{ Form::close() }}
             <div class="col-sm-12">
@@ -74,26 +79,23 @@
             </div>
                                                 
             <div class="table-responsive col-sm-12">
-              <table class="table table-striped table-hover" id="expenses-table">
+              <table class="table table-striped table-hover" id="operations-table">
                 <thead>
                   <tr>
                     <th text-align="center" width="5%"></th>
+                    <th width="5%">Nro</th>
                     <th width="10%">Fecha</th>
-                    <th width="35%">Gasto</th>
-                    <th width="15%">Oficina</th>
-                    <th width="10%">Monto</th>
-                    <th width="10%">Soporte</th>
+                    <th width="15%">Socio</th>
+                    <th width="15%">Cliente</th>
+                    <th width="5%">Folio</th>
+                    <th width="10%" class="text-right">Facturado</th>
+                    <th width="10%" class="text-right">Margen<br>Total</th>
+                    <th width="10%" class="text-right">Margen<br>SC</th>
+                    <th width="10%" class="text-right">Margen<br>HM</th>
+                    <th width="5%">Estado</th>
                   </tr>
                 </thead>
                 <tfoot>
-                  <tr>
-                    <th></th>
-                    <th>Fecha</th>
-                    <th>Gasto</th>
-                    <th>Oficina</th>
-                    <th>Monto</th>
-                    <th>Soporte</th>
-                  </tr>
                 </tfoot>
               </table>
               <br><br>
@@ -108,35 +110,56 @@
 </div>
   
 <!-- Modal para Datos -->
-<div class="modal inmodal" id="modalExpense" tabindex="-1" role="dialog"  aria-hidden="true">
+<div class="modal inmodal" id="modalOperation" tabindex="-1" role="dialog"  aria-hidden="true">
   <div class="modal-dialog">
     <div class="modal-content animated fadeIn">
-      <div id="expense"></div>
+      <div id="operation"></div>
     </div>
   </div>
 </div>
 <!-- /Modal para Datos -->
 
 <!-- Modal para eliminar-->
-<div class="modal inmodal" id="modalDeleteExpense" tabindex="-1" role="dialog"  aria-hidden="true">
+<div class="modal inmodal" id="modalDeleteOperation" tabindex="-1" role="dialog"  aria-hidden="true">
   <div class="modal-dialog">
     <div class="modal-content animated fadeIn">
       <div class="modal-header">
-        <h5 class="modal-title"><i class="fa fa-trash" aria-hidden="true"></i> <strong>Eliminar Gasto</strong></h5>
+        <h5 class="modal-title"><i class="fa fa-trash" aria-hidden="true"></i> <strong>Eliminar Operación</strong></h5>
         <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
       </div>      
       <div class="modal-body">
-          <input type="hidden" id="hdd_expense_id" value=""/>
-          <p>Esta seguro que desea eliminar el gasto <b><span id="expense_name"></span></b> ?</p>
+          <input type="hidden" id="hdd_operation_id" value=""/>
+          <p>Esta seguro que desea eliminar la operación <b><span id="operation_name"></span></b> ?</p>
       </div>
       <div class="modal-footer">
         <button type="button" id="btn_close" class="btn btn-default" data-dismiss="modal">Cerrar</button>        
-        <button type="button" id="btn_delete_expense" class="btn btn-danger">Eliminar</button>
+        <button type="button" id="btn_delete_operation" class="btn btn-danger">Eliminar</button>
       </div>
     </div>
   </div>
 </div>
 <!-- /Modal para eliminar-->
+
+<!-- Modal para pasar a pendiente -->
+<div class="modal inmodal" id="modalStatus" tabindex="-1" role="dialog"  aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content animated fadeIn">
+      <div id="status"></div>
+    </div>
+  </div>
+</div>
+<!-- /Modal para pasar a pendiente -->
+
+<!-- Modal para CRUD comentarios -->
+<div class="modal inmodal" id="modalComments" tabindex="-1" role="dialog"  aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content animated fadeIn">
+      <div id="modal_comments"></div>
+    </div>
+  </div>
+</div>
+<!-- /Modal para CRUD commentarios -->
+
 @endsection
 
 @push('scripts')
@@ -152,51 +175,63 @@
 <script src="{{ asset('js/plugins/dataTables/datatables.min.js') }}"></script>
 <script>
   
-function showModalExpense(id){
-  url = '{{URL::to("expenses.load")}}/'+id;
-  $('#expense').load(url);  
-  $("#modalExpense").modal("show");
+function showModalComments(id){
+  url = '{{URL::to("operations.load_comments")}}/'+id;
+  $('#modal_comments').load(url);  
+  $("#modalComments").modal("show");
+}
+
+function showModalStatus(id){
+  url = '{{URL::to("operations.load_status")}}/'+id;
+  $('#status').load(url);  
+  $("#modalStatus").modal("show");
+}
+
+function showModalOperation(id){
+  url = '{{URL::to("operations.load")}}/'+id;
+  $('#operation').load(url);  
+  $("#modalOperation").modal("show");
 }
  
 function showModalDelete(id, name){
-  $('#hdd_expense_id').val(id);
-  $('#expense_name').html(name);
-  $("#modalDeleteExpense").modal("show");    
+  $('#hdd_operation_id').val(id);
+  $('#operation_name').html(name);
+  $("#modalDeleteOperation").modal("show");    
 };
     
-$("#btn_delete_expense").on('click', function(event) {    
-    expense_delete($('#hdd_expense_id').val());
+$("#btn_delete_operation").on('click', function(event) {    
+    operation_delete($('#hdd_operation_id').val());
 });
 
-function expense_delete(id){  
+function operation_delete(id){  
   $.ajax({
-      url: `{{URL::to("expenses")}}/${id}`,
+      url: `{{URL::to("operations")}}/${id}`,
       type: 'DELETE',
       data: {
         _token: "{{ csrf_token() }}", 
       },
   })
   .done(function(response) {
-      $('#modalDeleteExpense').modal('toggle');
-      $('#expenses-table').DataTable().draw(false);
+      $('#modalDeleteOperation').modal('toggle');
+      $('#operations-table').DataTable().draw(false);
       toastr_msg('success', '{{ config('app.name') }}', response.message, 2000);
 
   })
   .fail(function(response) {
-      $('#modalDeleteExpense').modal('toggle');
+      $('#modalDeleteOperation').modal('toggle');
       toastr_msg('error', '{{ config('app.name') }}', response.responseJSON.message, 4000);
   });
 }  
 
-function expense_CRUD(id){
+function operation_CRUD(id){
         
-    var validator = $("#form_expense").validate();
+    var validator = $("#form_operation").validate();
     formulario_validado = validator.form();
     if(formulario_validado){
         $('#btn_submit').attr('disabled', true);
-        var form_data = new FormData($("#form_expense")[0]);
+        var form_data = new FormData($("#form_operation")[0]);
         $.ajax({
-          url:(id==0)?'{{URL::to("expenses")}}':'{{URL::to("expenses")}}/'+id,
+          url:(id==0)?'{{URL::to("operations")}}':'{{URL::to("operations")}}/'+id,
           type:'POST',
           cache:true,
           processData: false,
@@ -205,8 +240,8 @@ function expense_CRUD(id){
         })
         .done(function(response) {
           $('#btn_submit').attr('disabled', false);
-          $('#modalExpense').modal('toggle');
-          $('#expenses-table').DataTable().draw(false); 
+          $('#modalOperation').modal('toggle');
+          $('#operations-table').DataTable().draw(false); 
           toastr_msg('success', '{{ config('app.name') }}', response.message, 2000);
         })
         .fail(function(response) {
@@ -224,19 +259,19 @@ function expense_CRUD(id){
     }
 }
 
-$("#expense_type_filter").change( event => {
-  $('#expenses-table').DataTable().draw(false);
+$("#partner_filter").change( event => {
+  $('#operations-table').DataTable().draw(false);
 });
 
-$("#center_filter").change( event => {
-  $('#expenses-table').DataTable().draw(false);
+$("#customer_filter").change( event => {
+  $('#operations-table').DataTable().draw(false);
 });
 
 $('#btn_print').click(function(event) {
   var validator = $("#form_rpt" ).validate();
   formulario_validado = validator.form();
   if(formulario_validado){
-    url = '{{URL::to("expenses.rpt_expenses")}}';
+    url = '{{URL::to("operations.rpt_operations")}}';
     $('#form_rpt').attr('action', url);
     $('#form_rpt').attr('target', '_blank');
     $('#form_rpt').submit();
@@ -246,29 +281,34 @@ $('#btn_print').click(function(event) {
 $(document).ready(function(){
                       
     path_str_language = "{{URL::asset('js/plugins/dataTables/es_ES.txt')}}";          
-    var table=$('#expenses-table').DataTable({
+    var table=$('#operations-table').DataTable({
         "oLanguage":{"sUrl":path_str_language},
         "aaSorting": [[1, "asc"]],
         processing: true,
         serverSide: true,
         ajax: {
-            url: '{!! route('expenses.datatable') !!}',
+            url: '{!! route('operations.datatable') !!}',
             type: "POST",
             data: function(d) {
                 d._token= "{{ csrf_token() }}";
                 d.start_filter = $('#start_filter').val();
                 d.end_filter = $('#end_filter').val();
-                d.expense_type_filter = $('#expense_type_filter').val();
-                d.center_filter = $('#center_filter').val();
+                d.partner_filter = $('#partner_filter').val();
+                d.customer_filter = $('#customer_filter').val();
             }
         },        
         columns: [
             { data: 'action', name: 'action', orderable: false, searchable: false},
+            { data: 'number',   name: 'number', orderable: true, searchable: false},
             { data: 'date',   name: 'date', orderable: true, searchable: false},
-            { data: 'expense',   name: 'expense', orderable: false, searchable: true},
-            { data: 'center',   name: 'center', orderable: false, searchable: false},
-            { data: 'amount', name: 'amount', orderable: false, searchable: false },
-            { data: 'file', name: 'file', orderable: false, searchable: false }
+            { data: 'partner',   name: 'partner', orderable: true, searchable: false},
+            { data: 'customer',   name: 'customer', orderable: true, searchable: false},
+            { data: 'folio',   name: 'folio', orderable: false, searchable: true},
+            { data: 'amount',   name: 'amount', orderable: false, searchable: true},
+            { data: 'customer_profit',   name: 'customer_profit', orderable: false, searchable: false},
+            { data: 'partner_profit',   name: 'partner_tax', orderable: false, searchable: false},
+            { data: 'hm_profit',   name: 'hm_tax', orderable: false, searchable: false},
+            { data: 'status',   name: 'status', orderable: false, searchable: false}
         ],
         "fnDrawCallback": function () {
             $('.popup-link').magnificPopup({
@@ -281,40 +321,29 @@ $(document).ready(function(){
         }
     });
 
-    $("#expense_type_filter").select2({
+    $("#partner_filter").select2({
       language: "es",
-      placeholder: "Tipos de egresos - Todos",
+      placeholder: "Socio - Todos",
       minimumResultsForSearch: 10,
       allowClear: true,
       width: '100%'
     });
 
-    $("#center_filter").select2({
+    $("#customer_filter").select2({
       language: "es",
-      placeholder: "Proveedores - Todos",
+      placeholder: "Cliente - Todos",
       minimumResultsForSearch: 10,
       allowClear: true,
       width: '100%'
     });
 
-    $('#start_filter').datepicker({
-        format: 'dd/mm/yyyy',
-        todayHighlight: true,
-        autoclose: true,
-        language: 'es',
-    }).on("changeDate", function (e) {
-        $('#expenses-table').DataTable().draw();
+    $("#user_filter").select2({
+      language: "es",
+      placeholder: "Mensajero - Todos",
+      minimumResultsForSearch: 10,
+      allowClear: true,
+      width: '100%'
     });
-
-    $('#end_filter').datepicker({
-        format: 'dd/mm/yyyy',
-        todayHighlight: true,
-        autoclose: true,
-        language: 'es',
-    }).on("changeDate", function (e) {
-        $('#expenses-table').DataTable().draw();
-    });
-
 });
 </script>
 @endpush

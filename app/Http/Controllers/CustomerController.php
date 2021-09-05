@@ -89,7 +89,7 @@ class CustomerController extends Controller
                     }
                 })           
             ->editColumn('name', function ($customer) {                    
-                    return '<a href="#"  onclick="showModalCustomer('.$customer->id.')" class="modal-class" style="color:inherit"  title="Click para editar"><b>'.$customer->full_name.'</b><br><small><i>'.$customer->email.'</i></small></a>';
+                    return '<a href="#"  onclick="showModalCustomer('.$customer->id.')" class="modal-class" style="color:inherit"  title="Click para editar"><b>'.$customer->full_name.'</b><br><span class="text-muted">'.$customer->code.'</span><br><small><i>'.$customer->email.'</i></small></a>';
                 })
             ->addColumn('partner', function ($customer) {                    
                     return $customer->partner->user->full_name;
@@ -165,6 +165,31 @@ class CustomerController extends Controller
         }
     }
     
+    /**
+     * Display the specified resource.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function show($id)
+    {            
+        try {            
+            $customer = Customer::findOrFail($id);
+            
+            return response()->json([
+                    'success' => true,
+                    'customer' => $customer
+                ], 200);
+
+        } catch (Exception $e) {
+            
+            return response()->json([
+                    'success' => false,
+                    'message' => $e->getMessage()
+                ], 500);            
+        }
+    }
+   
    /**
      * Update the specified customer in storage.
      *
@@ -251,12 +276,14 @@ class CustomerController extends Controller
     
     public function rpt_customers()
     {        
-        $logo=($this->condominium->logo)?'data:image/png;base64, '.base64_encode(Storage::get($this->condominium->id.'/'.$this->condominium->logo)):'';
-        $company=$this->condominium->name;
-        
+        $setting=Setting::first();
+        $logo=($setting->logo)?'data:image/png;base64, '.base64_encode(Storage::get('settings/'.$setting->logo)):'';
+
+        $customers=Customer::orderBy('full_name')->get();
+
         $data=[
-            'company' => $this->condominium->name,
-            'customers' => $this->condominium->customers()->get(),
+            'company' => $setting->company,
+            'customers' => $customers,
             'logo' => $logo
         ];
 

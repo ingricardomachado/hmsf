@@ -4,51 +4,73 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Expense extends Model
+class Operation extends Model
 {
-    protected $table = 'expenses';
+    protected $table = 'operations';
     protected $dates = ['date'];
     
     //*** Relations ***
-    public function center(){
+    public function customer(){
    
-        return $this->belongsTo('App\Models\Center');
+        return $this->belongsTo('App\Models\Customer');
     }
 
-    public function expense_type(){
+    public function comments(){
    
-        return $this->belongsTo('App\Models\ExpenseType');
+        return $this->hasMany('App\Models\Comment');
     }
 
-    //*** Accesors ***   
-    public function getPaymentMethodDescriptionAttribute(){
+    public function partner(){
+   
+        return $this->belongsTo('App\Models\Partner');
+    }
+
+    public function user(){
+   
+        return $this->belongsTo('App\User');
+    }
+
+    //*** Accesors *** 
+    public function getStatusDescriptionAttribute(){
         
-        if($this->payment_method=='EF'){
-            return "Efectivo";
-        }elseif($this->payment_method=='TA'){
-            return "Transferencia";
-        }elseif($this->payment_method=='CH'){
-            return "Cheque";
-        }elseif($this->payment_method=='OT'){
-            return "Otro";
-        }else{
-            $this->payment_method;
+        switch ($this->status) {
+            case '1':
+                return "Proceso";
+                break;
+            case '2':
+                return "Pendiente";
+                break;
+            case '3':
+                return "Entregado";
+                break;
+            
+            default:
+                return $this->status;
+                break;
         }
     }
 
-    public function getDownloadFileAttribute(){
-        if($this->file){                    
-            $ext=$this->file_type;
-            if($ext=='jpg'||$ext=='jpeg'||$ext=='png'||$ext=='bmp'){
-                $url_show_file = url('expense_image', $this->id);
-                return '<div class="text-center"><a class="popup-link" href="'.$url_show_file.'" title="'.$this->file_name.'"><i class="fa fa-picture-o"></i></a></div>';
-            }else{
-                $url_download_file = route('expenses.download', $this->id);
-                return '<div class="text-center"><a href="'.$url_download_file.'" title="'.$this->file_name.'"><i class="fa fa-cloud-download"></i></a></div>';
-            }
-        }else{
-            return "";
+    public function getStatusLabelAttribute(){
+                
+        switch ($this->status) {
+            case '1':
+                return "<span class='label label-default' style='font-weight:normal'>$this->status_description</span>";
+                break;
+            case '2':
+                return "<span class='label label-warning' style='font-weight:normal'>$this->status_description</span>";
+                break;
+            case '3':
+                return "<span class='label label-primary' style='font-weight:normal'>$this->status_description</span>";
+                break;
+            
+            default:
+                return $this->status;
+                break;
         }
+
+        $label=($this->active)?'primary':'danger';
+
+        return "<span class='label label-".$label."' style='font-weight:normal'>$this->status_description</span>";       
     }
 
 }

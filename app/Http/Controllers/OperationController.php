@@ -5,12 +5,15 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 
 use App\Http\Requests;
-use App\Http\Requests\ExpenseRequest;
+use App\Http\Requests\OperationRequest;
 use App\Models\Account;
-use App\Models\Expense;
-use App\Models\ExpenseType;
+use App\Models\Operation;
+use App\Models\OperationType;
 use App\Models\Center;
 use App\Models\Setting;
+use App\Models\Customer;
+use App\Models\Partner;
+use App\User;
 use Illuminate\Support\Facades\Crypt;
 use Yajra\Datatables\Datatables;
 use Maatwebsite\Excel\Facades\Excel;
@@ -29,9 +32,9 @@ use PDF;
 use Auth;
 use Carbon\Carbon;
 use Mail;
-use App\Mail\ExpenseNotification;
+use App\Mail\OperationNotification;
 
-class ExpenseController extends Controller
+class OperationController extends Controller
 {
        
     public function __construct()
@@ -40,7 +43,7 @@ class ExpenseController extends Controller
     }    
     
     /**
-     * Display a listing of the expense.
+     * Display a listing of the operation.
      *
      * @return \Illuminate\Http\Response
      */
@@ -49,108 +52,135 @@ class ExpenseController extends Controller
         $start = new Carbon('first day of this month');
         $end = new Carbon('last day of this month');                
         
-        $expense_types=ExpenseType::orderBy('name')->pluck('name','id');
-        $centers=Center::orderBy('name')->pluck('name','id');
+        $customers=Customer::orderBy('full_name')->pluck('full_name','id');
+        $partners=Partner::join('users', 'partners.user_id', '=', 'users.id')
+                        ->where('active',true)
+                        ->orderBy('full_name')->pluck('full_name','partners.id');
+        $users=User::where('role', 'MEN')->orderBy('full_name')->pluck('full_name','id');
         
-        return view('expenses.index')
+        return view('operations.index')
                         ->with('start', $start->format('d/m/Y'))
                         ->with('end', $end->format('d/m/Y'))
-                        ->with('expense_types', $expense_types)
-                        ->with('centers', $centers);
+                        ->with('customers', $customers)
+                        ->with('partners', $partners)
+                        ->with('users', $users);
     }
 
     public function datatable(Request $request)
     {        
-        $expenses=$this->get_expenses_collection($request);
+        $operations=$this->get_operations_collection($request);
         
-        return Datatables::of($expenses)
-            ->addColumn('action', function ($expense) {
+        return Datatables::of($operations)
+            ->addColumn('action', function ($operation) {
                     return '<div class="input-group-btn text-center">
                         <button data-toggle="dropdown" class="btn btn-xs btn-default dropdown-toggle" type="button" title="Acciones"><i class="fa fa-chevron-circle-down" aria-hidden="true"></i></button>
                         <ul class="dropdown-menu">
                             <li>
-                                <a href="#" name="href_cancel" class="modal-class" onclick="showModalExpense('.$expense->id.')"><i class="fa fa-pencil-square-o"></i> Editar</a>
+                                <a href="#" name="href_cancel" class="modal-class" onclick="showModalOperation('.$operation->id.')"><i class="fa fa-pencil-square-o"></i> Editar</a>
                             </li>
+                            <li>
+                                <a href="#" name="href_cancel" class="modal-class" onclick="showModalComments('.$operation->id.')"><i class="fa fa-comments-o"></i> Comentarios</a>
+                            </li>
+
                             <li class="divider"></li>
                             <li>
-                                <a href="#" onclick="showModalDelete(`'.$expense->id.'`, `'.$expense->concept.'`)"><i class="fa fa-trash-o"></i> Eliminiar</a>                                
+                                <a href="#" onclick="showModalDelete(`'.$operation->id.'`, `'.$operation->concept.'`)"><i class="fa fa-trash-o"></i> Eliminiar</a>                                
                             </li>
                         </ul>
                     </div>';
                 })           
-            ->editColumn('expense', function ($expense) {                    
-                        return '<a href="#"  onclick="showModalExpense('.$expense->id.')" class="modal-class" style="color:inherit"  title="Click para editar">'.$expense->concept.'<br><small><i>'.$expense->expense_type->name.'</i></small></a>';
+            ->editColumn('partner', function ($operation) {                    
+                    return $operation->partner->user->full_name;
                 })
-            ->editColumn('center', function ($expense) {                    
-                    return ($expense->center_id)?$expense->center->name:null;
+            ->editColumn('customer', function ($operation) {                    
+                    return $operation->customer->full_name;
                 })
-            ->editColumn('date', function ($expense) {                    
-                    return $expense->date->format('d/m/Y');
+            ->editColumn('date', function ($operation) {                    
+                    return $operation->date->format('d/m/Y');
                 })
-            ->editColumn('amount', function ($expense) {                    
-                    return money_fmt($expense->amount);
+            ->editColumn('amount', function ($operation) {                    
+                    return '<div class="text-right">'.session('coin').money_fmt($operation->amount).'</div>';
                 })
-            ->addColumn('file', function ($expense) {
-                    return $expense->download_file;
+            ->editColumn('customer_profit', function ($operation) {                    
+                    return '<div class="text-right">'.session('coin').money_fmt($operation->customer_profit).'<br>('.$operation->customer_tax.'%)</div>';
                 })
-            ->rawColumns(['action', 'expense', 'account', 'file'])
+            ->editColumn('partner_profit', function ($operation) {                    
+                    return '<div class="text-right">'.session('coin').money_fmt($operation->partner_profit).'<br>('.$operation->partner_tax.'%)</div>';
+                })
+            ->editColumn('hm_profit', function ($operation) {                    
+                    return '<div class="text-right">'.session('coin').money_fmt($operation->hm_profit).'<br>('.$operation->hm_tax.'%)</div>';
+                })
+            ->editColumn('status', function ($operation) {                    
+                    if($operation->status==1){
+                        return '<a href="#" onclick="showModalStatus('.$operation->id.')" title="Pasar a Pendiente">'.$operation->status_label.'</a>';
+                    }elseif($operation->status==2){
+                        return '<a href="#" onclick="showModalStatus('.$operation->id.')" title="Pasar a Entregado">'.$operation->status_label.'</a>';
+                    }else{
+                        return $operation->status_label;
+                    }
+                })
+            ->rawColumns(['action', 'amount', 'customer_profit', 'partner_profit', 'hm_profit', 'status'])
             ->make(true);
     }
     
     /**
-     * Display the specified expense.
+     * Display the specified operation.
      *
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
     public function load($id)
     {
-        $expense_types=ExpenseType::orderBy('name')->pluck('name','id');
-        $centers=Center::orderBy('name')->pluck('name','id');
+        $setting=Setting::first();
+        $customers=Customer::orderBy('full_name')->pluck('full_name','id');
+        $partners=Partner::join('users', 'partners.user_id', '=', 'users.id')
+                        ->where('active',true)
+                        ->orderBy('full_name')->pluck('full_name','partners.id');
         $today=Carbon::now();
 
         if($id==0){
-            $expense = new Expense();
+            $operation = new Operation();
         }else{
-            $expense = Expense::find($id);
+            $operation = Operation::find($id);
         }
         
-        return view('expenses.save')->with('expense', $expense)
+        return view('operations.save')->with('operation', $operation)
                                 ->with('today', $today)
-                                ->with('expense_types', $expense_types)
-                                ->with('centers', $centers);
+                                ->with('setting', $setting)
+                                ->with('customers', $customers)
+                                ->with('partners', $partners);
     }
 
     /**
-     * Store a newly created expense in storage.
+     * Store a newly created operation in storage.
      *
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(ExpenseRequest $request)
+    public function store(OperationRequest $request)
     {
         try {
-            $expense = new Expense();
-            $expense->center_id=($request->center)?$request->center:null;
-            $expense->expense_type_id=$request->expense_type;
-            $expense->date=Carbon::createFromFormat('d/m/Y', $request->date);
-            $expense->concept=$request->concept;
-            $expense->amount=$request->amount;
-            $expense->reference=$request->reference;
-            $expense->notes=$request->notes;
-            $file = $request->file;
-            if (File::exists($file)){
-                $expense->file_name = $file->getClientOriginalName();
-                $expense->file_type = $file->getClientOriginalExtension();
-                $expense->file_size = $file->getSize();
-                $expense->file=$this->upload_file($expense->condominium_id.'/expenses/', $file);
-            }
-            $expense->save();
+            $operation = new Operation();
+            $operation->number=Operation::max('number')+1;
+            $operation->customer_id=$request->customer;
+            $operation->partner_id=$request->partner;
+            $operation->date=Carbon::createFromFormat('d/m/Y', $request->date);
+            $operation->company=$request->company;
+            $operation->folio=$request->folio;
+            $operation->amount=$request->amount;
+            $operation->customer_tax=$request->customer_tax;
+            $operation->partner_tax=$request->partner_tax;
+            $operation->hm_tax=$request->hm_tax;
+            $operation->customer_profit=$operation->amount*($operation->customer_tax/100);
+            $operation->partner_profit=$operation->customer_profit*($operation->partner_tax/100);
+            $operation->hm_profit=$operation->customer_profit*($operation->hm_tax/100);
+            $operation->notes=$request->notes;
+            $operation->save();
             
             return response()->json([
                     'success' => true,
                     'message' => 'Gasto registrado exitosamente',
-                    'expense' => $expense->toArray()
+                    'operation' => $operation->toArray()
                 ], 200);
             
         } catch (Exception $e) {
@@ -162,40 +192,40 @@ class ExpenseController extends Controller
     }
     
    /**
-     * Update the specified expense in storage.
+     * Update the specified operation in storage.
      *
      * @param  \Illuminate\Http\Request  $request
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(ExpenseRequest $request, $id)
+    public function update(OperationRequest $request, $id)
     {
         try {
-            $expense = Expense::findOrFail($id);
-            $expense->center_id=($request->center)?$request->center:null;
-            $expense->expense_type_id=$request->expense_type;
-            $expense->date=Carbon::createFromFormat('d/m/Y', $request->date);
-            $expense->concept=$request->concept;
-            $expense->amount=$request->amount;
-            $expense->reference=$request->reference;
-            $expense->notes=$request->notes;
+            $operation = Operation::findOrFail($id);
+            $operation->center_id=($request->center)?$request->center:null;
+            $operation->operation_type_id=$request->operation_type;
+            $operation->date=Carbon::createFromFormat('d/m/Y', $request->date);
+            $operation->concept=$request->concept;
+            $operation->amount=$request->amount;
+            $operation->reference=$request->reference;
+            $operation->notes=$request->notes;
             $file = $request->file;
             if (File::exists($file)){
-                if($expense->file){
-                    Storage::delete('expenses/'.$expense->file);
-                    Storage::delete('expenses/thumbs/'.$expense->file);
+                if($operation->file){
+                    Storage::delete('operations/'.$operation->file);
+                    Storage::delete('operations/thumbs/'.$operation->file);
                 }
-                $expense->file_name = $file->getClientOriginalName();
-                $expense->file_type = $file->getClientOriginalExtension();
-                $expense->file_size = $file->getSize();
-                $expense->file=$this->upload_file('expenses/', $file);
+                $operation->file_name = $file->getClientOriginalName();
+                $operation->file_type = $file->getClientOriginalExtension();
+                $operation->file_size = $file->getSize();
+                $operation->file=$this->upload_file('operations/', $file);
             }
-            $expense->save();
+            $operation->save();
             
             return response()->json([
                     'success' => true,
                     'message' => 'Gasto actualizado exitosamente',
-                    'expense' => $expense->toArray()
+                    'operation' => $operation->toArray()
                 ], 200);
             
         } catch (Exception $e) {
@@ -208,7 +238,7 @@ class ExpenseController extends Controller
     }
 
     /**
-     * Remove the specified expense from storage.
+     * Remove the specified operation from storage.
      *
      * @param  int  $id
      * @return \Illuminate\Http\Response
@@ -216,12 +246,12 @@ class ExpenseController extends Controller
     public function destroy($id)
     {
         try {
-            $expense = Expense::findOrFail($id);
-            if($expense->file){
-                Storage::delete('expenses/'.$expense->file);
-                Storage::delete('expenses/thumbs/'.$expense->file);                
+            $operation = Operation::findOrFail($id);
+            if($operation->file){
+                Storage::delete('operations/'.$operation->file);
+                Storage::delete('operations/thumbs/'.$operation->file);                
             }
-            $expense->delete();
+            $operation->delete();
                         
             return response()->json([
                 'success' => true,
@@ -237,46 +267,46 @@ class ExpenseController extends Controller
         }
     }
 
-    public function get_expenses_collection(Request $request){
+    public function get_operations_collection(Request $request){
         
         $start_filter=Carbon::createFromFormat('d/m/Y', $request->start_filter);
         $end_filter=Carbon::createFromFormat('d/m/Y', $request->end_filter);;
 
-        $expense_type_filter=$request->expense_type_filter;
+        $operation_type_filter=$request->operation_type_filter;
         $center_filter=$request->center_filter;
 
-        if($expense_type_filter!=''){
+        if($operation_type_filter!=''){
             if($center_filter!=''){
-                $expenses = Expense::whereDate('date','>=', $start_filter)
+                $operations = Operation::whereDate('date','>=', $start_filter)
                                     ->whereDate('date','<=', $end_filter)
-                                    ->where('expense_type_id', $expense_type_filter)
+                                    ->where('operation_type_id', $operation_type_filter)
                                     ->where('center_id', $center_filter);
             }else{
-                $expenses = Expense::whereDate('date','>=', $start_filter)
+                $operations = Operation::whereDate('date','>=', $start_filter)
                                     ->whereDate('date','<=', $end_filter)
-                                    ->where('expense_type_id', $expense_type_filter);
+                                    ->where('operation_type_id', $operation_type_filter);
             }
         }else{
             if($center_filter!=''){
-                $expenses = Expense::whereDate('date','>=', $start_filter)
+                $operations = Operation::whereDate('date','>=', $start_filter)
                                     ->whereDate('date','<=', $end_filter)
                                     ->where('center_id', $center_filter);
             }else{
-                $expenses = Expense::whereDate('date','>=', $start_filter)
+                $operations = Operation::whereDate('date','>=', $start_filter)
                                     ->whereDate('date','<=', $end_filter);
             }
         }
 
-        return $expenses;
+        return $operations;
     }
 
 
-    public function rpt_expenses(Request $request){
+    public function rpt_operations(Request $request){
                 
         $setting=Setting::first();
         $logo=($setting->logo)?'data:image/png;base64, '.base64_encode(Storage::get('settings/'.$setting->logo)):'';
         
-        $expenses=$this->get_expenses_collection($request)->get();
+        $operations=$this->get_operations_collection($request)->get();
 
         if($request->center_filter!=''){
             $supplier=Supplier::find($request->center_filter);
@@ -285,11 +315,11 @@ class ExpenseController extends Controller
             $supplier_name='Todos';
         }
 
-        if($request->expense_type_filter!=''){
-            $expense_type=ExpenseType::find($request->expense_type_filter);
-            $expense_type_name=$expense_type->name;
+        if($request->operation_type_filter!=''){
+            $operation_type=OperationType::find($request->operation_type_filter);
+            $operation_type_name=$operation_type->name;
         }else{
-            $expense_type_name='Todos';
+            $operation_type_name='Todos';
         }
         
         if($request->center_filter!=''){
@@ -305,23 +335,69 @@ class ExpenseController extends Controller
             'start' => $request->start_filter,
             'end' => $request->end_filter,
             'supplier_name' => $supplier_name,
-            'expense_type_name' => $expense_type_name,
+            'operation_type_name' => $operation_type_name,
             'center_name' => $center_name,
-            'expenses' => $expenses            
+            'operations' => $operations            
         ];
 
-        $pdf = PDF::loadView('reports/rpt_expenses', $data);
+        $pdf = PDF::loadView('reports/rpt_operations', $data);
         
         return $pdf->stream('Gastos.pdf');        
-    }    
-    
-    /*
-     * Download file from DB  
-    */ 
-    public function download_file($id)
-    {
-        $expense = Expense::find($id);
-        
-        return Storage::download($expense->condominium_id.'/expenses/'.$expense->file, $expense->file_name);
     }
+
+    /**
+     * Display the specified operation.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function load_status($id)
+    {
+        $operation=Operation::findOrFail($id);
+        $users=User::where('role', 'MEN')->pluck('full_name','id');
+        
+        return view('operations.status')->with('operation', $operation)
+                                ->with('users', $users);
+    }
+
+    public function status(Request $request, $id)
+    {
+        try {
+            $operation = Operation::findOrFail($id);
+            if($operation->status==1){
+                $operation->user_id=$request->user;                
+                $operation->status=2;
+            }elseif($operation->status==2){
+                $operation->status=3;                
+            }
+            $operation->save();
+            
+            return response()->json([
+                    'success' => true,
+                    'message' => 'Cambio de estado exitosamente',
+                    'operation' => $operation->toArray()
+                ], 200);
+            
+        } catch (Exception $e) {
+            
+            return response()->json([
+                    'success' => false,
+                    'message' => $e->getMessage()
+                ], 500);
+        }
+    }
+
+    /**
+     * Display the specified operation.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function load_comments($id)
+    {
+        $operation=Operation::findOrFail($id);
+
+        return view('comments.save')->with('operation', $operation);
+    }
+
 }

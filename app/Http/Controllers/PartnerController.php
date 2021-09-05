@@ -166,6 +166,31 @@ class PartnerController extends Controller
         }
     }
     
+    /**
+     * Display the specified resource.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function show($id)
+    {            
+        try {            
+            $partner = Partner::findOrFail($id);
+            
+            return response()->json([
+                    'success' => true,
+                    'partner' => $partner
+                ], 200);
+
+        } catch (Exception $e) {
+            
+            return response()->json([
+                    'success' => false,
+                    'message' => $e->getMessage()
+                ], 500);            
+        }        
+    }
+   
    /**
      * Update the specified partner in storage.
      *

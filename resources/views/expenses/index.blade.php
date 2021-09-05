@@ -283,7 +283,7 @@ $(document).ready(function(){
 
     $("#expense_type_filter").select2({
       language: "es",
-      placeholder: "Tipos de egresos - Todos",
+      placeholder: "Todos",
       minimumResultsForSearch: 10,
       allowClear: true,
       width: '100%'
@@ -291,7 +291,7 @@ $(document).ready(function(){
 
     $("#center_filter").select2({
       language: "es",
-      placeholder: "Proveedores - Todos",
+      placeholder: "Todas",
       minimumResultsForSearch: 10,
       allowClear: true,
       width: '100%'
