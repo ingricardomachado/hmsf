@@ -57,6 +57,15 @@
                     <label>Dirección</label>
                     {!! Form::text('address', $customer->address, ['id'=>'address', 'class'=>'form-control', 'type'=>'text', 'placeholder'=>'', 'maxlength'=>'100']) !!}
                 </div>
+                <div class="form-group col-sm-6">
+                    <div class="i-checks">
+                        <label>{!! Form::checkbox('has_contract', null,  false, ['id'=>'has_contract']) !!} Tiene contrato</label>
+                    </div>
+                </div>
+                <div class="form-group col-sm-6" id="div_contract" style="display:{{ ($customer->contract)?'solid':'none' }}">
+                    <label>Contrato *</label><small>Max. 20 caracteres</small>
+                    {!! Form::text('contract', $customer->contract, ['id'=>'contract', 'class'=>'form-control', 'type'=>'text', 'placeholder'=>'', 'maxlength'=>'20', 'required']) !!}
+                </div>
             </div>
         </div>
         <div class="modal-footer">
@@ -97,8 +106,20 @@ input.addEventListener('change', handleChange);
 input.addEventListener('keyup', handleChange);
 
 
+$('#has_contract').on('ifChanged', function(event){
+  (event.target.checked)?$('#div_contract').show():$('#div_contract').hide();
+});
+
 $(document).ready(function() {
 
+    ('{{ $customer->id && $customer->contract }}'!='')?$('#has_contract').iCheck('check'):'';
+
+    // iCheck
+    $('.i-checks').iCheck({
+        checkboxClass: 'icheckbox_square-green',
+        radioClass: 'iradio_square-green',
+    });
+    
     $("#partner").select2({
         language: "es",
         placeholder: "Seleccione",

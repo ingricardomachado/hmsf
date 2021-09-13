@@ -12,6 +12,7 @@ use App\Models\OperationType;
 use App\Models\Center;
 use App\Models\Setting;
 use App\Models\Customer;
+use App\Models\Company;
 use App\Models\Partner;
 use App\User;
 use Illuminate\Support\Facades\Crypt;
@@ -32,7 +33,7 @@ use PDF;
 use Auth;
 use Carbon\Carbon;
 use Mail;
-use App\Mail\OperationNotification;
+use App\Mail\AssignedOperation;
 
 class OperationController extends Controller
 {
@@ -58,12 +59,35 @@ class OperationController extends Controller
                         ->orderBy('full_name')->pluck('full_name','partners.id');
         $users=User::where('role', 'MEN')->orderBy('full_name')->pluck('full_name','id');
         
-        return view('operations.index')
+        if(Auth::user()->role=='ADM'){
+            return view('operations.adm')
                         ->with('start', $start->format('d/m/Y'))
                         ->with('end', $end->format('d/m/Y'))
                         ->with('customers', $customers)
                         ->with('partners', $partners)
                         ->with('users', $users);
+        }elseif(Auth::user()->role=='SOC'){
+            return view('operations.soc')
+                        ->with('start', $start->format('d/m/Y'))
+                        ->with('end', $end->format('d/m/Y'))
+                        ->with('customers', $customers)
+                        ->with('partners', $partners)
+                        ->with('users', $users);
+        }elseif(Auth::user()->role=='SUP'){
+            return view('operations.sup')
+                        ->with('start', $start->format('d/m/Y'))
+                        ->with('end', $end->format('d/m/Y'))
+                        ->with('customers', $customers)
+                        ->with('partners', $partners)
+                        ->with('users', $users);
+        }elseif(Auth::user()->role=='MEN'){
+            return view('operations.men')
+                        ->with('start', $start->format('d/m/Y'))
+                        ->with('end', $end->format('d/m/Y'))
+                        ->with('customers', $customers)
+                        ->with('partners', $partners)
+                        ->with('users', $users);
+        }
     }
 
     public function datatable(Request $request)
@@ -72,6 +96,7 @@ class OperationController extends Controller
         
         return Datatables::of($operations)
             ->addColumn('action', function ($operation) {
+                if(Auth::user()->role=='ADM'){
                     return '<div class="input-group-btn text-center">
                         <button data-toggle="dropdown" class="btn btn-xs btn-default dropdown-toggle" type="button" title="Acciones"><i class="fa fa-chevron-circle-down" aria-hidden="true"></i></button>
                         <ul class="dropdown-menu">
@@ -87,13 +112,34 @@ class OperationController extends Controller
                                 <a href="#" onclick="showModalDelete(`'.$operation->id.'`, `'.$operation->concept.'`)"><i class="fa fa-trash-o"></i> Eliminiar</a>                                
                             </li>
                         </ul>
-                    </div>';
+                    </div>';                    
+                }else{
+                    return "";
+                }    
                 })           
+            ->editColumn('number', function ($operation) {                    
+                    return '<a href="#"  onclick="showModalComments('.$operation->id.')" class="modal-class" style="color:inherit"  title="Click para comentarios"><b>'.$operation->number.'</b></a>';
+                })
             ->editColumn('partner', function ($operation) {                    
                     return $operation->partner->user->full_name;
                 })
             ->editColumn('customer', function ($operation) {                    
-                    return $operation->customer->full_name;
+                    if(Auth::user()->role=='SOC'){
+                        if($operation->customer->contract){
+                            return $operation->customer->code.'<br>Contrato '.$operation->customer->contract;
+                        }else{
+                            return $operation->customer->code;
+                        }
+                    }else{
+                        if($operation->customer->contract){
+                            return $operation->customer->full_name.'<br><span class="text-muted">'.$operation->customer->code.'</span><br>Contrato '.$operation->customer->contract;
+                        }else{
+                            return $operation->customer->full_name.'<br><span class="text-muted">'.$operation->customer->code.'</span>';                
+                        }
+                    }
+                })
+            ->editColumn('user', function ($operation) {                    
+                    return ($operation->user_id)?$operation->user->full_name:'';
                 })
             ->editColumn('date', function ($operation) {                    
                     return $operation->date->format('d/m/Y');
@@ -110,16 +156,19 @@ class OperationController extends Controller
             ->editColumn('hm_profit', function ($operation) {                    
                     return '<div class="text-right">'.session('coin').money_fmt($operation->hm_profit).'<br>('.$operation->hm_tax.'%)</div>';
                 })
+            ->editColumn('return_amount', function ($operation) {                    
+                    return '<div class="text-right">'.session('coin').money_fmt($operation->return_amount).'</div>';
+                })
             ->editColumn('status', function ($operation) {                    
-                    if($operation->status==1){
-                        return '<a href="#" onclick="showModalStatus('.$operation->id.')" title="Pasar a Pendiente">'.$operation->status_label.'</a>';
-                    }elseif($operation->status==2){
-                        return '<a href="#" onclick="showModalStatus('.$operation->id.')" title="Pasar a Entregado">'.$operation->status_label.'</a>';
+                    if($operation->status==1 && (Auth::user()->role=='ADM' || Auth::user()->role=='MEN')){
+                        return '<a href="#" onclick="showModalStatus('.$operation->id.')">'.$operation->status_label.'</a>';
+                    }elseif($operation->status==2 && (Auth::user()->role=='ADM' || Auth::user()->role=='MEN')){
+                        return '<a href="#" onclick="showModalStatus('.$operation->id.')">'.$operation->status_label.'</a>';
                     }else{
                         return $operation->status_label;
                     }
                 })
-            ->rawColumns(['action', 'amount', 'customer_profit', 'partner_profit', 'hm_profit', 'status'])
+            ->rawColumns(['action', 'number', 'customer', 'amount', 'customer_profit', 'partner_profit', 'hm_profit', 'return_amount', 'status'])
             ->make(true);
     }
     
@@ -133,6 +182,8 @@ class OperationController extends Controller
     {
         $setting=Setting::first();
         $customers=Customer::orderBy('full_name')->pluck('full_name','id');
+        $companies=Company::orderBy('name')->pluck('name','id');
+        $users=User::where('role', 'MEN')->orderBy('full_name')->pluck('full_name','id');
         $partners=Partner::join('users', 'partners.user_id', '=', 'users.id')
                         ->where('active',true)
                         ->orderBy('full_name')->pluck('full_name','partners.id');
@@ -148,6 +199,8 @@ class OperationController extends Controller
                                 ->with('today', $today)
                                 ->with('setting', $setting)
                                 ->with('customers', $customers)
+                                ->with('companies', $companies)
+                                ->with('users', $users)
                                 ->with('partners', $partners);
     }
 
@@ -165,7 +218,8 @@ class OperationController extends Controller
             $operation->customer_id=$request->customer;
             $operation->partner_id=$request->partner;
             $operation->date=Carbon::createFromFormat('d/m/Y', $request->date);
-            $operation->company=$request->company;
+            $operation->company_id=$request->company;
+            $operation->user_id=$request->user;
             $operation->folio=$request->folio;
             $operation->amount=$request->amount;
             $operation->customer_tax=$request->customer_tax;
@@ -174,9 +228,12 @@ class OperationController extends Controller
             $operation->customer_profit=$operation->amount*($operation->customer_tax/100);
             $operation->partner_profit=$operation->customer_profit*($operation->partner_tax/100);
             $operation->hm_profit=$operation->customer_profit*($operation->hm_tax/100);
-            $operation->notes=$request->notes;
+            $operation->return_amount=$operation->amount-$operation->customer_profit;
             $operation->save();
-            
+            if($request->notification){
+                Mail::to($operation->user->email)->send(new AssignedOperation($operation));
+            }
+
             return response()->json([
                     'success' => true,
                     'message' => 'Gasto registrado exitosamente',
@@ -202,29 +259,25 @@ class OperationController extends Controller
     {
         try {
             $operation = Operation::findOrFail($id);
-            $operation->center_id=($request->center)?$request->center:null;
-            $operation->operation_type_id=$request->operation_type;
+            $operation->customer_id=$request->customer;
+            $operation->partner_id=$request->partner;
             $operation->date=Carbon::createFromFormat('d/m/Y', $request->date);
-            $operation->concept=$request->concept;
+            $operation->company_id=$request->company;
+            $operation->user_id=$request->user;
+            $operation->folio=$request->folio;
             $operation->amount=$request->amount;
-            $operation->reference=$request->reference;
-            $operation->notes=$request->notes;
-            $file = $request->file;
-            if (File::exists($file)){
-                if($operation->file){
-                    Storage::delete('operations/'.$operation->file);
-                    Storage::delete('operations/thumbs/'.$operation->file);
-                }
-                $operation->file_name = $file->getClientOriginalName();
-                $operation->file_type = $file->getClientOriginalExtension();
-                $operation->file_size = $file->getSize();
-                $operation->file=$this->upload_file('operations/', $file);
-            }
+            $operation->customer_tax=$request->customer_tax;
+            $operation->partner_tax=$request->partner_tax;
+            $operation->hm_tax=$request->hm_tax;
+            $operation->customer_profit=$operation->amount*($operation->customer_tax/100);
+            $operation->partner_profit=$operation->customer_profit*($operation->partner_tax/100);
+            $operation->hm_profit=$operation->customer_profit*($operation->hm_tax/100);
+            $operation->return_amount=$operation->amount-$operation->customer_profit;
             $operation->save();
             
             return response()->json([
                     'success' => true,
-                    'message' => 'Gasto actualizado exitosamente',
+                    'message' => 'Operación actualizado exitosamente',
                     'operation' => $operation->toArray()
                 ], 200);
             
@@ -272,28 +325,129 @@ class OperationController extends Controller
         $start_filter=Carbon::createFromFormat('d/m/Y', $request->start_filter);
         $end_filter=Carbon::createFromFormat('d/m/Y', $request->end_filter);;
 
-        $operation_type_filter=$request->operation_type_filter;
-        $center_filter=$request->center_filter;
+        if(Auth::user()->role=='SOC'){
+            $partner=Partner::where('user_id', Auth::user()->id)->first();
+            $partner_filter=$partner->id;
+        }else{
+            $partner_filter=$request->partner_filter;
+        }
 
-        if($operation_type_filter!=''){
-            if($center_filter!=''){
-                $operations = Operation::whereDate('date','>=', $start_filter)
-                                    ->whereDate('date','<=', $end_filter)
-                                    ->where('operation_type_id', $operation_type_filter)
-                                    ->where('center_id', $center_filter);
+        if(Auth::user()->role=='MEN'){
+            $user_filter=Auth::user()->id;
+        }else{
+            $user_filter=$request->user_filter;
+        }
+
+        $customer_filter=$request->customer_filter;
+        $status_filter=$request->status_filter;
+
+        if($partner_filter!=''){
+            if($customer_filter!=''){
+                if($user_filter!=''){
+                    if($status_filter!=''){
+                        $operations = Operation::whereDate('date','>=', $start_filter)
+                                ->whereDate('date','<=', $end_filter)
+                                ->where('partner_id', $partner_filter)
+                                ->where('customer_id', $customer_filter)
+                                ->where('user_id', $user_filter)
+                                ->where('status', $status_filter);
+                    }else{
+                        $operations = Operation::whereDate('date','>=', $start_filter)
+                                ->whereDate('date','<=', $end_filter)
+                                ->where('partner_id', $partner_filter)
+                                ->where('customer_id', $customer_filter)
+                                ->where('user_id', $user_filter);
+                    }
+                }else{
+                    if($status_filter!=''){
+                        $operations = Operation::whereDate('date','>=', $start_filter)
+                                ->whereDate('date','<=', $end_filter)
+                                ->where('partner_id', $partner_filter)
+                                ->where('customer_id', $customer_filter)
+                                ->where('status', $status_filter);
+                    }else{
+                        $operations = Operation::whereDate('date','>=', $start_filter)
+                                ->whereDate('date','<=', $end_filter)
+                                ->where('partner_id', $partner_filter)
+                                ->where('customer_id', $customer_filter);
+                    }
+                }
             }else{
-                $operations = Operation::whereDate('date','>=', $start_filter)
-                                    ->whereDate('date','<=', $end_filter)
-                                    ->where('operation_type_id', $operation_type_filter);
+                if($user_filter!=''){
+                    if($status_filter!=''){
+                        $operations = Operation::whereDate('date','>=', $start_filter)
+                                ->whereDate('date','<=', $end_filter)
+                                ->where('partner_id', $partner_filter)
+                                ->where('user_id', $user_filter)
+                                ->where('status', $status_filter);
+                    }else{
+                        $operations = Operation::whereDate('date','>=', $start_filter)
+                                ->whereDate('date','<=', $end_filter)
+                                ->where('partner_id', $partner_filter)
+                                ->where('user_id', $user_filter);
+                    }
+                }else{
+                    if($status_filter!=''){
+                        $operations = Operation::whereDate('date','>=', $start_filter)
+                                ->whereDate('date','<=', $end_filter)
+                                ->where('partner_id', $partner_filter)
+                                ->where('status', $status_filter);
+                    }else{
+                        $operations = Operation::whereDate('date','>=', $start_filter)
+                                ->whereDate('date','<=', $end_filter)
+                                ->where('partner_id', $partner_filter);
+                    }
+                }
             }
         }else{
-            if($center_filter!=''){
-                $operations = Operation::whereDate('date','>=', $start_filter)
-                                    ->whereDate('date','<=', $end_filter)
-                                    ->where('center_id', $center_filter);
+            if($customer_filter!=''){
+                if($user_filter!=''){
+                    if($status_filter!=''){
+                        $operations = Operation::whereDate('date','>=', $start_filter)
+                                ->whereDate('date','<=', $end_filter)
+                                ->where('customer_id', $customer_filter)
+                                ->where('user_id', $user_filter)
+                                ->where('status', $status_filter);
+                    }else{
+                        $operations = Operation::whereDate('date','>=', $start_filter)
+                                ->whereDate('date','<=', $end_filter)
+                                ->where('customer_id', $customer_filter)
+                                ->where('user_id', $user_filter);
+                    }
+                }else{
+                    if($status_filter!=''){
+                        $operations = Operation::whereDate('date','>=', $start_filter)
+                                ->whereDate('date','<=', $end_filter)
+                                ->where('customer_id', $customer_filter)
+                                ->where('status', $status_filter);
+                    }else{
+                        $operations = Operation::whereDate('date','>=', $start_filter)
+                                ->whereDate('date','<=', $end_filter)
+                                ->where('customer_id', $customer_filter);
+                    }
+                }
             }else{
-                $operations = Operation::whereDate('date','>=', $start_filter)
-                                    ->whereDate('date','<=', $end_filter);
+                if($user_filter!=''){
+                    if($status_filter!=''){
+                        $operations = Operation::whereDate('date','>=', $start_filter)
+                                ->whereDate('date','<=', $end_filter)
+                                ->where('user_id', $user_filter)
+                                ->where('status', $status_filter);
+                    }else{
+                        $operations = Operation::whereDate('date','>=', $start_filter)
+                                ->whereDate('date','<=', $end_filter)
+                                ->where('user_id', $user_filter);
+                    }
+                }else{
+                    if($status_filter!=''){
+                        $operations = Operation::whereDate('date','>=', $start_filter)
+                                ->whereDate('date','<=', $end_filter)
+                                ->where('status', $status_filter);
+                    }else{
+                        $operations = Operation::whereDate('date','>=', $start_filter)
+                                ->whereDate('date','<=', $end_filter);
+                    }
+                }
             }
         }
 
@@ -308,39 +462,58 @@ class OperationController extends Controller
         
         $operations=$this->get_operations_collection($request)->get();
 
-        if($request->center_filter!=''){
-            $supplier=Supplier::find($request->center_filter);
-            $supplier_name=$supplier->name;
-        }else{
-            $supplier_name='Todos';
+        $partner=null;
+        $customer=null;
+        $user=null;
+        $status=null;
+        
+        if($request->partner_filter!=''){
+            $partner=Partner::findOrFail($request->partner_filter);
+        }elseif(Auth::user()->role=='SOC'){
+            $partner=Partner::where('user_id', Auth::user()->id)->first();
         }
 
-        if($request->operation_type_filter!=''){
-            $operation_type=OperationType::find($request->operation_type_filter);
-            $operation_type_name=$operation_type->name;
-        }else{
-            $operation_type_name='Todos';
+        if($request->customer_filter!=''){
+            $customer=Customer::findOrFail($request->customer_filter);
+        }
+
+        if($request->user_filter!=''){
+            $user=User::findOrFail($request->user_filter);
+        }elseif(Auth::user()->role=='MEN'){
+            $user=Auth::user();
+        }
+
+        if($request->status_filter!=''){
+            switch ($request->status_filter) {
+                case 1:
+                    $status = "Proceso";
+                    break;
+                case 2:
+                    $status = "Pendiente";
+                    break;
+                case 3:
+                    $status = "Entregado";
+                    break;
+                
+                default:
+                    $status = $request->status_filter;
+                    break;
+            }
         }
         
-        if($request->center_filter!=''){
-            $center=Center::find($request->center_filter);
-            $center_name=$center->name;
-        }else{
-            $center_name='Todos';
-        }
-
         $data=[
             'company' => $setting->company,
             'logo' => $logo,            
             'start' => $request->start_filter,
             'end' => $request->end_filter,
-            'supplier_name' => $supplier_name,
-            'operation_type_name' => $operation_type_name,
-            'center_name' => $center_name,
+            'partner' => $partner,
+            'customer' => $customer,
+            'user' => $user,
+            'status' => $status,
             'operations' => $operations            
         ];
 
-        $pdf = PDF::loadView('reports/rpt_operations', $data);
+        $pdf = PDF::loadView('reports/rpt_operations_'.strtolower(Auth::user()->role), $data)->setPaper('a4', 'landscape');
         
         return $pdf->stream('Gastos.pdf');        
     }
@@ -364,11 +537,18 @@ class OperationController extends Controller
     {
         try {
             $operation = Operation::findOrFail($id);
+            $status=$request->status;
             if($operation->status==1){
-                $operation->user_id=$request->user;                
-                $operation->status=2;
+                if($request->status==2){
+                    $operation->s2_notes=$request->s2_notes;
+                    $operation->status=2;                    
+                }elseif($request->status==3){
+                    $operation->s3_notes=($request->s3_notes)?$request->s3_notes:null;
+                    $operation->status=3;
+                }
             }elseif($operation->status==2){
-                $operation->status=3;                
+                $operation->s3_notes=($request->s3_notes)?$request->s3_notes:null;
+                $operation->status=3;
             }
             $operation->save();
             

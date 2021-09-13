@@ -19,10 +19,11 @@ class CreateOperationsTable extends Migration
             $table->foreign('partner_id')->references('id')->on('partners')->onDelete('cascade');
             $table->bigInteger('customer_id')->unsigned()->nullable();
             $table->foreign('customer_id')->references('id')->on('customers')->onDelete('cascade');
+            $table->bigInteger('company_id')->unsigned()->nullable();
+            $table->foreign('company_id')->references('id')->on('companies')->onDelete('cascade');
             $table->bigInteger('user_id')->unsigned()->nullable();
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
             $table->Integer('number');
-            $table->string('company',100)->nullable();
             $table->date('date');
             $table->string('folio',20)->nullable();
             $table->float('amount', 11,2);
@@ -33,6 +34,7 @@ class CreateOperationsTable extends Migration
             $table->float('customer_profit', 11,2);
             $table->float('hm_profit', 11,2);
             $table->string('notes',200)->nullable();
+            $table->string('pending_notes',200)->nullable();
             $table->Integer('status')->default(1);
             $table->timestamps();
         });

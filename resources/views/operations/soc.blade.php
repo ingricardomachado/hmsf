@@ -24,7 +24,7 @@
         
         <!-- ibox-title -->
         <div class="ibox-title">
-          <h5><i class="fa fa-folder-o" aria-hidden="true"></i> Operaciones</h5>
+          <h5><i class="fa fa-truck" aria-hidden="true"></i> Operaciones</h5>
             <div class="ibox-tools">
               <a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
               <a class="dropdown-toggle" data-toggle="dropdown" href="#"><i class="fa fa-wrench"></i></a>
@@ -56,21 +56,12 @@
                     {{ Form::text ('end_filter', $end, ['id'=>'end_filter', 'class'=>'form-control', 'placeholder'=>'', 'style'=>'font-size:12px', 'required']) }}
                   </div>
               </div>
-              <div class="col-sm-68col-xs-12 text-right">
-                  <a href="#" class="btn btn-sm btn-primary" onclick="showModalOperation(0);"><i class="fa fa-plus-circle"></i> Nueva Operación</a>
+              <div class="col-sm-3 col-xs-12" style="margin-top:5mm">
+                  {{ Form::select('status_filter', ['1'=>'Proceso', '2'=>'Pendiente', '3'=>'Entregado'], null, ['id'=>'status_filter', 'class'=>'select2 form-control-sm', 'tabindex'=>'-1', 'placeholder'=>''])}}
+              </div>
+              <div class="col-sm-5 col-xs-12 text-right">
                   <button type="button" name="btn_print" id="btn_print" class="btn btn-sm btn-default" title="Imprimir"><i class="fa fa-print" aria-hidden="true"></i></button>
                   <br>
-              </div>
-            </div>
-            <div class="form-group col-sm-12">
-              <div class="col-sm-4 col-xs-12">
-                  {{ Form::select('partner_filter', $partners, null, ['id'=>'partner_filter', 'class'=>'select2 form-control-sm', 'tabindex'=>'-1', 'placeholder'=>''])}}
-              </div>
-              <div class="col-sm-4 col-xs-12">
-                  {{ Form::select('customer_filter', $customers, null, ['id'=>'customer_filter', 'class'=>'select2 form-control-sm', 'tabindex'=>'-1', 'placeholder'=>''])}}
-              </div>
-              <div class="col-sm-4 col-xs-12">
-                  {{ Form::select('user_filter', $users, null, ['id'=>'user_filter', 'class'=>'select2 form-control-sm', 'tabindex'=>'-1', 'placeholder'=>''])}}
               </div>
             </div>
             {{ Form::close() }}
@@ -78,27 +69,24 @@
               @include('partials.errors')
             </div>
                                                 
-            <div class="table-responsive col-sm-12">
+            <div class="table-responsive col-sm-12" style="font-size:12px">
               <table class="table table-striped table-hover" id="operations-table">
                 <thead>
                   <tr>
                     <th text-align="center" width="5%"></th>
                     <th width="5%">Nro</th>
                     <th width="10%">Fecha</th>
-                    <th width="15%">Socio</th>
-                    <th width="15%">Cliente</th>
+                    <th width="20%">Cliente</th>
                     <th width="5%">Folio</th>
                     <th width="10%" class="text-right">Facturado</th>
-                    <th width="10%" class="text-right">Margen<br>Total</th>
                     <th width="10%" class="text-right">Margen<br>SC</th>
-                    <th width="10%" class="text-right">Margen<br>HM</th>
                     <th width="5%">Estado</th>
                   </tr>
                 </thead>
                 <tfoot>
                 </tfoot>
               </table>
-              <br><br>
+              <br><br><br><br>
             </div>
           </div>
         </div>
@@ -144,7 +132,7 @@
 <div class="modal inmodal" id="modalStatus" tabindex="-1" role="dialog"  aria-hidden="true">
   <div class="modal-dialog">
     <div class="modal-content animated fadeIn">
-      <div id="status"></div>
+      <div id="modal_status"></div>
     </div>
   </div>
 </div>
@@ -183,7 +171,7 @@ function showModalComments(id){
 
 function showModalStatus(id){
   url = '{{URL::to("operations.load_status")}}/'+id;
-  $('#status').load(url);  
+  $('#modal_status').load(url);  
   $("#modalStatus").modal("show");
 }
 
@@ -267,6 +255,14 @@ $("#customer_filter").change( event => {
   $('#operations-table').DataTable().draw(false);
 });
 
+$("#user_filter").change( event => {
+  $('#operations-table').DataTable().draw(false);
+});
+
+$("#status_filter").change( event => {
+  $('#operations-table').DataTable().draw(false);
+});
+
 $('#btn_print').click(function(event) {
   var validator = $("#form_rpt" ).validate();
   formulario_validado = validator.form();
@@ -295,19 +291,18 @@ $(document).ready(function(){
                 d.end_filter = $('#end_filter').val();
                 d.partner_filter = $('#partner_filter').val();
                 d.customer_filter = $('#customer_filter').val();
+                d.user_filter = $('#user_filter').val();
+                d.status_filter = $('#status_filter').val();
             }
         },        
         columns: [
             { data: 'action', name: 'action', orderable: false, searchable: false},
-            { data: 'number',   name: 'number', orderable: true, searchable: false},
+            { data: 'number',   name: 'number', orderable: true, searchable: true},
             { data: 'date',   name: 'date', orderable: true, searchable: false},
-            { data: 'partner',   name: 'partner', orderable: true, searchable: false},
             { data: 'customer',   name: 'customer', orderable: true, searchable: false},
-            { data: 'folio',   name: 'folio', orderable: false, searchable: true},
-            { data: 'amount',   name: 'amount', orderable: false, searchable: true},
-            { data: 'customer_profit',   name: 'customer_profit', orderable: false, searchable: false},
+            { data: 'folio',   name: 'folio', orderable: false, searchable: false},
+            { data: 'amount',   name: 'amount', orderable: false, searchable: false},
             { data: 'partner_profit',   name: 'partner_tax', orderable: false, searchable: false},
-            { data: 'hm_profit',   name: 'hm_tax', orderable: false, searchable: false},
             { data: 'status',   name: 'status', orderable: false, searchable: false}
         ],
         "fnDrawCallback": function () {
@@ -321,6 +316,24 @@ $(document).ready(function(){
         }
     });
 
+    $('#start_filter').datepicker({
+        format: 'dd/mm/yyyy',
+        todayHighlight: true,
+        autoclose: true,
+        language: 'es',
+    }).on("changeDate", function (e) {
+        $('#operations-table').DataTable().draw();
+    });
+
+    $('#end_filter').datepicker({
+        format: 'dd/mm/yyyy',
+        todayHighlight: true,
+        autoclose: true,
+        language: 'es',
+    }).on("changeDate", function (e) {
+        $('#operations-table').DataTable().draw();
+    });
+    
     $("#partner_filter").select2({
       language: "es",
       placeholder: "Socio - Todos",
@@ -344,6 +357,15 @@ $(document).ready(function(){
       allowClear: true,
       width: '100%'
     });
+
+    $("#status_filter").select2({
+      language: "es",
+      placeholder: "Estado - Todos",
+      minimumResultsForSearch: 10,
+      allowClear: true,
+      width: '100%'
+    });
+
 });
 </script>
 @endpush

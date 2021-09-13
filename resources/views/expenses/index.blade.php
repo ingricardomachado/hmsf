@@ -88,11 +88,11 @@
                 <tfoot>
                   <tr>
                     <th></th>
-                    <th>Fecha</th>
-                    <th>Gasto</th>
-                    <th>Oficina</th>
-                    <th>Monto</th>
-                    <th>Soporte</th>
+                    <th></th>
+                    <th></th>
+                    <th></th>
+                    <th></th>
+                    <th></th>
                   </tr>
                 </tfoot>
               </table>
@@ -150,8 +150,21 @@
 <script src="{{ URL::asset('js/plugins/select2/dist/js/i18n/es.js') }}"></script>
 <!-- Datatables -->
 <script src="{{ asset('js/plugins/dataTables/datatables.min.js') }}"></script>
+<!-- JQuery number-format -->
+<script src="{{ URL::asset('js/plugins/jquery-number-format/jquery.number.min.js') }}"></script>
 <script>
   
+function money_fmt(num){        
+  if('{{ session('money_format') }}' == 'PC'){
+      num_fmt = $.number(num, 0, ',', '.');        
+  }else if('{{ session('money_format') }}' == 'PC2'){
+      num_fmt = $.number(num, 2, ',', '.');          
+  }else if('{{ session('money_format') }}' == 'CP2'){
+      num_fmt = $.number(num, 2, '.', ',');
+  }
+  return num_fmt;        
+}
+
 function showModalExpense(id){
   url = '{{URL::to("expenses.load")}}/'+id;
   $('#expense').load(url);  
@@ -251,6 +264,7 @@ $(document).ready(function(){
         "aaSorting": [[1, "asc"]],
         processing: true,
         serverSide: true,
+        
         ajax: {
             url: '{!! route('expenses.datatable') !!}',
             type: "POST",
@@ -270,6 +284,18 @@ $(document).ready(function(){
             { data: 'amount', name: 'amount', orderable: false, searchable: false },
             { data: 'file', name: 'file', orderable: false, searchable: false }
         ],
+        footerCallback: function ( row, data, start, end, display ) {
+            var api = this.api(), data; 
+            var col4 = api
+                .column( 4 )
+                .data()
+                .reduce( function (a, b) {
+                    return parseFloat(a) + parseFloat(b);
+                }, 0 );            
+            // Update footer by showing the total with the reference of the column index 
+            $( api.column( 0 ).footer() ).html('TOTAL');
+            $( api.column( 4 ).footer() ).html(money_fmt(col4));
+        },
         "fnDrawCallback": function () {
             $('.popup-link').magnificPopup({
               type: 'image',

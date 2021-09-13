@@ -7,7 +7,7 @@
         <div class="modal-body">
             <div class="row">
                 <div class="col-sm-12">
-                    <label>Comentar *</label>
+                    <label>Comentar *</label><small> Max 200 caracteres.</small>
                     {!! Form::textarea('comment', null, ['id'=>'comment', 'class'=>'form-control', 'type'=>'text', 'placeholder'=>'', 'rows'=>'2', 'maxlength'=>'200', 'required']) !!}
                 </div>
                 <div class="col-sm-12 text-right" style="margin-top: 2mm;margin-bottom: 2mm;">
@@ -23,6 +23,8 @@
             <button type="button" id="btn_close" class="btn btn-sm btn-default" data-dismiss="modal">Cerrar</button>
         </div>
     </form>
+<!-- Maxlenght -->
+<script src="{{ asset('js/plugins/bootstrap-character-counter/dist/bootstrap-maxlength.min.js') }}"></script>
 <!-- Timeago -->
 <script src="{{ URL::asset('js/plugins/jquery-timeago/jquery.timeago.js') }}"></script>
 <script src="{{ URL::asset('js/plugins/jquery-timeago/locales/jquery.timeago.es.js') }}"></script>
@@ -92,6 +94,14 @@ $("#btn_comment").on('click', function(event) {
 
 
 $(document).ready(function() {
-    posts()
+    posts();
+
+    $('#comment').maxlength({
+        warningClass: "small text-muted",
+        limitReachedClass: "small text-muted",
+        placement: "top-right-inside"
+    });  
+
+
 });
 </script>

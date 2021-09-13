@@ -88,10 +88,10 @@ class PartnerController extends Controller
                     return $partner->tax.'%';
                 })
             ->addColumn('customers', function ($partner) {                    
-                    return "";
+                    return $partner->customers()->count();
                 })
             ->addColumn('operations', function ($partner) {                    
-                    return "";
+                    return $partner->operations()->count();
                 })
             ->editColumn('status', function ($partner) {                    
                     return $partner->status_label;

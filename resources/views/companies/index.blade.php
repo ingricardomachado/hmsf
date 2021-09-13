@@ -1,9 +1,6 @@
 @extends('layouts.app')
 
 @push('stylesheets')
-<!-- Select2 -->
-<link href="{{ URL::asset('js/plugins/select2/dist/css/select2.min.css') }}" rel="stylesheet">
-<link href="{{ URL::asset('css/style.css') }}" rel="stylesheet">
 <!-- CSS Datatables -->
 <link href="{{ URL::asset('css/plugins/dataTables/datatables.min.css') }}" rel="stylesheet">
 @endpush
@@ -20,7 +17,7 @@
         
         <!-- ibox-title -->
         <div class="ibox-title">
-          <h5><i class="fa fa-wrench" aria-hidden="true"></i> Clientes</h5>
+          <h5><i class="fa fa-building-o" aria-hidden="true"></i> Empresas Emisoras</h5>
             <div class="ibox-tools">
               <a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
               <a class="dropdown-toggle" data-toggle="dropdown" href="#"><i class="fa fa-wrench"></i></a>
@@ -36,14 +33,11 @@
         <!-- ibox-content- -->
         <div class="ibox-content">
           <div class="row">
-            {{ Form::open(array('url' => '', 'id' => 'form_rpt', 'method' => 'get'), ['' ])}}
-            {{ Form::close() }}
-            <div class="col-sm-4 col-xs-12">
-                {{ Form::select('partner_filter', $partners, null, ['id'=>'partner_filter', 'class'=>'select2 form-control-sm', 'tabindex'=>'-1', 'placeholder'=>''])}}
+            <div class="col-sm-3 col-xs-12">
             </div>
-            <div class="col-sm-8 col-xs-12 text-right">
-                <a href="#" class="btn btn-sm btn-primary" onclick="showModalCustomer(0);"><i class="fa fa-plus-circle"></i> Nuevo Cliente</a>
-                <a href="{{ url('customers.rpt_customers') }}" class="btn btn-sm btn-default" target="_blank" title="Imprimir PDF"><i class="fa fa-print"></i></a>
+            <div class="col-sm-9 col-xs-12 text-right">
+                <a href="#" class="btn btn-sm btn-primary" onclick="showModalCompany(0);"><i class="fa fa-plus-circle"></i> Nueva Empresa</a>
+                <a href="{{ url('companies.rpt_companies') }}" class="btn btn-sm btn-default" target="_blank" title="Imprimir PDF"><i class="fa fa-print"></i></a>
                 <br><br>
             </div>
             <div class="col-sm-12">
@@ -51,28 +45,18 @@
             </div>
                                                 
             <div class="table-responsive col-sm-12">
-              <table class="table table-striped table-hover" id="customers-table">
+              <table class="table table-striped table-hover" id="companies-table">
                 <thead>
                   <tr>
                     <th text-align="center" width="5%"></th>
-                    <th width="25%">Nombre</th>
-                    <th width="10%">Contrato</th>
-                    <th width="15%">Socio Comercial</th>
-                    <th width="10%">Celular</th>
-                    <th width="10%">Comisión</th>
-                    <th width="10%">Operaciones</th>
-                    <th width="10%">Estado</th>
+                    <th width="80%">Nombre</th>
+                    <th width="20%">Estado</th>
                   </tr>
                 </thead>
                 <tfoot>
                   <tr>
                     <th></th>
                     <th>Nombre</th>
-                    <th>Contrato</th>
-                    <th>Socio Comercial</th>
-                    <th>Celular</th>
-                    <th>Comisión</th>
-                    <th>Operaciones</th>
                     <th>Estado</th>
                   </tr>
                 </tfoot>
@@ -89,30 +73,30 @@
 </div>
   
 <!-- Modal para Datos -->
-<div class="modal inmodal" id="modalCustomer" tabindex="-1" role="dialog"  aria-hidden="true">
+<div class="modal inmodal" id="modalCompany" tabindex="-1" role="dialog"  aria-hidden="true">
   <div class="modal-dialog">
     <div class="modal-content animated fadeIn">
-      <div id="customer"></div>
+      <div id="company"></div>
     </div>
   </div>
 </div>
 <!-- /Modal para Datos -->
 
 <!-- Modal para eliminar-->
-<div class="modal inmodal" id="modalDeleteCustomer" tabindex="-1" role="dialog"  aria-hidden="true">
+<div class="modal inmodal" id="modalDeleteCompany" tabindex="-1" role="dialog"  aria-hidden="true">
   <div class="modal-dialog">
     <div class="modal-content animated fadeIn">
       <div class="modal-header">
-        <h5 class="modal-title"><i class="fa fa-trash" aria-hidden="true"></i> <strong>Eliminar Vehículo</strong></h5>
+        <h5 class="modal-title"><i class="fa fa-trash" aria-hidden="true"></i> <strong>Eliminar Tipo de Gasto</strong></h5>
         <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
       </div>      
       <div class="modal-body">
-          <input type="hidden" id="hdd_asset_id" value=""/>
-          <p>Esta seguro que desea eliminar el cliente <b><span id="customer_name"></span></b> ?</p>
+          <input type="hidden" id="hdd_company_id" value=""/>
+          <p>Esta seguro que desea eliminar la empresa <b><span id="company_name"></span></b> ?</p>
       </div>
       <div class="modal-footer">
         <button type="button" id="btn_close" class="btn btn-default" data-dismiss="modal">Cerrar</button>        
-        <button type="button" id="btn_delete_asset" class="btn btn-danger">Eliminar</button>
+        <button type="button" id="btn_delete_company" class="btn btn-danger">Eliminar</button>
       </div>
     </div>
   </div>
@@ -121,32 +105,29 @@
 @endsection
 
 @push('scripts')
-<!-- Select2 -->
-<script src="{{ URL::asset('js/plugins/select2/dist/js/select2.full.min.js') }}"></script>
-<script src="{{ URL::asset('js/plugins/select2/dist/js/i18n/es.js') }}"></script>
 <!-- Datatables -->
 <script src="{{ asset('js/plugins/dataTables/datatables.min.js') }}"></script>
 <script>
   
-function showModalCustomer(id){
-  url = '{{URL::to("customers.load")}}/'+id;
-  $('#customer').load(url);  
-  $("#modalCustomer").modal("show");
+function showModalCompany(id){
+  url = '{{URL::to("companies.load")}}/'+id;
+  $('#company').load(url);  
+  $("#modalCompany").modal("show");
 }
  
 function change_status(id){
   $.ajax({
-      url: `{{URL::to("customers.status")}}/${id}`,
+      url: `{{URL::to("companies.status")}}/${id}`,
       type: 'GET',
       data: {
         _token: "{{ csrf_token() }}", 
       },
   })
   .done(function(response) {
-      $('#customers-table').DataTable().draw(false);
+      $('#companies-table').DataTable().draw(false);
       toastr_msg('success', '{{ config('app.name') }}', response.message, 2000);
   })
-  .fail(function(response) {
+  .fail(function() {
     if(response.status == 422){
       var errorsHtml='';
       $.each(response.responseJSON.errors, function (key, value) {
@@ -160,44 +141,44 @@ function change_status(id){
 }  
 
 function showModalDelete(id, name){
-  $('#hdd_customer_id').val(id);
-  $('#customer_name').html(name);
-  $("#modalDeleteCustomer").modal("show");    
+  $('#hdd_company_id').val(id);
+  $('#company_name').html(name);
+  $("#modalDeleteCompany").modal("show");    
 };
     
-$("#btn_delete_customer").on('click', function(event) {    
-    customer_delete($('#hdd_customer_id').val());
+$("#btn_delete_company").on('click', function(event) {    
+    company_delete($('#hdd_company_id').val());
 });
 
-function customer_delete(id){  
+function company_delete(id){  
   $.ajax({
-      url: `{{URL::to("customers")}}/${id}`,
+      url: `{{URL::to("companies")}}/${id}`,
       type: 'DELETE',
       data: {
         _token: "{{ csrf_token() }}", 
       },
   })
   .done(function(response) {
-      $('#modalDeleteCustomer').modal('toggle');
-      $('#customers-table').DataTable().draw(false);
+      $('#modalDeleteCompany').modal('toggle');
+      $('#companies-table').DataTable().draw(false);
       toastr_msg('success', '{{ config('app.name') }}', response.message, 2000);
 
   })
   .fail(function(response) {
-      $('#modalDeleteCustomer').modal('toggle');
+      $('#modalDeleteCompany').modal('toggle');
       toastr_msg('error', '{{ config('app.name') }}', response.responseJSON.message, 4000);
   });
 }  
 
-function customer_CRUD(id){
+function company_CRUD(id){
         
-    var validator = $("#form_customer").validate();
+    var validator = $("#form_company").validate();
     formulario_validado = validator.form();
     if(formulario_validado){
         $('#btn_submit').attr('disabled', true);
-        var form_data = new FormData($("#form_customer")[0]);
+        var form_data = new FormData($("#form_company")[0]);
         $.ajax({
-          url:(id==0)?'{{URL::to("customers")}}':'{{URL::to("customers")}}/'+id,
+          url:(id==0)?'{{URL::to("companies")}}':'{{URL::to("companies")}}/'+id,
           type:'POST',
           cache:true,
           processData: false,
@@ -206,8 +187,8 @@ function customer_CRUD(id){
         })
         .done(function(response) {
           $('#btn_submit').attr('disabled', false);
-          $('#modalCustomer').modal('toggle');
-          $('#customers-table').DataTable().draw(false); 
+          $('#modalCompany').modal('toggle');
+          $('#companies-table').DataTable().draw(false); 
           toastr_msg('success', '{{ config('app.name') }}', response.message, 2000);
         })
         .fail(function(response) {
@@ -225,46 +206,23 @@ function customer_CRUD(id){
     }
 }
 
-$("#partner_filter").change( event => {
-  $('#customers-table').DataTable().draw(false);
-});
-
 $(document).ready(function(){
                       
     path_str_language = "{{URL::asset('js/plugins/dataTables/es_ES.txt')}}";          
-    var table=$('#customers-table').DataTable({
+    var table=$('#companies-table').DataTable({
         "oLanguage":{"sUrl":path_str_language},
         "aaSorting": [[1, "asc"]],
         processing: true,
         serverSide: true,
-        ajax: {
-            url: '{!! route('customers.datatable') !!}',
-            type: "POST",
-            data: function(d) {
-                d._token= "{{ csrf_token() }}";
-                d.partner_filter = $('#partner_filter').val();
-            }
-        },        
+        ajax: '{!! route('companies.datatable') !!}',
         columns: [
             { data: 'action', name: 'action', orderable: false, searchable: false},
-            { data: 'name',   name: 'customers.full_name', orderable: false, searchable: true},
-            { data: 'contract',   name: 'contract', orderable: false, searchable: false},
-            { data: 'partner',   name: 'partner', orderable: false, searchable: false},
-            { data: 'cell',   name: 'cell', orderable: false, searchable: false},
-            { data: 'tax',   name: 'tax', orderable: false, searchable: false},
-            { data: 'operations', name: 'operations', orderable: false, searchable: false },
+            { data: 'name',   name: 'name', orderable: true, searchable: true},
             { data: 'status', name: 'status', orderable: false, searchable: false }
         ]
     });
 
-    $("#partner_filter").select2({
-      language: "es",
-      placeholder: "Socio Comercial - Todos",
-      minimumResultsForSearch: 10,
-      allowClear: true,
-      width: '100%'
-    });
-
 });
+
 </script>
 @endpush

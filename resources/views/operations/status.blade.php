@@ -5,7 +5,7 @@
         <div class="modal-header">
             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
             <span aria-hidden="true">&times;</span></button>
-            <h5 class="modal-title"><i class="fa fa-folder-o" aria-hidden="true"></i> Pasar Operación a {{ ($operation->status==1)?'Pendiente':'Entregado' }}</h5><small>Complete el formulario <b>(*) Campos obligatorios.</b></small>
+            <h5 class="modal-title"><i class="fa fa-truck" aria-hidden="true"></i> Cambiar Operación de Estado</h5><small>Complete el formulario <b>(*) Campos obligatorios.</b></small>
         </div>
         <div class="modal-body">
             <div class="row">            
@@ -13,8 +13,9 @@
                     <b>Operación Nro:</b> {{ $operation->number }}<br>
                     <b>Fecha:</b> {{ $operation->date->format('d/m/Y') }}<br>
                     <b>Cliente:</b> {{ $operation->customer->full_name }}<br>
-                    <b>Empresa emisora:</b> {{ $operation->company }}<br>
+                    <b>Empresa emisora:</b> {{ $operation->company->name }}<br>
                     <b>Socio Comercial:</b> {{ $operation->partner->user->full_name }}<br>
+                    <b>Mensajero:</b> {{ $operation->user->full_name }}
                 </div>
                 <div class="form-group col-sm-5">
                     <b>Folio:</b> {{ $operation->folio }}<br>
@@ -28,14 +29,24 @@
                         <b>Notas:</b> {{ $operation->notes }}
                     </div>
                 @endif
-                <div class="form-group col-sm-6">  
-                  <label>Mensajero *</label>
-                  {{ Form::select('user', $users, $operation->user_id, ['id'=>'user', 'class'=>'select2 form-control form-control-sm', 'tabindex'=>'-1', 'placeholder'=>'', 'required'])}}
-                </div>
-                <div class="form-group col-sm-6">
-                    <div class="i-checks">
-                        {!! Form::checkbox('notification', null, false, ['id'=>'notification', 'class'=>'i-checks']) !!} <label>Enviar notificacion al mensajero</label>
+                @if($operation->pending_notes)
+                    <div class="form-group col-sm-12">
+                        <b>Motivo de no entrega:</b> {{ $operation->pending_notes }}
                     </div>
+                @endif
+                @if($operation->status==1)
+                    <div class="form-group col-sm-12">  
+                      <label>Estado *</label>
+                      {{ Form::select('status', ['2'=>'Pendiente', '3'=>'Entregado'], null, ['id'=>'status', 'class'=>'select2 form-control form-control-sm', 'tabindex'=>'-1', 'placeholder'=>'', 'required'])}}
+                    </div>
+                @endif
+                <div class="form-group col-sm-12" id="div_s2_notes" style="display:none">
+                    <label>Motivo de no entrega *</label><small> Máx. 150 caracteres</small>
+                    {!! Form::textarea('s2_notes', null, ['id'=>'s2_notes', 'class'=>'form-control', 'type'=>'text', 'rows'=>'2', 'style'=>'font-size:12px', 'placeholder'=>'Escribe aqui el motivo de no entrega ...', 'maxlength'=>'150', 'required']) !!}
+                </div>
+                <div class="form-group col-sm-12" id="div_s3_notes" style="display:{{ ($operation->status==2)?'solid':'none' }}">
+                    <label>Notas finales</label><small> Máx. 150 caracteres</small>
+                    {!! Form::textarea('s3_notes', null, ['id'=>'s3_notes', 'class'=>'form-control', 'type'=>'text', 'rows'=>'2', 'style'=>'font-size:12px', 'placeholder'=>'Escribe aqui alguna nota de interés ...', 'maxlength'=>'150']) !!}
                 </div>
             </div>
         </div>
@@ -46,6 +57,8 @@
     </form>
 <!-- iCheck -->
 <script src="{{ URL::asset('js/plugins/iCheck/icheck.min.js') }}"></script>
+<!-- Maxlenght -->
+<script src="{{ asset('js/plugins/bootstrap-character-counter/dist/bootstrap-maxlength.min.js') }}"></script>
 <script>
     
 $("#btn_status").on('click', function(event) {    
@@ -59,7 +72,9 @@ $("#btn_status").on('click', function(event) {
               type: 'POST',
               data: {
                 _token: "{{ csrf_token() }}",
-                user:$('#user').val(),
+                status:$('#status').val(),
+                s2_notes:$('#s2_notes').val(),
+                s3_notes:$('#s3_notes').val(),
                 notification:$('#notification').is(":checked")?1:0, 
               },
             })
@@ -83,6 +98,15 @@ $("#btn_status").on('click', function(event) {
     }
 });
 
+$('#status').on('select2:select', function (e) {
+  if(e.target.value==2){
+        $('#div_s2_notes').show();
+        $('#div_s3_notes').hide();
+  }else{
+        $('#div_s3_notes').show();
+        $('#div_s2_notes').hide();
+  }
+});
 
 $(document).ready(function() {
     
@@ -99,6 +123,21 @@ $(document).ready(function() {
         allowClear: false,
         dropdownParent: $('#modalStatus .modal-content'),
         width: '100%'
+    });
+
+    $("#status").select2({
+        language: "es",
+        placeholder: "Seleccione",
+        minimumResultsForSearch: 10,
+        allowClear: false,
+        dropdownParent: $('#modalStatus .modal-content'),
+        width: '100%'
+    });
+
+    $('#pending_notes').maxlength({
+        warningClass: "small text-muted",
+        limitReachedClass: "small text-muted",
+        placement: "top-right-inside"
     });
 });
 </script>

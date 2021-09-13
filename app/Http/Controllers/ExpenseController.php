@@ -87,9 +87,6 @@ class ExpenseController extends Controller
             ->editColumn('date', function ($expense) {                    
                     return $expense->date->format('d/m/Y');
                 })
-            ->editColumn('amount', function ($expense) {                    
-                    return money_fmt($expense->amount);
-                })
             ->addColumn('file', function ($expense) {
                     return $expense->download_file;
                 })

@@ -2,31 +2,30 @@
 
 namespace App\Mail;
 
-use App\Models\Condominium;
 use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Contracts\Queue\ShouldQueue;
 
-class SignedupCondominium extends Mailable
+class AssignedOperation extends Mailable
 {
     use Queueable, SerializesModels;
 
     /**
-     * The condominium instance.
+     * The owner instance.
      *
      * @var Condominium
      */
-    public $condominium;    
+    public $operation;
     
     /**
      * Create a new message instance.
      *
      * @return void
      */
-    public function __construct(Condominium $condominium)
+    public function __construct($operation)
     {
-        $this->condominium = $condominium;
+        $this->operation = $operation;
     }
 
     /**
@@ -36,6 +35,6 @@ class SignedupCondominium extends Mailable
      */
     public function build()
     {
-        return $this->markdown('emails.signedup_condominium')->subject('Condominio registrado');
+        return $this->markdown('emails.assigned_operation')->subject('Operacion Asignada');
     }
 }

@@ -1,6 +1,13 @@
 <!DOCTYPE html>
 <html>
-
+<style type="text/css">
+    body{
+        background-image:url('img/background.png');
+        background-attachment:fixed;
+        background-repeat: no-repeat;
+        background-size: cover;
+    }    
+</style>
 <head>
 
     <meta charset="utf-8">

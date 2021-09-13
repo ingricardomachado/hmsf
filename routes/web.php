@@ -31,6 +31,13 @@ Route::get('centers.rpt_centers', 'CenterController@rpt_centers')->name('centers
 Route::resource("comments","CommentController");
 Route::get('comments.index/{id}', 'CommentController@index')->name('comment.index');
 
+//Companies
+Route::resource("companies","CompanyController");
+Route::get('companies.datatable', 'CompanyController@datatable')->name('companies.datatable');
+Route::get('companies.load/{id}', 'CompanyController@load')->name('companies.load');
+Route::get('companies.status/{id}', 'CompanyController@status')->name('companies.status');
+Route::get('companies.rpt_companies', 'CompanyController@rpt_companies')->name('companies.rpt_companies');
+
 //Customers
 Route::resource("customers","CustomerController");
 Route::post('customers.datatable', 'CustomerController@datatable')->name('customers.datatable');
@@ -72,7 +79,7 @@ Route::resource("operations","OperationController");
 Route::post('operations.datatable', 'OperationController@datatable')->name('operations.datatable');
 Route::get('operations.load/{id}', 'OperationController@load')->name('operations.load');
 Route::get('operations.status/{id}', 'OperationController@status')->name('operations.status');
-Route::get('operations.rpt_operations', 'OperationController@rpt_operations')->name('operations.rpt_operations');
+Route::post('operations.rpt_operations', 'OperationController@rpt_operations')->name('operations.rpt_operations');
 
 Route::get('operations.load_status/{id}', 'OperationController@load_status')->name('operations.load_status');
 Route::post('operations.status/{id}', 'OperationController@status')->name('operations.status');

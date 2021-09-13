@@ -9,8 +9,8 @@
                 <th class="text-left">Nombre</th>
                 <th class="text-left">Celular</th>
                 <th class="text-left">Comisión</th>
-                <th class="text-left">Clientes</th>
-                <th class="text-left">Operaciones</th>
+                <th class="text-center">Clientes</th>
+                <th class="text-center">Operaciones</th>
                 <th class="text-left">Estado</th>
             </tr>
         </thead>
@@ -23,8 +23,8 @@
                 </td>
                 <td class="text-left">{{ $partner->cell }}</td>
                 <td class="text-left">{{ $partner->tax }}</td>
-                <td class="text-left"></td>
-                <td class="text-left"></td>
+                <td class="text-center">{{ $partner->customers()->count() }}</td>
+                <td class="text-center">{{ $partner->operations()->count() }}</td>
                 <td class="text-left">{{ $partner->status_description }}</td>
             </tr>
         @endforeach

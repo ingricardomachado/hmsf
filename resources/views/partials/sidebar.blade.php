@@ -13,7 +13,7 @@
                 <div class="dropdown profile-element">
                     <span><img alt="image" class="img-circle" style="max-height:70px; max-width:70px;" src="{{ url('user_avatar/'.Auth::user()->id) }}"/></span>
                     <a data-toggle="dropdown" class="dropdown-toggle" href="#">
-                    <span class="clear"> <span class="block m-t-xs"> <strong class="font-bold">{{ Auth::user()->name }}</strong>
+                    <span class="clear"> <span class="block m-t-xs"> <strong class="font-bold">{{ Auth::user()->full_name }}</strong>
                     </span> <span class="text-muted text-xs block">{{ Auth::user()->role_description }} <b class="caret"></b></span> </span> </a>
                     <ul class="dropdown-menu animated fadeInRight m-t-xs">
                         <li>
@@ -38,6 +38,9 @@
             </li>
             <li class="{{ set_active(['partners']) }}">
                 <a href="{{url('partners')}}"><i class="fa fa-users"></i> <span class="nav-label">Socios Comerciales</span></a>
+            </li>
+            <li class="{{ set_active(['companies']) }}">
+                <a href="{{url('companies')}}"><i class="fa fa-building-o"></i> <span class="nav-label">Empresas emisoras</span></a>
             </li>
             <li class="{{ set_active(['customers']) }}">
                 <a href="{{url('customers')}}"><i class="fa fa-users"></i> <span class="nav-label">Clientes</span></a>
@@ -75,24 +78,24 @@
         
         <!-- Menu Socio de Negocios -->
         @if(session('role')=='SOC')
-            <li class="{{ set_active(['home']) }}">
-                <a href="{{url('home')}}"><i class="fa fa-laptop"></i> <span class="nav-label">Dashboard</span></a>
+            <li class="{{ set_active(['operations']) }}">
+                <a href="{{url('operations')}}"><i class="fa fa-truck"></i> <span class="nav-label">Operaciones</span></a>
             </li>
         @endif
         <!-- /Menu Socio de Negocios -->
         
         <!-- Menu Supervisor -->
         @if(session('role')=='SUP')
-            <li class="{{ set_active(['home']) }}">
-                <a href="{{url('home')}}"><i class="fa fa-laptop"></i> <span class="nav-label">Dashboard</span></a>
+            <li class="{{ set_active(['operations']) }}">
+                <a href="{{url('operations')}}"><i class="fa fa-truck"></i> <span class="nav-label">Operaciones</span></a>
             </li>
         @endif
         <!-- /Menu Supervisor -->
 
         <!-- Menu Mensajero -->
         @if(session('role')=='MEN')
-            <li class="{{ set_active(['home']) }}">
-                <a href="{{url('home')}}"><i class="fa fa-laptop"></i> <span class="nav-label">Dashboard</span></a>
+            <li class="{{ set_active(['operations']) }}">
+                <a href="{{url('operations')}}"><i class="fa fa-truck"></i> <span class="nav-label">Operaciones</span></a>
             </li>
         @endif
         <!-- /Menu Mensajero -->

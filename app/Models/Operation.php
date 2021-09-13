@@ -10,6 +10,11 @@ class Operation extends Model
     protected $dates = ['date'];
     
     //*** Relations ***
+    public function company(){
+   
+        return $this->belongsTo('App\Models\Company');
+    }
+
     public function customer(){
    
         return $this->belongsTo('App\Models\Customer');
@@ -53,14 +58,14 @@ class Operation extends Model
     public function getStatusLabelAttribute(){
                 
         switch ($this->status) {
-            case '1':
-                return "<span class='label label-default' style='font-weight:normal'>$this->status_description</span>";
+            case 1:
+                return "<span class='label label-default' style='font-weight:normal' title='Cambiar de estado'>$this->status_description</span>";
                 break;
-            case '2':
-                return "<span class='label label-warning' style='font-weight:normal'>$this->status_description</span>";
+            case 2:
+                return "<span class='label label-warning' style='font-weight:normal' title='$this->s2_notes'>$this->status_description</span>";
                 break;
-            case '3':
-                return "<span class='label label-primary' style='font-weight:normal'>$this->status_description</span>";
+            case 3:
+                return "<span class='label label-primary' style='font-weight:normal' title='$this->s3_notes'>$this->status_description</span>";
                 break;
             
             default:
@@ -72,5 +77,4 @@ class Operation extends Model
 
         return "<span class='label label-".$label."' style='font-weight:normal'>$this->status_description</span>";       
     }
-
 }

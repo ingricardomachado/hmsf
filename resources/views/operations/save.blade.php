@@ -12,7 +12,7 @@
         <div class="modal-header">
             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
             <span aria-hidden="true">&times;</span></button>
-            <h5 class="modal-title"><i class="fa fa-folder-o" aria-hidden="true"></i> {{ ($operation->id) ? "Modificar Operación": "Registrar Operación" }}</h5><small>Complete el formulario <b>(*) Campos obligatorios.</b></small>
+            <h5 class="modal-title"><i class="fa fa-truck" aria-hidden="true"></i> {{ ($operation->id) ? "Modificar Operación": "Registrar Operación" }}</h5><small>Complete el formulario <b>(*) Campos obligatorios.</b></small>
         </div>
         <div class="modal-body">
             <div class="row">            
@@ -27,17 +27,17 @@
                   <label>Cliente *</label>
                   {{ Form::select('customer', $customers, $operation->customer_id, ['id'=>'customer', 'class'=>'select2 form-control form-control-sm', 'tabindex'=>'-1', 'placeholder'=>'', 'required'])}}
                 </div>
-                <div class="form-group col-sm-6">
-                    <label>Empresa emisora *</label>
-                    {!! Form::text('company', $operation->company, ['id'=>'company', 'class'=>'form-control', 'type'=>'text', 'placeholder'=>'', 'maxlength'=>'50']) !!}
+                <div class="form-group col-sm-6">  
+                  <label>Empresa emisora *</label>
+                  {{ Form::select('company', $companies, $operation->company_id, ['id'=>'company', 'class'=>'select2 form-control form-control-sm', 'tabindex'=>'-1', 'placeholder'=>'', 'required'])}}
                 </div>
                 <div class="form-group col-sm-6">  
                   <label>Socio comercial *</label>
-                  {{ Form::select('partner', $partners, $operation->partner_id, ['id'=>'partner', 'class'=>'select2 form-control', 'tabindex'=>'-1', 'placeholder'=>''])}}
+                  {{ Form::select('partner', $partners, $operation->partner_id, ['id'=>'partner', 'class'=>'select2 form-control', 'tabindex'=>'-1', 'placeholder'=>'', 'required'])}}
                 </div>
                 <div class="form-group col-sm-6">
                     <label>Folio *</label>
-                    {!! Form::text('folio', $operation->folio, ['id'=>'folio', 'class'=>'form-control', 'type'=>'text', 'placeholder'=>'', 'maxlength'=>'15']) !!}
+                    {!! Form::text('folio', $operation->folio, ['id'=>'folio', 'class'=>'form-control', 'type'=>'text', 'placeholder'=>'', 'maxlength'=>'15', 'required']) !!}
                 </div>
                 <div class="form-group col-sm-6">
                     <label>Total Facturado {{ session()->get('coin') }} *</label>
@@ -58,9 +58,14 @@
                     <input type="number" name="hm_tax" id="hm_tax" value="{{ ($operation->id)?$operation->hm_tax:$setting->tax }}" class="form-control" style="margin-bottom:2mm" min="0" max="100" step="0.01" placeholder="" required/>
                     <span class="text-muted" id="hm_profit"></span>
                 </div>
-                <div class="form-group col-sm-12">
-                    <label>Notas</label><small> Máx. 150 caracteres</small>
-                    {!! Form::textarea('notes', $operation->notes, ['id'=>'notes', 'class'=>'form-control', 'type'=>'text', 'rows'=>'2', 'style'=>'font-size:12px', 'placeholder'=>'Escribe aqui alguna nota de interés ...', 'maxlength'=>'150']) !!}
+                <div class="form-group col-sm-12">  
+                  <label>Mensajero *</label>
+                  {{ Form::select('user', $users, $operation->user_id, ['id'=>'user', 'class'=>'select2 form-control', 'tabindex'=>'-1', 'placeholder'=>'', 'required'])}}
+                </div>
+                <div class="form-group col-sm-12" id="div_notification" style="display:{{ ($operation->id)?'none':'solid' }}">
+                    <div class="i-checks">
+                        <label>{!! Form::checkbox('notification', null,  false, ['id'=>'notification']) !!} <span id="label_notification">Notificar al mensajero</label>
+                    </div>
                 </div>
             </div>
         </div>
@@ -167,6 +172,24 @@ $(document).ready(function() {
     });
 
     $("#customer").select2({
+        language: "es",
+        placeholder: "Seleccione",
+        minimumResultsForSearch: 10,
+        allowClear: false,
+        dropdownParent: $('#modalOperation .modal-content'),
+        width: '100%'
+    });
+
+    $("#company").select2({
+        language: "es",
+        placeholder: "Seleccione",
+        minimumResultsForSearch: 10,
+        allowClear: false,
+        dropdownParent: $('#modalOperation .modal-content'),
+        width: '100%'
+    });
+
+    $("#user").select2({
         language: "es",
         placeholder: "Seleccione",
         minimumResultsForSearch: 10,

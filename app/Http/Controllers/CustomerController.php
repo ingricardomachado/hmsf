@@ -97,8 +97,8 @@ class CustomerController extends Controller
             ->editColumn('tax', function ($customer) {                    
                     return $customer->tax.'%';
                 })
-            ->addColumn('operations', function ($partner) {                    
-                    return "";
+            ->addColumn('operations', function ($customer) {                    
+                    return $customer->operations()->count();
                 })
             ->editColumn('status', function ($customer) {                    
                     return $customer->status_label;
@@ -149,6 +149,7 @@ class CustomerController extends Controller
             $customer->phone=$request->phone;
             $customer->address=$request->address;
             $customer->tax=$request->tax;
+            $customer->contract=($request->has_contract)?$request->contract:null;
             $customer->save();
             
             return response()->json([
@@ -210,6 +211,7 @@ class CustomerController extends Controller
             $customer->phone=$request->phone;
             $customer->address=$request->address;
             $customer->tax=$request->tax;
+            $customer->contract=($request->has_contract)?$request->contract:null;
             $customer->save();
 
             return response()->json([

@@ -25,8 +25,8 @@
                         <i class="fa fa-users fa-4x"></i>
                     </div>
                     <div class="col-xs-8 text-right">
-                        <span> Clientes </span>
-                        <h3 class="font-bold">0000</h3>
+                        <span> Tot Clientes </span>
+                        <h3 class="font-bold">{{ $tot_customers }}</h3>
                     </div>
                 </div>
             </div>
@@ -38,8 +38,8 @@
                         <i class="fa fa-truck fa-4x"></i>
                     </div>
                     <div class="col-xs-8 text-right">
-                        <span> Operaciones <b>000</b></span>
-                        <h3 class="font-bold">{{ session('coin') }}{{ money_fmt(0) }}</h3>
+                        <span> Tot Operaciones </span>
+                        <h3 class="font-bold">{{ $tot_operations }}</h3>
                     </div>
                 </div>
             </div>
@@ -51,8 +51,8 @@
                         <i class="fa fa-money fa-4x"></i>
                     </div>
                     <div class="col-xs-8 text-right">
-                        <span> Tot Ingresos Mes</span>
-                        <h3 class="font-bold">{{ session('coin') }}{{ money_fmt(0) }}</h3>
+                        <span> Tot Facturado Mes</span>
+                        <h3 class="font-bold">{{ session('coin') }}{{ money_fmt($tot_incomes_month) }}</h3>
                     </div>
                 </div>
             </div>
@@ -65,7 +65,7 @@
                     </div>
                     <div class="col-xs-8 text-right">
                         <span> Tot Egresos Mes</span>
-                        <h3 class="font-bold">{{ session('coin') }}{{ money_fmt(0) }}</h3>
+                        <h3 class="font-bold">{{ session('coin') }}{{ money_fmt($tot_expenses_month) }}</h3>
                     </div>
                 </div>
             </div>
@@ -73,31 +73,105 @@
 	</div>
 
     <div class="row">
-        <div class="col-lg-8">
+        <div class="col-lg-12">
             <div class="ibox float-e-margins">
-                <div class="ibox-title">
-                    <h5>Ingresos vs Egresos <b>{{ $today->year }}</b></h5> <span class="label label-primary">IN+</span>
-                    <div class="ibox-tools">
-                        <a class="collapse-link">
-                            <i class="fa fa-chevron-up"></i>
-                        </a>
-                    </div>
-                </div>
-                
                 <div class="ibox-content">
+                    <div>
+                        <span class="pull-right text-right">Total Facturado Mes: <b>{{ money_fmt($tot_incomes_month) }}</b></span>
+                        <h3 class="font-bold no-margins"> Facturación {{ month_letter($today->month, 'lg') }}</h3>
+                    </div>
                     <div class="m-t-sm">
                         <div class="row">
                             <div class="col-md-12">
-                                <div>
-                                    <canvas id="lineChartMovements" height="80"></canvas>
-                                </div>
+                                <div><canvas id="lineChartIncomesMonth" height="40"></canvas></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="m-t-md">
+                        <small class="pull-right">
+                            <i class="fa fa-clock-o"></i> Actualizado al {{ $today->format('d.m.Y') }}
+                        </small>
+                        <small>
+                            <strong>Facturación diaria {{ Session::get('coin') }}</strong>.
+                        </small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-6">
+            <div class="ibox float-e-margins">
+                <div class="ibox-content">
+                    <div>
+                        <span class="pull-right text-right">Total Facturado Año: <b>{{ money_fmt($tot_incomes_year) }}</b></span>
+                        <h3 class="font-bold no-margins"> Facturación {{ $today->year }}</h3>
+                    </div>
+                    <div class="m-t-sm">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div><canvas id="lineChartIncomesYear" height="120"></canvas></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="m-t-md">
+                        <small class="pull-right">
+                            <i class="fa fa-clock-o"></i> Actualizado al {{ $today->format('d.m.Y') }}
+                        </small>
+                        <small>
+                            <strong>Facturación mensual {{ Session::get('coin') }}</strong>.
+                        </small>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-6">
+            <div class="ibox float-e-margins">
+                <div class="ibox-content">
+                    <div>
+                        <span class="pull-right text-right"></span>
+                        <h3 class="font-bold no-margins"> Margenes {{ $today->year }}</h3>
+                    </div>
+                    <div class="m-t-sm">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div><canvas id="lineChartMarginsYear" height="120"></canvas></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="m-t-md">
+                        <small class="pull-right">
+                            <i class="fa fa-clock-o"></i> Actualizado al {{ $today->format('d.m.Y') }}
+                        </small>
+                        <small>
+                            <strong>Margenes mensuales {{ Session::get('coin') }}</strong>.
+                        </small>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="ibox float-e-margins">
+                <div class="ibox-content">
+                    <div>
+                        <span class="pull-right text-right"></span>
+                        <h3 class="font-bold no-margins"> Margenes {{ month_letter($today->month, 'lg') }}</h3>
+                    </div>
+                    <div class="m-t-sm">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div><canvas id="lineChartMarginsMonth" height="40"></canvas></div>
                             </div>
                         </div>
                     </div>
                     <div class="m-t-md">
                         <small>
-                            <i class="fa fa-circle text-navy" aria-hidden="true"></i> Ingresos 
-                            <i class="fa fa-circle text-muted" aria-hidden="true"></i>  Egresos 
+                            <i class="fa fa-circle text-warning" aria-hidden="true"></i> Margen Total <i class="fa fa-circle text-navy" aria-hidden="true"></i>  Margen SC <i class="fa fa-circle text-danger" aria-hidden="true"></i> Margen HM
                         </small>
                         <small class="pull-right">
                             <i class="fa fa-clock-o"></i> Actualizado al {{ $today->format('d.m.Y') }}
@@ -105,83 +179,10 @@
                     </div>
                 </div>
             </div>
-
-        </div>
-        <div class="col-lg-4">
-            <div class="ibox float-e-margins">
-                <div class="ibox-title">
-                    <h5>Caja y Banco</h5>
-                    <div class="ibox-tools">
-                        <a class="collapse-link">
-                            <i class="fa fa-chevron-up"></i>
-                        </a>
-                        <a class="dropdown-toggle" data-toggle="dropdown" href="#">
-                            <i class="fa fa-wrench"></i>
-                        </a>
-                        <ul class="dropdown-menu dropdown-user">
-                            <li><a href="#">Config option 1</a>
-                            </li>
-                            <li><a href="#">Config option 2</a>
-                            </li>
-                        </ul>
-                        <a class="close-link">
-                            <i class="fa fa-times"></i>
-                        </a>
-                    </div>
-                </div>
-                <div class="ibox-content">
-                    <div>
-                        <table width="100%">
-                            <tbody>
-                                <tr>
-                                    <td></td>
-                                </tr>
-                            </tbody>
-                            <tfoot>
-                                <tr>
-                                    <th>TOTAL..:</th>
-                                    <th class="text-right">
-                                        {{ session('coin') }}{{ money_fmt(0) }}
-                                    </th>
-                                </tr>
-                            </tfoot>
-                        </table>
-                    </div>
-                </div>
-            </div>
-            <div class="ibox float-e-margins">
-                <div class="ibox-title">
-                    <h5><a href="#" style="color:inherit"  title="Click para ir a calendario">Eventos próximos</a></h5>
-                    <div class="ibox-tools">
-                        <span class="label label-warning-light pull-right"> Evento</span>
-                       </div>
-                </div>
-                <div class="ibox-content">
-                    <div>
-                            <div class="alert alert-info" style="font-size:12px">
-                                <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
-                                No hay eventos para mostrar ...
-                            </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="ibox float-e-margins">
-                <div class="ibox-title">
-                    <h5>Ultimos mensajes</h5>
-                    <div class="ibox-tools">
-                        <button type="button" class="btn btn-xs btn-primary pull-right" onclick="showModalPost()">Postear</button>
-                       </div>
-                </div>
-                <div class="ibox-content">
-                    <div>
-                            <span id="posts"></span>
-                    </div>
-                </div>
-            </div>
-
         </div>
     </div>
+
+
 </div>
 
 @endsection
@@ -209,33 +210,24 @@
 
 $(document).ready(function() {
     
-    var lineDataMovements = {
-        labels: {!! $labels !!},
+    //Grafica MES
+    var lineDataIncomesMonth = {
+        labels: {!! $labels_days !!},
         datasets: [
             {
-                label: "Ingresos",
+                label: "Example dataset",
                 fillColor: "rgba(26,179,148,0.5)",
                 strokeColor: "rgba(26,179,148,0.7)",
                 pointColor: "rgba(26,179,148,1)",
                 pointStrokeColor: "#fff",
                 pointHighlightFill: "#fff",
                 pointHighlightStroke: "rgba(26,179,148,1)",
-                data: {!! $array_incomes !!}
-            },
-            {
-                label: "Egresos",
-                fillColor: "rgba(220,220,220,0.5)",
-                strokeColor: "rgba(220,220,220,1)",
-                pointColor: "rgba(220,220,220,1)",
-                pointStrokeColor: "#fff",
-                pointHighlightFill: "#fff",
-                pointHighlightStroke: "rgba(220,220,220,1)",
-                data: {!! $array_expenses !!}
+                data: {!! $array_incomes_month !!}
             }
         ]
     };
 
-    var lineOptionsPurchases = {
+    var lineOptionsIncomesMonth = {
         scaleShowGridLines: true,
         scaleGridLineColor: "rgba(0,0,0,.05)",
         scaleGridLineWidth: 1,
@@ -251,8 +243,160 @@ $(document).ready(function() {
         responsive: true,
     };
 
-    var ctx_movements = document.getElementById("lineChartMovements").getContext("2d");
-    var myNewChartPurchases = new Chart(ctx_movements).Line(lineDataMovements, lineOptionsPurchases);
+    var ctx_incomes_month = document.getElementById("lineChartIncomesMonth").getContext("2d");
+    var myNewChartIncomesMonth = new Chart(ctx_incomes_month).Line(lineDataIncomesMonth, lineOptionsIncomesMonth);
+
+
+    //Grafica AÑO
+    var lineDataIncomesYear = {
+        labels: {!! $labels_months !!},
+        datasets: [
+            {
+                label: "Example dataset",
+                fillColor: "rgba(26,179,148,0.5)",
+                strokeColor: "rgba(26,179,148,0.7)",
+                pointColor: "rgba(26,179,148,1)",
+                pointStrokeColor: "#fff",
+                pointHighlightFill: "#fff",
+                pointHighlightStroke: "rgba(26,179,148,1)",
+                data: {!! $array_incomes_year !!}
+            }
+        ]
+    };
+
+    var lineOptionsIncomesYear = {
+        scaleShowGridLines: true,
+        scaleGridLineColor: "rgba(0,0,0,.05)",
+        scaleGridLineWidth: 1,
+        bezierCurve: true,
+        bezierCurveTension: 0.4,
+        pointDot: true,
+        pointDotRadius: 4,
+        pointDotStrokeWidth: 1,
+        pointHitDetectionRadius: 20,
+        datasetStroke: true,
+        datasetStrokeWidth: 2,
+        datasetFill: false,
+        responsive: true,
+    };
+
+    var ctx_incomes_year = document.getElementById("lineChartIncomesYear").getContext("2d");
+    var myNewIncomesYear = new Chart(ctx_incomes_year).Line(lineDataIncomesYear, lineOptionsIncomesYear);
+
+
+    //Grafica Margenes MES Total SC HM
+    var lineDataMarginsMonth = {
+        labels: {!! $labels_days !!},
+        datasets: [
+            {
+                label: "Margen Total",
+                fillColor: "rgba(248,172, 89,0.5)",
+                strokeColor: "rgba(248,172,89,1)",
+                pointColor: "rgba(248,172,89,1)",
+                pointStrokeColor: "#fff",
+                pointHighlightFill: "#fff",
+                pointHighlightStroke: "rgba(248,172,89,1)",
+                data: {!! $array_margin_total_month !!}
+            },
+            {
+                label: "Margen SC",
+                fillColor: "rgba(26,179,148,0.5)",
+                strokeColor: "rgba(26,179,148,1)",
+                pointColor: "rgba(26,179,148,1)",
+                pointStrokeColor: "#fff",
+                pointHighlightFill: "#fff",
+                pointHighlightStroke: "rgba(26,179,148,1)",
+                data: {!! $array_margin_sc_month !!}
+            },
+            {
+                label: "Margen HM",
+                fillColor: "rgba(237,85,101,0.5)",
+                strokeColor: "rgba(237,85,101,1)",
+                pointColor: "rgba(237,85,101,1)",
+                pointStrokeColor: "#fff",
+                pointHighlightFill: "#fff",
+                pointHighlightStroke: "rgba(237,85,101,1)",
+                data: {!! $array_margin_hm_month !!}
+            }
+        ]
+    };
+
+    var lineOptionsMarginsMonth = {
+        scaleShowGridLines: true,
+        scaleGridLineColor: "rgba(0,0,0,.05)",
+        scaleGridLineWidth: 1,
+        bezierCurve: true,
+        bezierCurveTension: 0.4,
+        pointDot: true,
+        pointDotRadius: 4,
+        pointDotStrokeWidth: 1,
+        pointHitDetectionRadius: 20,
+        datasetStroke: true,
+        datasetStrokeWidth: 2,
+        datasetFill: false,
+        responsive: true,
+    };
+
+    var ctx_margins_month = document.getElementById("lineChartMarginsMonth").getContext("2d");
+    var myNewChartMarginsMonth = new Chart(ctx_margins_month).Line(lineDataMarginsMonth, lineOptionsMarginsMonth);
+
+
+
+    //Grafica Margenes AÑO Total SC HM
+    var lineDataMarginsYear = {
+        labels: {!! $labels_months !!},
+        datasets: [
+            {
+                label: "Margen Total",
+                fillColor: "rgba(248,172, 89,0.5)",
+                strokeColor: "rgba(248,172,89,1)",
+                pointColor: "rgba(248,172,89,1)",
+                pointStrokeColor: "#fff",
+                pointHighlightFill: "#fff",
+                pointHighlightStroke: "rgba(248,172,89,1)",
+                data: {!! $array_margin_total_year !!}
+            },
+            {
+                label: "Margen SC",
+                fillColor: "rgba(26,179,148,0.5)",
+                strokeColor: "rgba(26,179,148,1)",
+                pointColor: "rgba(26,179,148,1)",
+                pointStrokeColor: "#fff",
+                pointHighlightFill: "#fff",
+                pointHighlightStroke: "rgba(26,179,148,1)",
+                data: {!! $array_margin_sc_year !!}
+            },
+            {
+                label: "Margen HM",
+                fillColor: "rgba(237,85,101,0.5)",
+                strokeColor: "rgba(237,85,101,1)",
+                pointColor: "rgba(237,85,101,1)",
+                pointStrokeColor: "#fff",
+                pointHighlightFill: "#fff",
+                pointHighlightStroke: "rgba(237,85,101,1)",
+                data: {!! $array_margin_hm_year !!}
+            }
+        ]
+    };
+
+    var lineOptionsMarginsYear = {
+        scaleShowGridLines: true,
+        scaleGridLineColor: "rgba(0,0,0,.05)",
+        scaleGridLineWidth: 1,
+        bezierCurve: true,
+        bezierCurveTension: 0.4,
+        pointDot: true,
+        pointDotRadius: 4,
+        pointDotStrokeWidth: 1,
+        pointHitDetectionRadius: 20,
+        datasetStroke: true,
+        datasetStrokeWidth: 2,
+        datasetFill: false,
+        responsive: true,
+    };
+
+    var ctx_margins_year = document.getElementById("lineChartMarginsYear").getContext("2d");
+    var myNewChartMarginsYear = new Chart(ctx_margins_year).Line(lineDataMarginsYear, lineOptionsMarginsYear);
 
 });
 </script>

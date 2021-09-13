@@ -9,10 +9,15 @@ class Partner extends Model
 
     protected $table = 'partners';
    
-   //*** Relations ***    
+   //*** Relations ***
     public function customers()
     {        
-        return $this->belongsTo('App\Models\Customer');
+        return $this->hasMany('App\Models\Customer');
+    }
+
+    public function operations()
+    {        
+        return $this->hasMany('App\Models\Operation');
     }
 
     public function user()
