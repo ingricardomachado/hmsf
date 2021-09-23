@@ -144,8 +144,6 @@ class PartnerController extends Controller
             $partner->user_id=$user->id;
             $partner->state_id=$request->state;
             $partner->cell=$request->cell;
-            $partner->phone=$request->phone;
-            $partner->address=$request->address;
             $partner->tax=$request->tax;
             $partner->save();
             if($request->notification){
@@ -218,8 +216,6 @@ class PartnerController extends Controller
             //actualizar partner
             $partner->state_id=$request->state;
             $partner->cell=$request->cell;
-            $partner->phone=$request->phone;
-            $partner->address=$request->address;
             $partner->tax=$request->tax;
             $partner->save();
 

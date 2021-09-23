@@ -36,8 +36,8 @@
                   {{ Form::select('partner', $partners, $operation->partner_id, ['id'=>'partner', 'class'=>'select2 form-control', 'tabindex'=>'-1', 'placeholder'=>'', 'required'])}}
                 </div>
                 <div class="form-group col-sm-6">
-                    <label>Folio *</label>
-                    {!! Form::text('folio', $operation->folio, ['id'=>'folio', 'class'=>'form-control', 'type'=>'text', 'placeholder'=>'', 'maxlength'=>'15', 'required']) !!}
+                    <label>Folio</label>
+                    {!! Form::text('folio', $operation->folio, ['id'=>'folio', 'class'=>'form-control', 'type'=>'text', 'placeholder'=>'', 'maxlength'=>'15']) !!}
                 </div>
                 <div class="form-group col-sm-6">
                     <label>Total Facturado {{ session()->get('coin') }} *</label>

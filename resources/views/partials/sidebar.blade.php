@@ -78,6 +78,9 @@
         
         <!-- Menu Socio de Negocios -->
         @if(session('role')=='SOC')
+            <li class="{{ set_active(['home']) }}">
+                <a href="{{url('home')}}"><i class="fa fa-laptop"></i> <span class="nav-label">Dashboard</span></a>
+            </li>
             <li class="{{ set_active(['operations']) }}">
                 <a href="{{url('operations')}}"><i class="fa fa-truck"></i> <span class="nav-label">Operaciones</span></a>
             </li>

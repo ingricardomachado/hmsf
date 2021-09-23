@@ -25,7 +25,7 @@
         <div class="modal-body">
             <div class="row">            
                 <div class="form-group col-sm-12">  
-                  <label>Socio de Negocio *</label>
+                  <label>Socio Comercial *</label>
                   {{ Form::select('partner', $partners, $customer->partner_id, ['id'=>'partner', 'class'=>'select2 form-control form-control-sm', 'tabindex'=>'-1', 'placeholder'=>'', 'required'])}}
                 </div>
                 <div class="form-group col-sm-6">
@@ -46,18 +46,10 @@
                     <span id="error-msg" style="color:#cc5965;font-weight:bold"></span>
                 </div>
                 <div class="form-group col-sm-6">
-                    <label>Teléfono</label>
-                    {!! Form::text('phone', $customer->phone, ['id'=>'phone', 'class'=>'form-control', 'type'=>'text', 'placeholder'=>'', 'maxlength'=>'30']) !!}
-                </div>
-                <div class="form-group col-sm-6">
                     <label>Comisión % *</label>
                     <input type="number" name="tax" id="tax" value="{{ $customer->tax }}" class="form-control" min="1" max=100 step="0.01" placeholder="" required/>
                 </div>
-                <div class="form-group col-sm-12">
-                    <label>Dirección</label>
-                    {!! Form::text('address', $customer->address, ['id'=>'address', 'class'=>'form-control', 'type'=>'text', 'placeholder'=>'', 'maxlength'=>'100']) !!}
-                </div>
-                <div class="form-group col-sm-6">
+                <div class="form-group col-sm-6" style="margin-top:7mm">
                     <div class="i-checks">
                         <label>{!! Form::checkbox('has_contract', null,  false, ['id'=>'has_contract']) !!} Tiene contrato</label>
                     </div>

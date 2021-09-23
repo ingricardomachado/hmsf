@@ -103,16 +103,17 @@
   <div class="modal-dialog">
     <div class="modal-content animated fadeIn">
       <div class="modal-header">
-        <h5 class="modal-title"><i class="fa fa-trash" aria-hidden="true"></i> <strong>Eliminar Vehículo</strong></h5>
+        <h5 class="modal-title"><i class="fa fa-trash" aria-hidden="true"></i> <strong>Eliminar Cliente</strong></h5>
         <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
       </div>      
       <div class="modal-body">
-          <input type="hidden" id="hdd_asset_id" value=""/>
+          <input type="hidden" id="hdd_customer_id" value=""/>
           <p>Esta seguro que desea eliminar el cliente <b><span id="customer_name"></span></b> ?</p>
+          <p>Al eliminar el cliente, se elliminarán todas las operaciones asociadas al él.</p>
       </div>
       <div class="modal-footer">
         <button type="button" id="btn_close" class="btn btn-default" data-dismiss="modal">Cerrar</button>        
-        <button type="button" id="btn_delete_asset" class="btn btn-danger">Eliminar</button>
+        <button type="button" id="btn_delete_customer" class="btn btn-danger">Eliminar</button>
       </div>
     </div>
   </div>

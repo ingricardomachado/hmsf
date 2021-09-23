@@ -2,7 +2,7 @@
 <html>
 <style type="text/css">
     body{
-        background-image:url('img/background.png');
+        background-image:url('img/company_logo.png');
         background-attachment:fixed;
         background-repeat: no-repeat;
         background-size: cover;
@@ -13,7 +13,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>HM Soluciones Financieras | Tu condominio inteligente</title>
+    <title>{{ config('app.name') }} | Login</title>
     <link rel="shortcut icon" href="{{ asset("img/app_ico.ico") }}" />
 
     <!-- Bootstrap -->
@@ -28,12 +28,11 @@
 </head>
 
 <body class="gray-bg">
-
     <div class="middle-box text-center loginscreen animated fadeInDown">
         <div>
-            <div>
+            <div style="margin-top:200px">
                 <h1>
-                   <span><img src="{{ asset("img/company_logo.png") }}" class="img-thumbnail" style="max-height:auto; max-width:280px;"/></span>
+                   <span></span>
                 </h1>            
                     <!-- show erros -->
                     @if (count($errors) > 0)
@@ -49,7 +48,7 @@
                     @endif
                     <!-- /show erros -->
             </div>
-                    
+
                     <form class="m-t" id="form" role="form" method="post" action="{{ url('/login') }}">
                         {!! csrf_field() !!}
                         <div class="form-group">
@@ -62,8 +61,9 @@
                         <a class="reset_pass" href="{{  url('/password/reset') }}">Olvidaste la contraseña?</a>
                     </form>
                     <p class="text-center m-t">
-                        <small><i class="fa fa-truck" aria-hidden="true"></i> <b>HM</b>Soluciones Financieras&nbsp;&nbsp;Copyright &copy; 2020</small>
+                        <small><i class="fa fa-truck" aria-hidden="true"></i> {{ config('app.name') }}&nbsp;&nbsp;Copyright &copy; {{ now()->year }}</small>
                     </p>
+                    
                 </div>
             </div>
         </div>

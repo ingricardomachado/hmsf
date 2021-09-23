@@ -14,15 +14,11 @@
                     <b>Fecha:</b> {{ $operation->date->format('d/m/Y') }}<br>
                     <b>Cliente:</b> {{ $operation->customer->full_name }}<br>
                     <b>Empresa emisora:</b> {{ $operation->company->name }}<br>
-                    <b>Socio Comercial:</b> {{ $operation->partner->user->full_name }}<br>
-                    <b>Mensajero:</b> {{ $operation->user->full_name }}
                 </div>
                 <div class="form-group col-sm-5">
-                    <b>Folio:</b> {{ $operation->folio }}<br>
-                    <b>Total Facturado:</b> {{ session('coin') }}{{ money_fmt($operation->amount) }}<br>
-                    <b>Margen Total:</b> {{ session('coin') }}{{ money_fmt($operation->customer_profit) }}<br>
-                    <b>Margen Socio:</b> {{ session('coin') }}{{ money_fmt($operation->partner_profit) }}<br>
-                    <b>Margen HM:</b> {{ session('coin') }}{{ money_fmt($operation->hm_profit) }}<br>
+                    <b>Socio Comercial:</b> {{ $operation->partner->user->full_name }}<br>
+                    <b>Mensajero:</b> {{ $operation->user->full_name }}<br>
+                    <b>Folio:</b> {{ $operation->folio }}
                 </div>
                 @if($operation->notes)
                     <div class="form-group col-sm-12">

@@ -1,12 +1,19 @@
 <!DOCTYPE html>
 <html>
-
+<style type="text/css">
+    body{
+        background-image:url('../img/company_logo.png');
+        background-attachment:fixed;
+        background-repeat: no-repeat;
+        background-size: cover;
+    }    
+</style>
 <head>
 
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>HM Soluciones Financieras | Recuperar contraseña</title>
+    <title>{{ config('app.name') }} | Recuperar contraseña</title>
     <link rel="shortcut icon" href="{{ asset("img/app_ico.ico") }}" />
 
     <!-- Bootstrap -->
@@ -24,10 +31,10 @@
 
     <div class="middle-box text-center loginscreen animated fadeInDown">
         <div>
-            <div>
+            <div style="margin-top:200px">
                 <div class="text-center">
                     <h1>
-                        <span><img src="{{ asset("img/company_logo.png") }}" style="max-height:auto; max-width:280px;"/></span>
+                        <span></span>
                     </h1>            
                     <!-- show erros -->
                     @if (count($errors) > 0)
@@ -60,7 +67,7 @@
                         <button type="submit" id="btn_submit" class="btn btn-primary block full-width m-b">Resetear mi contraseña</button>
                     </form>
                     <p class="text-center m-t">
-                        <small><i class="fa fa-building-o" aria-hidden="true"></i> Smart<b>Cond</b>&nbsp;&nbsp;Copyright &copy; 2020</small>
+                        <small><i class="fa fa-building-o" aria-hidden="true"></i> {{ config('app.name') }}&nbsp;&nbsp;Copyright &copy; {{ now()->year }}</small>
                     </p>
             </div>
         </div>

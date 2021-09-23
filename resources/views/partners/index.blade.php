@@ -100,6 +100,7 @@
       <div class="modal-body">
           <input type="hidden" id="hdd_partner_id" value=""/>
           <p>Esta seguro que desea eliminar el socio comercial <b><span id="partner_name"></span></b> ?</p>
+          <p>Al eliminar el socio comercial, se eliminarán todas las operaciones asociadas al él.</p>
       </div>
       <div class="modal-footer">
         <button type="button" id="btn_close" class="btn btn-default" data-dismiss="modal">Cerrar</button>        

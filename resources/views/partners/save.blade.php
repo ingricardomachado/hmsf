@@ -42,20 +42,12 @@
                     <span id="error-msg" style="color:#cc5965;font-weight:bold"></span>
                 </div>
                 <div class="form-group col-sm-6">
-                    <label>Teléfono</label>
-                    {!! Form::text('phone', $partner->phone, ['id'=>'phone', 'class'=>'form-control', 'type'=>'text', 'placeholder'=>'', 'maxlength'=>'30']) !!}
+                    <label>Comisión % *</label>
+                    <input type="number" name="tax" id="tax" value="{{ $partner->tax }}" class="form-control" min="1" max=100 step="0.01" placeholder="" required/>
                 </div>
                 <div class="form-group col-sm-6">  
                   <label>Estado *</label>
                   {{ Form::select('state', $states, ($partner->id)?$partner->state_id:null, ['id'=>'state', 'class'=>'select2 form-control form-control-sm', 'tabindex'=>'-1', 'placeholder'=>'', 'required'])}}
-                </div>
-                <div class="form-group col-sm-8">
-                    <label>Dirección</label>
-                    {!! Form::text('address', $partner->address, ['id'=>'address', 'class'=>'form-control', 'type'=>'text', 'placeholder'=>'', 'maxlength'=>'100']) !!}
-                </div>
-                <div class="form-group col-sm-4">
-                    <label>Comisión % *</label>
-                    <input type="number" name="tax" id="tax" value="{{ $partner->tax }}" class="form-control" min="1" max=100 step="0.01" placeholder="" required/>
                 </div>
                 <div class="form-group col-sm-12" style="display:{{ ($partner->id)?'solid':'none' }}">
                     <div class="i-checks">

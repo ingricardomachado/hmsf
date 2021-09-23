@@ -18,7 +18,7 @@
 @section('content')
 <div class="wrapper wrapper-content">
 	<div class="row">
-        <div class="col-lg-3">
+        <div class="col-lg-4">
             <div class="widget style1 style1 lazur-bg">
                 <div class="row">
                     <div class="col-xs-4">
@@ -31,7 +31,7 @@
                 </div>
             </div>
         </div>        
-        <div class="col-lg-3">
+        <div class="col-lg-4">
             <div class="widget style1 yellow-bg">
                 <div class="row">
                     <div class="col-xs-4">
@@ -44,7 +44,7 @@
                 </div>
             </div>
         </div>
-        <div class="col-lg-3">
+        <div class="col-lg-4">
             <div class="widget style1 navy-bg">
                 <div class="row">
                     <div class="col-xs-4">
@@ -53,19 +53,6 @@
                     <div class="col-xs-8 text-right">
                         <span> Tot Facturado Mes</span>
                         <h3 class="font-bold">{{ session('coin') }}{{ money_fmt($tot_incomes_month) }}</h3>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="col-lg-3">
-            <div class="widget style1 red-bg">
-                <div class="row">
-                    <div class="col-xs-4">
-                        <i class="fa fa-money fa-4x"></i>
-                    </div>
-                    <div class="col-xs-8 text-right">
-                        <span> Tot Egresos Mes</span>
-                        <h3 class="font-bold">{{ session('coin') }}{{ money_fmt($tot_expenses_month) }}</h3>
                     </div>
                 </div>
             </div>
@@ -141,11 +128,11 @@
                         </div>
                     </div>
                     <div class="m-t-md">
-                        <small>
-                            <i class="fa fa-circle text-warning" aria-hidden="true"></i> Margen Total <i class="fa fa-circle text-navy" aria-hidden="true"></i>  Margen SC <i class="fa fa-circle text-danger" aria-hidden="true"></i> Margen HM
-                        </small>
                         <small class="pull-right">
                             <i class="fa fa-clock-o"></i> Actualizado al {{ $today->format('d.m.Y') }}
+                        </small>
+                        <small>
+                            <strong>Margenes mensuales {{ Session::get('coin') }}</strong>.
                         </small>
                     </div>
                 </div>
@@ -170,9 +157,6 @@
                         </div>
                     </div>
                     <div class="m-t-md">
-                        <small>
-                            <i class="fa fa-circle text-warning" aria-hidden="true"></i> Margen Total <i class="fa fa-circle text-navy" aria-hidden="true"></i>  Margen SC <i class="fa fa-circle text-danger" aria-hidden="true"></i> Margen HM
-                        </small>
                         <small class="pull-right">
                             <i class="fa fa-clock-o"></i> Actualizado al {{ $today->format('d.m.Y') }}
                         </small>
@@ -220,6 +204,7 @@ function money_fmt(num){
   return num_fmt;        
 }
 
+
 $(document).ready(function() {
     
     //Grafica MES
@@ -241,7 +226,7 @@ $(document).ready(function() {
 
     var lineOptionsIncomesMonth = {
         scaleLabel:"<%= money_fmt(value) %>",
-        tooltipTemplate: "<%= money_fmt(value) %>",
+        tooltipTemplate: "<%= money_fmt(value) %>",        
         scaleShowGridLines: true,
         scaleGridLineColor: "rgba(0,0,0,.05)",
         scaleGridLineWidth: 1,
@@ -279,7 +264,7 @@ $(document).ready(function() {
     };
 
     var lineOptionsIncomesYear = {
-        scaleLabel:"<%= money_fmt(value) %>",
+        scaleLabel:"<%= money_fmt(value) %>",        
         tooltipTemplate: "<%= money_fmt(value) %>",        
         scaleShowGridLines: true,
         scaleGridLineColor: "rgba(0,0,0,.05)",
@@ -305,16 +290,6 @@ $(document).ready(function() {
         labels: {!! $labels_days !!},
         datasets: [
             {
-                label: "Margen Total",
-                fillColor: "rgba(248,172, 89,0.5)",
-                strokeColor: "rgba(248,172,89,1)",
-                pointColor: "rgba(248,172,89,1)",
-                pointStrokeColor: "#fff",
-                pointHighlightFill: "#fff",
-                pointHighlightStroke: "rgba(248,172,89,1)",
-                data: {!! $array_margin_total_month !!}
-            },
-            {
                 label: "Margen SC",
                 fillColor: "rgba(26,179,148,0.5)",
                 strokeColor: "rgba(26,179,148,1)",
@@ -323,23 +298,13 @@ $(document).ready(function() {
                 pointHighlightFill: "#fff",
                 pointHighlightStroke: "rgba(26,179,148,1)",
                 data: {!! $array_margin_sc_month !!}
-            },
-            {
-                label: "Margen HM",
-                fillColor: "rgba(237,85,101,0.5)",
-                strokeColor: "rgba(237,85,101,1)",
-                pointColor: "rgba(237,85,101,1)",
-                pointStrokeColor: "#fff",
-                pointHighlightFill: "#fff",
-                pointHighlightStroke: "rgba(237,85,101,1)",
-                data: {!! $array_margin_hm_month !!}
             }
         ]
     };
 
     var lineOptionsMarginsMonth = {
-        scaleLabel:"<%= money_fmt(value) %>",
-        multiTooltipTemplate: "<%= money_fmt(value) %>",
+        scaleLabel:"<%= money_fmt(value) %>",        
+        tooltipTemplate: "<%= money_fmt(value) %>",        
         scaleShowGridLines: true,
         scaleGridLineColor: "rgba(0,0,0,.05)",
         scaleGridLineWidth: 1,
@@ -365,16 +330,6 @@ $(document).ready(function() {
         labels: {!! $labels_months !!},
         datasets: [
             {
-                label: "Margen Total",
-                fillColor: "rgba(248,172, 89,0.5)",
-                strokeColor: "rgba(248,172,89,1)",
-                pointColor: "rgba(248,172,89,1)",
-                pointStrokeColor: "#fff",
-                pointHighlightFill: "#fff",
-                pointHighlightStroke: "rgba(248,172,89,1)",
-                data: {!! $array_margin_total_year !!},
-            },
-            {
                 label: "Margen SC",
                 fillColor: "rgba(26,179,148,0.5)",
                 strokeColor: "rgba(26,179,148,1)",
@@ -383,23 +338,13 @@ $(document).ready(function() {
                 pointHighlightFill: "#fff",
                 pointHighlightStroke: "rgba(26,179,148,1)",
                 data: {!! $array_margin_sc_year !!}
-            },
-            {
-                label: "Margen HM",
-                fillColor: "rgba(237,85,101,0.5)",
-                strokeColor: "rgba(237,85,101,1)",
-                pointColor: "rgba(237,85,101,1)",
-                pointStrokeColor: "#fff",
-                pointHighlightFill: "#fff",
-                pointHighlightStroke: "rgba(237,85,101,1)",
-                data: {!! $array_margin_hm_year !!}
             }
         ]
     };
 
     var lineOptionsMarginsYear = {
-        scaleLabel:"<%= money_fmt(value) %>",
-        multiTooltipTemplate: "<%= money_fmt(value) %>",
+        scaleLabel:"<%= money_fmt(value) %>",        
+        tooltipTemplate: "<%= money_fmt(value) %>",        
         scaleShowGridLines: true,
         scaleGridLineColor: "rgba(0,0,0,.05)",
         scaleGridLineWidth: 1,

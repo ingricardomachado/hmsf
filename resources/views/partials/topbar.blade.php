@@ -19,6 +19,6 @@
                         @csrf
                     </form>
                 </li>
-            </ul>
+            </ul>            
     </nav>
 </div>

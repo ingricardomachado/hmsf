@@ -146,8 +146,6 @@ class CustomerController extends Controller
             $customer->full_name=$customer->first_name.' '.$customer->last_name;
             $customer->email=$request->email;
             $customer->cell=$request->cell;
-            $customer->phone=$request->phone;
-            $customer->address=$request->address;
             $customer->tax=$request->tax;
             $customer->contract=($request->has_contract)?$request->contract:null;
             $customer->save();
@@ -208,8 +206,6 @@ class CustomerController extends Controller
             $customer->full_name=$customer->first_name.' '.$customer->last_name;
             $customer->email=$request->email;
             $customer->cell=$request->cell;
-            $customer->phone=$request->phone;
-            $customer->address=$request->address;
             $customer->tax=$request->tax;
             $customer->contract=($request->has_contract)?$request->contract:null;
             $customer->save();
