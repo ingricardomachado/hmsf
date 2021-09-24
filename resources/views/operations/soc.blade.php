@@ -84,6 +84,12 @@
                   </tr>
                 </thead>
                 <tfoot>
+                  <tr>
+                    <th colspan="5"></th>
+                    <th></th>
+                    <th></th>
+                    <th></th>
+                  </tr>
                 </tfoot>
               </table>
               <br><br><br><br>
@@ -161,8 +167,21 @@
 <script src="{{ URL::asset('js/plugins/select2/dist/js/i18n/es.js') }}"></script>
 <!-- Datatables -->
 <script src="{{ asset('js/plugins/dataTables/datatables.min.js') }}"></script>
+<!-- JQuery number-format -->
+<script src="{{ URL::asset('js/plugins/jquery-number-format/jquery.number.min.js') }}"></script>
 <script>
   
+function money_fmt(num){        
+  if('{{ session('money_format') }}' == 'PC'){
+      num_fmt = $.number(num, 0, ',', '.');        
+  }else if('{{ session('money_format') }}' == 'PC2'){
+      num_fmt = $.number(num, 2, ',', '.');          
+  }else if('{{ session('money_format') }}' == 'CP2'){
+      num_fmt = $.number(num, 2, '.', ',');
+  }
+  return num_fmt;        
+}
+
 function showModalComments(id){
   url = '{{URL::to("operations.load_comments")}}/'+id;
   $('#modal_comments').load(url);  
@@ -276,6 +295,7 @@ $('#btn_print').click(function(event) {
 
 $(document).ready(function(){
                       
+    var coin = '{{ session('coin') }}';    
     path_str_language = "{{URL::asset('js/plugins/dataTables/es_ES.txt')}}";          
     var table=$('#operations-table').DataTable({
         "oLanguage":{"sUrl":path_str_language},
@@ -305,16 +325,29 @@ $(document).ready(function(){
             { data: 'partner_profit',   name: 'partner_tax', orderable: false, searchable: false},
             { data: 'status',   name: 'status', orderable: false, searchable: false}
         ],
-        "fnDrawCallback": function () {
-            $('.popup-link').magnificPopup({
-              type: 'image',
-              closeOnContentClick: true,
-              closeBtnInside: false,
-              fixedContentPos: true,
-              mainClass: 'my-custom-class'
-            });
-        }
-    });
+        createdRow: function (row, data, dataIndex) {
+          (data.amount !== undefined)?$(row).find('td:eq(5)').html('<div class="text-right">'+coin+money_fmt(data.amount)):'';
+          (data.partner_profit !== undefined)?$(row).find('td:eq(6)').html('<div class="text-right">'+coin+money_fmt(data.partner_profit)+'<br>('+data.partner_tax+'%)</div>'):'';
+        },
+        footerCallback: function ( row, data, start, end, display ) {
+            var api = this.api(); 
+            var col5 = api
+                .column(5)
+                .data()
+                .reduce( function (a, b) {
+                    return parseFloat(a) + parseFloat(b);
+                }, 0 );            
+            var col6 = api
+                .column(6)
+                .data()
+                .reduce( function (a, b) {
+                    return parseFloat(a) + parseFloat(b);
+                }, 0 );            
+            $( api.column( 0 ).footer() ).html('<div class="text-right">TOTALES</div>');
+            $( api.column( 5 ).footer() ).html('<div class="text-right">'+coin+money_fmt(col5)+'</div>');
+            $( api.column( 6 ).footer() ).html('<div class="text-right">'+coin+money_fmt(col6)+'</div>');
+        },    
+      });
 
     $('#start_filter').datepicker({
         format: 'dd/mm/yyyy',

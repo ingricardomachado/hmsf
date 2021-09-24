@@ -144,6 +144,21 @@ class OperationController extends Controller
             ->editColumn('date', function ($operation) {                    
                     return $operation->date->format('d/m/Y');
                 })
+            ->editColumn('amount', function ($operation) {                    
+                    return '<div class="text-right">'.session('coin').money_fmt($operation->amount).'</div>';
+                })
+            ->editColumn('customer_profit', function ($operation) {                    
+                    return '<div class="text-right">'.session('coin').money_fmt($operation->customer_profit).'<br>('.$operation->customer_tax.'%)</div>';
+                })
+            ->editColumn('partner_profit', function ($operation) {                    
+                    return '<div class="text-right">'.session('coin').money_fmt($operation->partner_profit).'<br>('.$operation->partner_tax.'%)</div>';
+                })
+            ->editColumn('hm_profit', function ($operation) {                    
+                    return '<div class="text-right">'.session('coin').money_fmt($operation->hm_profit).'<br>('.$operation->hm_tax.'%)</div>';
+                })
+            ->editColumn('return_amount', function ($operation) {                    
+                    return '<div class="text-right">'.session('coin').money_fmt($operation->return_amount).'</div>';
+                })
             ->editColumn('status', function ($operation) {                    
                     if($operation->status==1 && (Auth::user()->role=='ADM' || Auth::user()->role=='MEN')){
                         return '<a href="#" onclick="showModalStatus('.$operation->id.')">'.$operation->status_label.'</a>';

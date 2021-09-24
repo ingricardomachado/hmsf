@@ -100,6 +100,14 @@
                   </tr>
                 </thead>
                 <tfoot>
+                  <tr>
+                    <th colspan="7"></th>
+                    <th></th>
+                    <th></th>
+                    <th></th>
+                    <th></th>
+                    <th></th>
+                  </tr>
                 </tfoot>
               </table>
               <br><br><br><br>
@@ -177,8 +185,21 @@
 <script src="{{ URL::asset('js/plugins/select2/dist/js/i18n/es.js') }}"></script>
 <!-- Datatables -->
 <script src="{{ asset('js/plugins/dataTables/datatables.min.js') }}"></script>
+<!-- JQuery number-format -->
+<script src="{{ URL::asset('js/plugins/jquery-number-format/jquery.number.min.js') }}"></script>
 <script>
   
+function money_fmt(num){        
+  if('{{ session('money_format') }}' == 'PC'){
+      num_fmt = $.number(num, 0, ',', '.');        
+  }else if('{{ session('money_format') }}' == 'PC2'){
+      num_fmt = $.number(num, 2, ',', '.');          
+  }else if('{{ session('money_format') }}' == 'CP2'){
+      num_fmt = $.number(num, 2, '.', ',');
+  }
+  return num_fmt;        
+}
+
 function showModalComments(id){
   url = '{{URL::to("operations.load_comments")}}/'+id;
   $('#modal_comments').load(url);  
@@ -292,6 +313,7 @@ $('#btn_print').click(function(event) {
 
 $(document).ready(function(){
                       
+    var coin = '{{ session('coin') }}';
     path_str_language = "{{URL::asset('js/plugins/dataTables/es_ES.txt')}}";          
     var table=$('#operations-table').DataTable({
         "oLanguage":{"sUrl":path_str_language},
@@ -325,15 +347,45 @@ $(document).ready(function(){
             { data: 'hm_profit',   name: 'hm_tax', orderable: false, searchable: false},
             { data: 'status',   name: 'status', orderable: false, searchable: false}
         ],
-        "fnDrawCallback": function () {
-            $('.popup-link').magnificPopup({
-              type: 'image',
-              closeOnContentClick: true,
-              closeBtnInside: false,
-              fixedContentPos: true,
-              mainClass: 'my-custom-class'
-            });
-        }
+        createdRow: function (row, data, dataIndex) {
+          (data.amount !== undefined)?$(row).find('td:eq(7)').html('<div class="text-right">'+coin+money_fmt(data.amount)):'';
+          (data.customer_profit !== undefined)?$(row).find('td:eq(8)').html('<div class="text-right">'+coin+money_fmt(data.customer_profit)+'<br>('+data.customer_tax+'%)</div>'):'';
+          (data.partner_profit !== undefined)?$(row).find('td:eq(9)').html('<div class="text-right">'+coin+money_fmt(data.partner_profit)+'<br>('+data.partner_tax+'%)</div>'):'';
+          (data.hm_profit !== undefined)?$(row).find('td:eq(10)').html('<div class="text-right">'+coin+money_fmt(data.hm_profit)+'<br>('+data.hm_tax+'%)</div>'):'';
+        },
+        footerCallback: function ( row, data, start, end, display ) {
+            var api = this.api(); 
+            var col7 = api
+                .column(7)
+                .data()
+                .reduce( function (a, b) {
+                    return parseFloat(a) + parseFloat(b);
+                }, 0 );            
+            var col8 = api
+                .column(8)
+                .data()
+                .reduce( function (a, b) {
+                    return parseFloat(a) + parseFloat(b);
+                }, 0 );            
+            var col9 = api
+                .column(9)
+                .data()
+                .reduce( function (a, b) {
+                    return parseFloat(a) + parseFloat(b);
+                }, 0 );            
+            var col10 = api
+                .column(10)
+                .data()
+                .reduce( function (a, b) {
+                    return parseFloat(a) + parseFloat(b);
+                }, 0 );            
+
+            $( api.column( 0 ).footer() ).html('<div class="text-right">TOTALES</div>');
+            $( api.column( 7 ).footer() ).html('<div class="text-right">'+coin+money_fmt(col7)+'</div>');
+            $( api.column( 8 ).footer() ).html('<div class="text-right">'+coin+money_fmt(col8)+'</div>');
+            $( api.column( 9 ).footer() ).html('<div class="text-right">'+coin+money_fmt(col9)+'</div>');
+            $( api.column( 10 ).footer() ).html('<div class="text-right">'+coin+money_fmt(col10)+'</div>');
+        },
     });
 
     $('#start_filter').datepicker({

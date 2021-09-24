@@ -258,6 +258,7 @@ $('#btn_print').click(function(event) {
 
 $(document).ready(function(){
                       
+    var coin = '{{ session('coin') }}';
     path_str_language = "{{URL::asset('js/plugins/dataTables/es_ES.txt')}}";          
     var table=$('#expenses-table').DataTable({
         "oLanguage":{"sUrl":path_str_language},
@@ -284,6 +285,9 @@ $(document).ready(function(){
             { data: 'amount', name: 'amount', orderable: false, searchable: false },
             { data: 'file', name: 'file', orderable: false, searchable: false }
         ],
+        createdRow: function (row, data, dataIndex) {
+          (data.amount !== undefined)?$(row).find('td:eq(4)').html(coin+money_fmt(data.amount)):'';
+        },        
         footerCallback: function ( row, data, start, end, display ) {
             var api = this.api(), data; 
             var col4 = api
@@ -292,9 +296,8 @@ $(document).ready(function(){
                 .reduce( function (a, b) {
                     return parseFloat(a) + parseFloat(b);
                 }, 0 );            
-            // Update footer by showing the total with the reference of the column index 
             $( api.column( 0 ).footer() ).html('TOTAL');
-            $( api.column( 4 ).footer() ).html(money_fmt(col4));
+            $( api.column( 4 ).footer() ).html(coin+money_fmt(col4));
         },
         "fnDrawCallback": function () {
             $('.popup-link').magnificPopup({
