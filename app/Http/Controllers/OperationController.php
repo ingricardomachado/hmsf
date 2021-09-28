@@ -204,7 +204,7 @@ class OperationController extends Controller
             $operation->partner_id=$request->partner;
             $operation->date=Carbon::createFromFormat('d/m/Y', $request->date);
             $operation->company_id=$request->company;
-            $operation->user_id=$request->user;
+            $operation->user_id=($request->user)?$request->user:null;
             $operation->folio=$request->folio;
             $operation->amount=$request->amount;
             $operation->customer_tax=$request->customer_tax;
@@ -221,7 +221,7 @@ class OperationController extends Controller
 
             return response()->json([
                     'success' => true,
-                    'message' => 'Gasto registrado exitosamente',
+                    'message' => 'Operación registrada exitosamente',
                     'operation' => $operation->toArray()
                 ], 200);
             
@@ -248,7 +248,7 @@ class OperationController extends Controller
             $operation->partner_id=$request->partner;
             $operation->date=Carbon::createFromFormat('d/m/Y', $request->date);
             $operation->company_id=$request->company;
-            $operation->user_id=$request->user;
+            $operation->user_id=($request->user)?$request->user:null;
             $operation->folio=$request->folio;
             $operation->amount=$request->amount;
             $operation->customer_tax=$request->customer_tax;
@@ -262,7 +262,7 @@ class OperationController extends Controller
             
             return response()->json([
                     'success' => true,
-                    'message' => 'Operación actualizado exitosamente',
+                    'message' => 'Operación actualizada exitosamente',
                     'operation' => $operation->toArray()
                 ], 200);
             
@@ -293,7 +293,7 @@ class OperationController extends Controller
                         
             return response()->json([
                 'success' => true,
-                'message' => 'Gasto eliminado exitosamente'
+                'message' => 'Operación eliminada exitosamente'
             ], 200);
 
         } catch (Exception $e) {

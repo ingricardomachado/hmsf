@@ -51,8 +51,8 @@
                         <i class="fa fa-money fa-4x"></i>
                     </div>
                     <div class="col-xs-8 text-right">
-                        <span> Tot Facturado Mes</span>
-                        <h3 class="font-bold">{{ session('coin') }}{{ money_fmt($tot_incomes_month) }}</h3>
+                        <span> Tot Margen Mes</span>
+                        <h3 class="font-bold">{{ session('coin') }}{{ money_fmt($tot_margin_sc_month) }}</h3>
                     </div>
                 </div>
             </div>
@@ -117,7 +117,7 @@
             <div class="ibox float-e-margins">
                 <div class="ibox-content">
                     <div>
-                        <span class="pull-right text-right"></span>
+                        <span class="pull-right text-right">Total Margenes Año: <b>{{ money_fmt($tot_margin_sc_year) }}</b></span>
                         <h3 class="font-bold no-margins"> Margenes {{ $today->year }}</h3>
                     </div>
                     <div class="m-t-sm">
@@ -146,7 +146,7 @@
             <div class="ibox float-e-margins">
                 <div class="ibox-content">
                     <div>
-                        <span class="pull-right text-right"></span>
+                        <span class="pull-right text-right">Total Margenes Mes: <b>{{ money_fmt($tot_margin_sc_month) }}</b></span>
                         <h3 class="font-bold no-margins"> Margenes {{ month_letter($today->month, 'lg') }}</h3>
                     </div>
                     <div class="m-t-sm">

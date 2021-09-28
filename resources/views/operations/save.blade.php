@@ -59,14 +59,16 @@
                     <span class="text-muted" id="hm_profit"></span>
                 </div>
                 <div class="form-group col-sm-12">  
-                  <label>Mensajero *</label>
-                  {{ Form::select('user', $users, $operation->user_id, ['id'=>'user', 'class'=>'select2 form-control', 'tabindex'=>'-1', 'placeholder'=>'', 'required'])}}
+                  <label>Mensajero</label>
+                  {{ Form::select('user', $users, $operation->user_id, ['id'=>'user', 'class'=>'select2 form-control', 'tabindex'=>'-1', 'placeholder'=>''])}}
                 </div>
-                <div class="form-group col-sm-12" id="div_notification" style="display:{{ ($operation->id)?'none':'solid' }}">
-                    <div class="i-checks">
-                        <label>{!! Form::checkbox('notification', null,  false, ['id'=>'notification']) !!} <span id="label_notification">Notificar al mensajero</label>
+                @if(!$operation->id)
+                    <div class="form-group col-sm-12" id="div_notification" style="display:none">
+                        <div class="i-checks">
+                            <label>{!! Form::checkbox('notification', null,  false, ['id'=>'notification']) !!} <span id="label_notification">Notificar al mensajero</label>
+                        </div>
                     </div>
-                </div>
+                @endif
             </div>
         </div>
         <div class="modal-footer">
@@ -148,6 +150,14 @@ function calculate_profits(){
     $('#hm_profit').html("Margen "+money_fmt(hm_profit)+coin);
 }
 
+$('#user').on('select2:select', function (e) {
+  $('#div_notification').show();
+});
+
+$('#user').on('select2:unselect', function (e) {
+  $('#div_notification').hide();
+});
+
 $(document).ready(function() {
     
     // iCheck
@@ -193,7 +203,7 @@ $(document).ready(function() {
         language: "es",
         placeholder: "Seleccione",
         minimumResultsForSearch: 10,
-        allowClear: false,
+        allowClear: true,
         dropdownParent: $('#modalOperation .modal-content'),
         width: '100%'
     });

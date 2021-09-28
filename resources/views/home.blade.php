@@ -130,7 +130,10 @@
             <div class="ibox float-e-margins">
                 <div class="ibox-content">
                     <div>
-                        <span class="pull-right text-right"></span>
+                        <span class="pull-right text-right">Totales Año:
+                            <i class="fa fa-circle text-warning" aria-hidden="true"></i> {{ money_fmt($tot_margin_total_year) }} <i class="fa fa-circle text-navy" aria-hidden="true"></i>  {{ money_fmt($tot_margin_sc_year) }} 
+                            <i class="fa fa-circle text-danger" aria-hidden="true"></i> {{ money_fmt($tot_margin_hm_year) }}
+                        </span>
                         <h3 class="font-bold no-margins"> Margenes {{ $today->year }}</h3>
                     </div>
                     <div class="m-t-sm">
@@ -142,7 +145,8 @@
                     </div>
                     <div class="m-t-md">
                         <small>
-                            <i class="fa fa-circle text-warning" aria-hidden="true"></i> Margen Total <i class="fa fa-circle text-navy" aria-hidden="true"></i>  Margen SC <i class="fa fa-circle text-danger" aria-hidden="true"></i> Margen HM
+                            <i class="fa fa-circle text-warning" aria-hidden="true"></i> Margen Total <i class="fa fa-circle text-navy" aria-hidden="true"></i>  Margen SC 
+                            <i class="fa fa-circle text-danger" aria-hidden="true"></i> Margen HM
                         </small>
                         <small class="pull-right">
                             <i class="fa fa-clock-o"></i> Actualizado al {{ $today->format('d.m.Y') }}
@@ -159,7 +163,10 @@
             <div class="ibox float-e-margins">
                 <div class="ibox-content">
                     <div>
-                        <span class="pull-right text-right"></span>
+                        <span class="pull-right text-right">Totales Mes:
+                            <i class="fa fa-circle text-warning" aria-hidden="true"></i> {{ money_fmt($tot_margin_total_month) }} <i class="fa fa-circle text-navy" aria-hidden="true"></i>  {{ money_fmt($tot_margin_sc_month) }} 
+                            <i class="fa fa-circle text-danger" aria-hidden="true"></i> {{ money_fmt($tot_margin_hm_month) }}
+                        </span>
                         <h3 class="font-bold no-margins"> Margenes {{ month_letter($today->month, 'lg') }}</h3>
                     </div>
                     <div class="m-t-sm">

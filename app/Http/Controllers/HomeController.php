@@ -50,6 +50,13 @@ class HomeController extends Controller
             $array_margin_sc_month = array_fill(0, $today->day, 0);
             $array_margin_hm_month = array_fill(0, $today->day, 0);
 
+            $tot_margin_total_year=0;
+            $tot_margin_total_month=0;
+            $tot_margin_sc_year=0;
+            $tot_margin_sc_month=0;
+            $tot_margin_hm_year=0;
+            $tot_margin_hm_month=0;
+
             $array_margin_total_year = array_fill(0, $today->month, 0);
             $array_margin_sc_year = array_fill(0, $today->month, 0);
             $array_margin_hm_year = array_fill(0, $today->month, 0);
@@ -120,8 +127,20 @@ class HomeController extends Controller
                             ->groupBy('mes')->get();
             
             foreach ($margins_year as $margin) {
+                $tot_margin_total_year+=$margin->customer_profit;
+                $tot_margin_sc_year+=$margin->partner_profit;
+                $tot_margin_hm_year+=$margin->hm_profit;
+
+                if($margin->mes==$today->month){
+                    $tot_margin_total_month=$margin->customer_profit;
+                    $tot_margin_sc_month=$margin->partner_profit;
+                    $tot_margin_hm_month=$margin->hm_profit;
+                }
+                
                 $array_margin_total_year[intval($margin->mes-1)]=round(floatval($margin->customer_profit), 2);
+                
                 $array_margin_sc_year[intval($margin->mes-1)]=round(floatval($margin->partner_profit), 2);
+                
                 $array_margin_hm_year[intval($margin->mes-1)]=round(floatval($margin->hm_profit), 2);
             }
             
@@ -133,6 +152,12 @@ class HomeController extends Controller
                         ->with('tot_expenses_month', 0)
                         ->with('labels_days', json_encode($labels_days))
                         ->with('labels_months', json_encode($labels_months))
+                        ->with('tot_margin_total_year', $tot_margin_total_year)
+                        ->with('tot_margin_total_month', $tot_margin_total_month)
+                        ->with('tot_margin_sc_year', $tot_margin_sc_year)
+                        ->with('tot_margin_sc_month', $tot_margin_sc_month)
+                        ->with('tot_margin_hm_year', $tot_margin_hm_year)
+                        ->with('tot_margin_hm_month', $tot_margin_hm_month)
                         ->with('array_incomes_month', json_encode($array_incomes_month))
                         ->with('array_incomes_year', json_encode($array_incomes_year))
                         ->with('array_margin_total_month', json_encode($array_margin_total_month))
@@ -193,11 +218,12 @@ class HomeController extends Controller
                             ->groupBy('dia')->get();
             
             foreach ($margins_month as $margin) {
-                $array_margin_total_month[intval($margin->dia-1)]=round(floatval($margin->customer_profit), 2);
                 $array_margin_sc_month[intval($margin->dia-1)]=round(floatval($margin->partner_profit), 2);
-                $array_margin_hm_month[intval($margin->dia-1)]=round(floatval($margin->hm_profit), 2);
             }
             
+            $tot_margin_sc_month=0;
+            $tot_margin_sc_year=0;
+
             $margins_year=Operation::
                             where('partner_id', $partner->id)
                             ->whereYear('date', '=', $today->year)
@@ -210,9 +236,9 @@ class HomeController extends Controller
                             ->groupBy('mes')->get();
             
             foreach ($margins_year as $margin) {
-                $array_margin_total_year[intval($margin->mes-1)]=round(floatval($margin->customer_profit), 2);
+                $tot_margin_sc_year+=$margin->partner_profit;
+                ($margin->mes==$today->month)?$tot_margin_sc_month=$margin->partner_profit:'';
                 $array_margin_sc_year[intval($margin->mes-1)]=round(floatval($margin->partner_profit), 2);
-                $array_margin_hm_year[intval($margin->mes-1)]=round(floatval($margin->hm_profit), 2);
             }
             
             return view('home_sc')->with('today', $today)
@@ -220,17 +246,14 @@ class HomeController extends Controller
                         ->with('tot_operations', $tot_operations)
                         ->with('tot_incomes_month', $tot_incomes_month)
                         ->with('tot_incomes_year', $tot_incomes_year)
+                        ->with('tot_margin_sc_month', $tot_margin_sc_month)
+                        ->with('tot_margin_sc_year', $tot_margin_sc_year)
                         ->with('labels_days', json_encode($labels_days))
-                        ->with('labels_months', json_encode($labels_months))
                         ->with('array_incomes_month', json_encode($array_incomes_month))
                         ->with('array_incomes_year', json_encode($array_incomes_year))
-                        ->with('array_margin_total_month', json_encode($array_margin_total_month))
+                        ->with('labels_months', json_encode($labels_months))
                         ->with('array_margin_sc_month', json_encode($array_margin_sc_month))
-                        ->with('array_margin_hm_month', json_encode($array_margin_hm_month))
-                        ->with('array_margin_total_year', json_encode($array_margin_total_year))
-                        ->with('array_margin_sc_year', json_encode($array_margin_sc_year))
-                        ->with('array_margin_hm_year', json_encode($array_margin_hm_year))
-                        ->with('array_expenses', json_encode($array_expenses));
+                        ->with('array_margin_sc_year', json_encode($array_margin_sc_year));
 
         
         }elseif(session('role')=='SUP'){
