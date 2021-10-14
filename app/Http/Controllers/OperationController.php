@@ -53,7 +53,7 @@ class OperationController extends Controller
         $start = new Carbon('first day of this month');
         $end = new Carbon('last day of this month');                
         
-        $customers=Customer::orderBy('full_name')->pluck('full_name','id');
+        $customers=Customer::orderBy('name')->pluck('name','id');
         $partners=Partner::join('users', 'partners.user_id', '=', 'users.id')
                         ->where('active',true)
                         ->orderBy('full_name')->pluck('full_name','partners.id');
@@ -132,9 +132,9 @@ class OperationController extends Controller
                         }
                     }else{
                         if($operation->customer->contract){
-                            return $operation->customer->full_name.'<br><span class="text-muted">'.$operation->customer->code.'</span><br>Contrato '.$operation->customer->contract;
+                            return $operation->customer->name.'<br><span class="text-muted">'.$operation->customer->code.'</span><br>Contrato '.$operation->customer->contract;
                         }else{
-                            return $operation->customer->full_name.'<br><span class="text-muted">'.$operation->customer->code.'</span>';                
+                            return $operation->customer->name.'<br><span class="text-muted">'.$operation->customer->code.'</span>';                
                         }
                     }
                 })
@@ -166,7 +166,7 @@ class OperationController extends Controller
     public function load($id)
     {
         $setting=Setting::first();
-        $customers=Customer::orderBy('full_name')->pluck('full_name','id');
+        $customers=Customer::orderBy('name')->pluck('name','id');
         $companies=Company::orderBy('name')->pluck('name','id');
         $users=User::where('role', 'MEN')->orderBy('full_name')->pluck('full_name','id');
         $partners=Partner::join('users', 'partners.user_id', '=', 'users.id')

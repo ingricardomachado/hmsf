@@ -30,11 +30,7 @@
                 </div>
                 <div class="form-group col-sm-6">
                     <label>Nombre *</label>
-                    {!! Form::text('first_name', $customer->first_name, ['id'=>'first_name', 'class'=>'form-control', 'type'=>'text', 'placeholder'=>'', 'maxlength'=>'50', 'required']) !!}
-                </div>
-                <div class="form-group col-sm-6">
-                    <label>Apellido *</label>
-                    {!! Form::text('last_name', $customer->last_name, ['id'=>'last_name', 'class'=>'form-control', 'type'=>'text', 'placeholder'=>'', 'maxlength'=>'50', 'required']) !!}
+                    {!! Form::text('name', $customer->name, ['id'=>'name', 'class'=>'form-control', 'type'=>'text', 'placeholder'=>'', 'maxlength'=>'100', 'required']) !!}
                 </div>
                 <div class="form-group col-sm-6">
                     <label>Correo *</label>

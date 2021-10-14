@@ -131,8 +131,10 @@
                 <div class="ibox-content">
                     <div>
                         <span class="pull-right text-right">Totales Año:
+                            <small>
                             <i class="fa fa-circle text-warning" aria-hidden="true"></i> {{ money_fmt($tot_margin_total_year) }} <i class="fa fa-circle text-navy" aria-hidden="true"></i>  {{ money_fmt($tot_margin_sc_year) }} 
                             <i class="fa fa-circle text-danger" aria-hidden="true"></i> {{ money_fmt($tot_margin_hm_year) }}
+                            </small>
                         </span>
                         <h3 class="font-bold no-margins"> Margenes {{ $today->year }}</h3>
                     </div>
@@ -164,8 +166,10 @@
                 <div class="ibox-content">
                     <div>
                         <span class="pull-right text-right">Totales Mes:
+                            <small>
                             <i class="fa fa-circle text-warning" aria-hidden="true"></i> {{ money_fmt($tot_margin_total_month) }} <i class="fa fa-circle text-navy" aria-hidden="true"></i>  {{ money_fmt($tot_margin_sc_month) }} 
                             <i class="fa fa-circle text-danger" aria-hidden="true"></i> {{ money_fmt($tot_margin_hm_month) }}
+                            </small>
                         </span>
                         <h3 class="font-bold no-margins"> Margenes {{ month_letter($today->month, 'lg') }}</h3>
                     </div>

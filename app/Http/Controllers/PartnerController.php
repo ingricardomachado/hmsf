@@ -26,6 +26,8 @@ use Mail;
 use App\Mail\SignedupPartner;
 use App\Mail\ChangePassword;
 use Storage;
+use Maatwebsite\Excel\Facades\Excel;
+
 
 class PartnerController extends Controller
 {
@@ -305,5 +307,4 @@ class PartnerController extends Controller
         return $pdf->stream('Socio Comercials.pdf');
 
     }
-
 }

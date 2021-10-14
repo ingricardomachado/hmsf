@@ -52,9 +52,9 @@ class CustomerController extends Controller
         $partner_filter=$request->partner_filter;
 
         if($partner_filter!=''){
-            $customers = Customer::where('partner_id', $partner_filter)->orderBy('full_name');
+            $customers = Customer::where('partner_id', $partner_filter)->orderBy('name');
         }else{
-            $customers = Customer::orderBy('full_name');
+            $customers = Customer::orderBy('name');
         }
 
         
@@ -73,7 +73,7 @@ class CustomerController extends Controller
                                 
                                 <li class="divider"></li>
                                 <li>
-                                    <a href="#" onclick="showModalDelete(`'.$customer->id.'`, `'.$customer->full_name.'`)"><i class="fa fa-trash-o"></i> Eliminiar</a>                                
+                                    <a href="#" onclick="showModalDelete(`'.$customer->id.'`, `'.$customer->name.'`)"><i class="fa fa-trash-o"></i> Eliminiar</a>                                
                                 </li>
                             </ul>
                         </div>';
@@ -89,7 +89,7 @@ class CustomerController extends Controller
                     }
                 })           
             ->editColumn('name', function ($customer) {                    
-                    return '<a href="#"  onclick="showModalCustomer('.$customer->id.')" class="modal-class" style="color:inherit"  title="Click para editar"><b>'.$customer->full_name.'</b><br><span class="text-muted">'.$customer->code.'</span><br><small><i>'.$customer->email.'</i></small></a>';
+                    return '<a href="#"  onclick="showModalCustomer('.$customer->id.')" class="modal-class" style="color:inherit"  title="Click para editar"><b>'.$customer->name.'</b><br><span class="text-muted">'.$customer->code.'</span><br><small><i>'.$customer->email.'</i></small></a>';
                 })
             ->addColumn('partner', function ($customer) {                    
                     return $customer->partner->user->full_name;
@@ -141,9 +141,7 @@ class CustomerController extends Controller
             $customer = new Customer();
             $customer->number=Customer::max('number')+1;
             $customer->partner_id=$request->partner;
-            $customer->first_name=$request->first_name;
-            $customer->last_name=$request->last_name;
-            $customer->full_name=$customer->first_name.' '.$customer->last_name;
+            $customer->name=$request->name;
             $customer->email=$request->email;
             $customer->cell=$request->cell;
             $customer->tax=$request->tax;
@@ -201,9 +199,7 @@ class CustomerController extends Controller
         try {
             $customer = Customer::findOrFail($id);
             $customer->partner_id=$request->partner;
-            $customer->first_name=$request->first_name;
-            $customer->last_name=$request->last_name;
-            $customer->full_name=$customer->first_name.' '.$customer->last_name;
+            $customer->name=$request->name;
             $customer->email=$request->email;
             $customer->cell=$request->cell;
             $customer->tax=$request->tax;
@@ -277,7 +273,7 @@ class CustomerController extends Controller
         $setting=Setting::first();
         $logo=($setting->logo)?'data:image/png;base64, '.base64_encode(Storage::get('settings/'.$setting->logo)):'';
 
-        $customers=Customer::orderBy('full_name')->get();
+        $customers=Customer::orderBy('name')->get();
 
         $data=[
             'company' => $setting->company,

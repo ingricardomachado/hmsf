@@ -45,6 +45,7 @@ Route::get('customers.load/{id}', 'CustomerController@load')->name('customers.lo
 Route::get('customers.status/{id}', 'CustomerController@status')->name('customers.status');
 Route::get('customers.rpt_customers', 'CustomerController@rpt_customers')->name('customers.rpt_customers');
 
+
 //Expenses
 Route::resource("expenses","ExpenseController");
 Route::post('expenses.datatable', 'ExpenseController@datatable')->name('expenses.datatable');
@@ -92,6 +93,7 @@ Route::get('partners.datatable', 'PartnerController@datatable')->name('partners.
 Route::get('partners.load/{id}', 'PartnerController@load')->name('partners.load');
 Route::get('partners.status/{id}', 'PartnerController@status')->name('partners.status');
 Route::get('partners.rpt_partners', 'PartnerController@rpt_partners')->name('partners.rpt_partners');
+Route::get('partners.upload_xls', 'PartnerController@upload_xls')->name('partners.upload_xls');
 
 //Profile
 Route::get('profile', ['as' => 'profile', 'uses' => 'ProfileController@edit']);
@@ -108,4 +110,9 @@ Route::get('users.load/{id}', 'UserController@load')->name('users.load');
 Route::get('users.status/{id}', 'UserController@status')->name('users.status');
 Route::get('users.rpt_users', 'UserController@rpt_users')->name('users.rpt_users');
 
+//Fix
+Route::get('upload_partners', 'FixController@upload_partners')->name('upload_partners');
+Route::get('upload_customers', 'FixController@upload_customers')->name('upload_customers');
+Route::get('upload_companies', 'FixController@upload_companies')->name('upload_companies');
+Route::get('upload_operations', 'FixController@upload_operations')->name('upload_operations');
 

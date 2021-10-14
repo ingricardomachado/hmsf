@@ -19,7 +19,7 @@
         @foreach($customers as $customer)                    
             <tr>
                 <td class="text-left">
-                    <b>{{ $customer->full_name }}</b><br>
+                    <b>{{ $customer->name }}</b><br>
                     {{ $customer->code }}<br>
                     <small>{{ $customer->email }}</small>
                 </td>

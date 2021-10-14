@@ -89,7 +89,7 @@
                     <th width="5%">Nro</th>
                     <th width="10%">Fecha</th>
                     <th width="15%">Socio</th>
-                    <th width="25%">Cliente</th>
+                    <th width="15%">Cliente</th>
                     <th width="15%">Mensajero</th>
                     <th width="5%">Folio</th>
                     <th width="10%" class="text-right">Facturado</th>

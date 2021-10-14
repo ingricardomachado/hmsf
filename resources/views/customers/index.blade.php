@@ -248,7 +248,7 @@ $(document).ready(function(){
         },        
         columns: [
             { data: 'action', name: 'action', orderable: false, searchable: false},
-            { data: 'name',   name: 'customers.full_name', orderable: false, searchable: true},
+            { data: 'name',   name: 'customers.name', orderable: false, searchable: true},
             { data: 'contract',   name: 'contract', orderable: false, searchable: false},
             { data: 'partner',   name: 'partner', orderable: false, searchable: false},
             { data: 'cell',   name: 'cell', orderable: false, searchable: false},
