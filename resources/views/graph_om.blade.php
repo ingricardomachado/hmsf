@@ -1,0 +1,84 @@
+<div class="ibox-content">
+    <div>
+        <span class="pull-right text-right">
+            <label>Mes</label> 
+            {{ Form::select('month_filter_om', ['01'=>'01','02'=>'02', '03'=>'03', '04'=>'04', '05'=>'05', '06'=>'06', '07'=>'07', '08'=>'08', '09'=>'09', '10'=>'10', '11'=>'11', '12'=>'12'], $month, ['id'=>'month_filter_om', 'class'=>'select2 form-control form-control-sm', 'tabindex'=>'-1', 'placeholder'=>'', 'required'])}}
+        </span>
+        <span class="pull-right text-right" style="margin-right: 3mm;">
+            Total Facturado Mes: <b>{{ money_fmt($tot_incomes_month) }}</b>
+        </span>
+        <h3 class="font-bold no-margins"> Facturación {{ month_letter($month, 'lg') }}</h3>
+    </div>
+    <div class="m-t-sm">
+        <div class="row">
+            <div class="col-md-12">
+                <div><canvas id="lineChartIncomesMonth" height="40"></canvas></div>
+            </div>
+        </div>
+    </div>
+    <div class="m-t-md">
+        <small class="pull-right">
+            <i class="fa fa-clock-o"></i> Actualizado al {{ $today->format('d.m.Y') }}
+        </small>
+        <small>
+            <strong>Facturación diaria {{ session('coin') }}</strong>.
+        </small>
+    </div>
+</div>
+<script>
+
+$("#month_filter_om").change( event => {
+    var month=$('#month_filter_om').val();
+    load_graph_om(month);
+});
+
+$(document).ready(function() {
+
+    $("#month_filter_om").select2({
+      language: "es",
+      placeholder: "Año",
+      minimumResultsForSearch: 10,
+      allowClear: false,
+      width: '100%'
+    });
+    
+    //Grafica MES
+    var lineDataIncomesMonth = {
+        labels: {!! $labels_days !!},
+        datasets: [
+            {
+                label: "Example dataset",
+                fillColor: "rgba(26,179,148,0.5)",
+                strokeColor: "rgba(26,179,148,0.7)",
+                pointColor: "rgba(26,179,148,1)",
+                pointStrokeColor: "#fff",
+                pointHighlightFill: "#fff",
+                pointHighlightStroke: "rgba(26,179,148,1)",
+                data: {!! $array_incomes_month !!}
+            }
+        ]
+    };
+
+    var lineOptionsIncomesMonth = {
+        scaleLabel:"<%= money_fmt(value) %>",
+        tooltipTemplate: "<%= money_fmt(value) %>",
+        scaleShowGridLines: true,
+        scaleGridLineColor: "rgba(0,0,0,.05)",
+        scaleGridLineWidth: 1,
+        bezierCurve: true,
+        bezierCurveTension: 0.4,
+        pointDot: true,
+        pointDotRadius: 4,
+        pointDotStrokeWidth: 1,
+        pointHitDetectionRadius: 20,
+        datasetStroke: true,
+        datasetStrokeWidth: 2,
+        datasetFill: false,
+        responsive: true,
+    };
+
+    var ctx_incomes_month = document.getElementById("lineChartIncomesMonth").getContext("2d");
+    var myNewChartIncomesMonth = new Chart(ctx_incomes_month).Line(lineDataIncomesMonth, lineOptionsIncomesMonth);
+
+});    
+</script>

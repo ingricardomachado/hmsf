@@ -37,8 +37,8 @@
                     {!! Form::email('email', ($partner->id)?$partner->user->email:null, ['id'=>'email', 'class'=>'form-control', 'placeholder'=>'', 'maxlength'=>'50', 'required']) !!}
                 </div>
                 <div class="form-group col-sm-6">
-                    <label>Celular *</label>
-                    {!! Form::tel('national_cell', $partner->cell, ['id'=>'national_cell', 'class'=>'form-control', 'placeholder'=>'', 'required']) !!}
+                    <label>Celular</label>
+                    {!! Form::tel('national_cell', $partner->cell, ['id'=>'national_cell', 'class'=>'form-control', 'placeholder'=>'']) !!}
                     <span id="error-msg" style="color:#cc5965;font-weight:bold"></span>
                 </div>
                 <div class="form-group col-sm-6">

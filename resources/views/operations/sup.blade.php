@@ -291,7 +291,7 @@ $(document).ready(function(){
     path_str_language = "{{URL::asset('js/plugins/dataTables/es_ES.txt')}}";          
     var table=$('#operations-table').DataTable({
         "oLanguage":{"sUrl":path_str_language},
-        "aaSorting": [[1, "asc"]],
+        "aaSorting": [[1, "desc"]],
         processing: true,
         serverSide: true,
         ajax: {

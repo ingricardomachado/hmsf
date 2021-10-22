@@ -33,12 +33,12 @@
                     {!! Form::text('name', $customer->name, ['id'=>'name', 'class'=>'form-control', 'type'=>'text', 'placeholder'=>'', 'maxlength'=>'100', 'required']) !!}
                 </div>
                 <div class="form-group col-sm-6">
-                    <label>Correo *</label>
-                    {!! Form::email('email', $customer->email, ['id'=>'email', 'class'=>'form-control', 'placeholder'=>'', 'maxlength'=>'50', 'required']) !!}
+                    <label>Correo</label>
+                    {!! Form::email('email', $customer->email, ['id'=>'email', 'class'=>'form-control', 'placeholder'=>'', 'maxlength'=>'50']) !!}
                 </div>
                 <div class="form-group col-sm-6">
-                    <label>Celular *</label>
-                    {!! Form::tel('national_cell', $customer->cell, ['id'=>'national_cell', 'class'=>'form-control', 'placeholder'=>'', 'required']) !!}
+                    <label>Celular</label>
+                    {!! Form::tel('national_cell', $customer->cell, ['id'=>'national_cell', 'class'=>'form-control', 'placeholder'=>'']) !!}
                     <span id="error-msg" style="color:#cc5965;font-weight:bold"></span>
                 </div>
                 <div class="form-group col-sm-6">
