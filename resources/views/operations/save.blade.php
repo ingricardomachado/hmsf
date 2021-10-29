@@ -55,7 +55,7 @@
                 </div>
                 <div class="form-group col-sm-4">
                     <label>Comisión HM % *</label>
-                    <input type="number" name="hm_tax" id="hm_tax" value="{{ ($operation->id)?$operation->hm_tax:$setting->tax }}" class="form-control" style="margin-bottom:2mm" min="0" max="100" step="0.01" placeholder="" required/>
+                    <input type="number" name="hm_tax" id="hm_tax" value="{{ ($operation->id)?$operation->hm_tax:'' }}" class="form-control" style="margin-bottom:2mm" min="0" max="100" step="0.01" placeholder="" required/>
                     <span class="text-muted" id="hm_profit"></span>
                 </div>
                 <div class="form-group col-sm-12">  
@@ -115,7 +115,9 @@ $("#partner").change( event => {
   if(event.target.value!=''){
       url=`{{URL::to('partners/')}}/${event.target.value}`;                    
       $.get(url, function(response){
-        $('#partner_tax').val(response.partner.tax);
+        partner_tax=parseFloat(response.partner.tax);
+        $('#partner_tax').val(partner_tax);
+        $('#hm_tax').val(100-partner_tax);
       });
       calculate_profits();
   }
