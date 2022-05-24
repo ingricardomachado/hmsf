@@ -19,8 +19,13 @@ use App\Models\PropertyType;
 Auth::routes();
 Route::get('/', 'HomeController@index')->name('home');
 Route::get('home', ['as' => 'home', 'uses' => 'HomeController@index']);
-Route::get('load_graph_om/{month}', ['as' => 'load_graph_om', 'uses' => 'HomeController@load_graph_om']);
-Route::get('load_graph_mm/{month}', ['as' => 'load_graph_mm', 'uses' => 'HomeController@load_graph_mm']);
+
+Route::get('load_graph_om/{year}/{month}', ['as' => 'load_graph_om', 'uses' => 'HomeController@load_graph_om']);
+Route::get('load_graph_mm/{year}/{month}', ['as' => 'load_graph_mm', 'uses' => 'HomeController@load_graph_mm']);
+Route::get('load_graph_oy/{year}', ['as' => 'load_graph_oy', 'uses' => 'HomeController@load_graph_oy']);
+Route::get('load_graph_my/{year}', ['as' => 'load_graph_my', 'uses' => 'HomeController@load_graph_my']);
+
+
 
 //Centers
 Route::resource("centers","CenterController");

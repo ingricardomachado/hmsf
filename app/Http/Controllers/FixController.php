@@ -48,9 +48,9 @@ class FixController extends Controller
    }
 
    public function upload_operations(Request $request){      
-        DB::statement('SET FOREIGN_KEY_CHECKS=0;');
-        Operation::truncate();
-        DB::statement('SET FOREIGN_KEY_CHECKS=1;');
+        //DB::statement('SET FOREIGN_KEY_CHECKS=0;');
+        //Operation::truncate();
+        //DB::statement('SET FOREIGN_KEY_CHECKS=1;');
         Excel::import(new OperationsImport(), storage_path().'/app/OPERACIONES.xlsx');
    }
 

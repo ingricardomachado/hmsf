@@ -43,7 +43,7 @@
                 </div>
                 <div class="form-group col-sm-6">
                     <label>Comisión % *</label>
-                    <input type="number" name="tax" id="tax" value="{{ $customer->tax }}" class="form-control" min="1" max=100 step="0.01" placeholder="" required/>
+                    <input type="number" name="tax" id="tax" value="{{ $customer->tax }}" class="form-control" min="0" max=100 step="0.01" placeholder="" required/>
                 </div>
                 <div class="form-group col-sm-6" style="margin-top:7mm">
                     <div class="i-checks">

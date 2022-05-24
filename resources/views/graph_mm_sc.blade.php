@@ -2,12 +2,16 @@
     <div>
         <span class="pull-right text-right">
             <label>Mes</label> 
-            {{ Form::select('month_filter_mm', ['01'=>'01','02'=>'02', '03'=>'03', '04'=>'04', '05'=>'05', '06'=>'06', '07'=>'07', '08'=>'08', '09'=>'09', '10'=>'10', '11'=>'11', '12'=>'12'], $month, ['id'=>'month_filter_mm', 'class'=>'select2 form-control form-control-sm', 'tabindex'=>'-1', 'placeholder'=>'', 'required'])}}
+            {{ Form::select('month_filter_mm', ['1'=>'01','2'=>'02', '3'=>'03', '4'=>'04', '5'=>'05', '6'=>'06', '7'=>'07', '8'=>'08', '9'=>'09', '10'=>'10', '11'=>'11', '12'=>'12'], $month, ['id'=>'month_filter_mm', 'class'=>'select2 form-control form-control-sm', 'tabindex'=>'-1', 'placeholder'=>'', 'required'])}}
+        </span>
+        <span class="pull-right text-right" style="margin-right:2mm">
+            <label>Año</label> 
+            {{ Form::select('year_filter_mm', $years, $year, ['id'=>'year_filter_mm', 'class'=>'select2 form-control form-control-sm', 'tabindex'=>'-1', 'placeholder'=>'', 'required'])}}
         </span>
         <span class="pull-right text-right">
             Total Margenes Mes: <b>{{ money_fmt($tot_margin_sc_month) }}</b>
         </span>
-        <h3 class="font-bold no-margins"> Margenes {{ month_letter($month, 'lg') }}</h3>
+        <h3 class="font-bold no-margins"> Margenes {{ month_letter($month, 'lg') }} {{ $year }}</h3>
     </div>
     <div class="m-t-sm">
         <div class="row">
@@ -24,13 +28,28 @@
 </div>
 <script>
     
-$("#month_filter_mm").change( event => {
+$("#year_filter_mm").change( event => {
+    var year=$('#year_filter_mm').val();
     var month=$('#month_filter_mm').val();
-    load_graph_mm(month);
+    load_graph_mm(year, month);
+});
+
+$("#month_filter_mm").change( event => {
+    var year=$('#year_filter_mm').val();
+    var month=$('#month_filter_mm').val();
+    load_graph_mm(year, month);
 });
 
 $(document).ready(function() {
 
+    $("#year_filter_mm").select2({
+      language: "es",
+      placeholder: "Año",
+      minimumResultsForSearch: 10,
+      allowClear: false,
+      width: '100%'
+    });
+    
     $("#month_filter_mm").select2({
       language: "es",
       placeholder: "Año",

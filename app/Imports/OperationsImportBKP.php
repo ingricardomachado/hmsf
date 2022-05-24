@@ -28,42 +28,35 @@ class OperationsImport implements ToCollection, WithHeadingRow
             $comision_cli=floatval(trim($row['comision_cli']))*100;
             $comision_sc=floatval(trim($row['comision_sc']))*100;
             $comision_hm=100-$comision_sc;
-            if($empresa!=''){
-                $operation = new Operation();
-                $operation->number=Operation::max('number')+1;
-                $operation->customer_id=$this->get_customer_id($cliente, $socio, $comision_cli);
-                $operation->partner_id=$this->get_partner_id($socio);
-                $operation->date=Carbon::createFromFormat('d/m/Y', $fecha);
-                $operation->company_id=$this->get_company_id($empresa);
-                $operation->folio=$folio;
-                $operation->amount=$facturado;
-                $operation->customer_tax=$comision_cli;
-                $operation->partner_tax=$comision_sc;
-                $operation->hm_tax=$comision_hm;
-                $operation->customer_profit=$operation->amount*($operation->customer_tax/100);
-                $operation->partner_profit=$operation->customer_profit*($operation->partner_tax/100);
-                $operation->hm_profit=$operation->customer_profit*($operation->hm_tax/100);
-                $operation->return_amount=$operation->amount-$operation->customer_profit;
-                $operation->status=1; //todas como finalizadas
-                $operation->save();                
-            }
+
+            $operation = new Operation();
+            $operation->number=Operation::max('number')+1;
+            $operation->customer_id=$this->get_customer_id($cliente);
+            $operation->partner_id=$this->get_partner_id($socio);
+            $operation->date=Carbon::createFromFormat('d/m/Y', $fecha);
+            $operation->company_id=$this->get_company_id($empresa);
+            $operation->folio=$folio;
+            $operation->amount=$facturado;
+            $operation->customer_tax=$comision_cli;
+            $operation->partner_tax=$comision_sc;
+            $operation->hm_tax=$comision_hm;
+            $operation->customer_profit=$operation->amount*($operation->customer_tax/100);
+            $operation->partner_profit=$operation->customer_profit*($operation->partner_tax/100);
+            $operation->hm_profit=$operation->customer_profit*($operation->hm_tax/100);
+            $operation->return_amount=$operation->amount-$operation->customer_profit;
+            $operation->status=3; //todas como finalizadas
+            $operation->save();
         }
         echo "Fin de importacion de operaciones";
     }
     
-    private function get_customer_id($cliente, $socio, $comision_cli)
+    private function get_customer_id($cliente)
     {
         if(Customer::where('name', $cliente)->exists()){
             $customer=Customer::where('name', $cliente)->first();
             return $customer->id;
         }else{
-            $customer = new Customer();
-            $customer->number=Customer::max('number')+1;
-            $customer->partner_id=$this->get_partner_id($socio);
-            $customer->name=$cliente;
-            $customer->tax=$comision_cli;
-            $customer->save();
-            return $customer->id;
+            return null;
         }
     }
 
@@ -84,10 +77,7 @@ class OperationsImport implements ToCollection, WithHeadingRow
             $company=Company::where('name', $empresa)->first();
             return $company->id;
         }else{
-            $company = new Company();
-            $company->name=$empresa;
-            $company->save();
-            return $company->id;
+            return null;
         }
     }
 
