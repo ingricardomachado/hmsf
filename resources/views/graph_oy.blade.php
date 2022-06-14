@@ -3,12 +3,14 @@
         <span class="pull-right text-right">Total Facturado Año: <b>{{ money_fmt($tot_incomes_year) }}</b></span>
         <h3 class="font-bold no-margins"> Facturación {{ $year }}</h3>
     </div>
-    <div class="col-sm-12">
-        <span class="pull-right text-right">
-            <label>Año</label> 
-            {{ Form::select('year_filter_oy', $years, $year, ['id'=>'year_filter_oy', 'class'=>'select2 form-control form-control-sm', 'tabindex'=>'-1', 'placeholder'=>'', 'required'])}}
-        </span>        
-    </div>
+    <div class="m-t-sm">
+        <div class="row">
+            <div class="col-md-4 col-xs-6 pull-right">
+                <label>Año</label> 
+                {{ Form::select('year_filter_oy', $years, $year, ['id'=>'year_filter_oy', 'class'=>'select2 form-control form-control-sm', 'tabindex'=>'-1', 'placeholder'=>'', 'required'])}}
+            </div>
+        </div>
+    </div>    
     <div class="m-t-sm">
         <div class="row">
             <div class="col-md-12">

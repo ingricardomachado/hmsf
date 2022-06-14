@@ -13,11 +13,13 @@
         </span>
         <h3 class="font-bold no-margins"> Margenes {{ $year }}</h3>
     </div>
-    <div class="col-sm-12">
-        <span class="pull-right text-right">
+    <div class="m-t-sm">
+        <div class="row">
+            <div class="col-md-4 col-xs-6 pull-right">
             <label>Año</label> 
             {{ Form::select('year_filter_my', $years, $year, ['id'=>'year_filter_my', 'class'=>'select2 form-control form-control-sm', 'tabindex'=>'-1', 'placeholder'=>'', 'required'])}}
-        </span>
+            </div>
+        </div>
     </div>
     <div class="m-t-sm">
         <div class="row">

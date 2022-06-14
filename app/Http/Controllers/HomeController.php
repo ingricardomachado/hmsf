@@ -85,6 +85,11 @@ class HomeController extends Controller
                             ->whereYear('date', '=', $last_day->year)
                             ->whereMonth('date', '=', $last_day->month)->sum('amount');
             
+            $tot_margin_sc_month=Operation::
+                            where('partner_id', $partner->id)
+                            ->whereYear('date', '=', $last_day->year)
+                            ->whereMonth('date', '=', $last_day->month)->sum('partner_profit');                            
+            
             $tot_customers=Customer::where('partner_id', $partner->id)->count();
             $tot_operations=Operation::where('partner_id', $partner->id)->count();            
             
@@ -94,7 +99,7 @@ class HomeController extends Controller
                         ->with('tot_operations', $tot_operations)
                         ->with('tot_incomes_month', $tot_incomes_month)
                         ->with('tot_incomes_year', 0)                        
-                        ->with('tot_margin_sc_month', 0)
+                        ->with('tot_margin_sc_month', $tot_margin_sc_month)
                         ->with('tot_margin_sc_year', 0);
 
         
